@@ -2,7 +2,6 @@ import { Box, Grid } from "@mui/material";
 import VendorDashboardLayout from "components/layouts/vendor-dashboard";
 import { GetStaticProps } from "next";
 import Card1 from "pages-sections/dashboard/Card1";
-import Section3 from "pages-sections/dashboard/Section3";
 import WishCard from "pages-sections/dashboard/WishCard";
 import { ReactElement } from "react";
 import api from "utils/api/dashboard";
