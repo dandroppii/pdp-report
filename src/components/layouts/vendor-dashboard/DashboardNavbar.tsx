@@ -1,5 +1,5 @@
 import { Search } from "@mui/icons-material";
-import { Box, Button, styled, Theme, useMediaQuery } from "@mui/material";
+import { Box, Button, styled, TextField, Theme, useMediaQuery } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import Container from "@mui/material/Container";
 import InputBase from "@mui/material/InputBase";
@@ -10,7 +10,8 @@ import Toggle from "components/icons/Toggle";
 import { useRouter } from "next/router";
 import { FC } from "react";
 import AccountPopover from "./popovers/AccountPopover";
-import NotificationsPopover from "./popovers/NoficationPopover";
+import { DatePicker } from '@mui/x-date-pickers-pro';
+
 
 // custom styled components
 const DashboardNavbarRoot = styled(AppBar)(({ theme }) => ({
@@ -78,22 +79,17 @@ const DashboardNavbar: FC<DashboardNavbarProps> = ({ handleDrawerToggle }) => {
             </ToggleWrapper>
           )}
 
-          <CustomButton
-            onClick={() => router.push("/")}
-            startIcon={<Globe sx={{ color: "grey.900" }} />}
-          >
-            Browse Website
-          </CustomButton>
-
           <Box flexGrow={1} />
-
+         
           <FlexBox alignItems="center" gap={2}>
-            <StyledInputBase
-              placeholder="Search anything..."
-              startAdornment={<Search sx={{ color: "grey.500", mr: 1 }} />}
-            />
-
-            <NotificationsPopover />
+          <DatePicker views={['year', 'month']}
+              minDate={new Date('2021-03-01')}
+              maxDate={new Date('2023-03-01')}
+              value={new Date('2023-03-01')}
+              onChange={() => {}}
+              renderInput={(params) => <TextField {...params}  helperText={null}
+               />}
+            ></DatePicker>
             <AccountPopover />
           </FlexBox>
         </StyledToolBar>

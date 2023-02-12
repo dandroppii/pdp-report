@@ -12,6 +12,10 @@ import "simplebar/dist/simplebar.min.css";
 import MuiTheme from "theme/MuiTheme";
 import OpenGraphTags from "utils/OpenGraphTags";
 import "../src/fake-db";
+import { LocalizationProvider } from '@mui/x-date-pickers-pro';
+import { AdapterDateFns } from '@mui/x-date-pickers-pro/AdapterDateFns';
+import 'date-fns/locale/vi';
+import vi from 'date-fns/locale/vi';
 
 type MyAppProps = AppProps & {
   Component: NextPage & {
@@ -25,6 +29,7 @@ Router.events.on("routeChangeComplete", () => nProgress.done());
 Router.events.on("routeChangeError", () => nProgress.done());
 // small change
 nProgress.configure({ showSpinner: false });
+// registerLocale('nl', nl);
 
 const App = ({ Component, pageProps }: MyAppProps) => {
   const AnyComponent = Component as any;
@@ -53,11 +58,13 @@ const App = ({ Component, pageProps }: MyAppProps) => {
       </Head>
 
       <SettingsProvider>
-        <AppProvider>
-          <MuiTheme>
-            <RTL>{getLayout(<AnyComponent {...pageProps} />)}</RTL>
-          </MuiTheme>
-        </AppProvider>
+        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
+          <AppProvider>
+            <MuiTheme>
+              <RTL>{getLayout(<AnyComponent {...pageProps} />)}</RTL>
+            </MuiTheme>
+          </AppProvider>
+        </LocalizationProvider>
       </SettingsProvider>
     </Fragment>
   );

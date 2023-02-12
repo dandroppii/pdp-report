@@ -1,7 +1,8 @@
 import { Box, Card } from "@mui/material";
-import { H3, H5, Paragraph } from "components/Typography";
+import { H3, H2, Paragraph } from "components/Typography";
 import NextImage from "next/image";
 import React from "react";
+import { formatCurrency } from "utils/currency";
 
 const WishCard = () => {
   return (
@@ -15,18 +16,18 @@ const WishCard = () => {
         justifyContent: "center",
       }}
     >
-      <H5 color="info.main" mb={0.5}>
-        Good Morning, Maruf!
-      </H5>
-      <Paragraph color="grey.600">
-        Here’s what happening with your store today!
+      <H2 color="info.main" mb={0.5}>
+        Xin chào KUCHEN
+      </H2>
+      <Paragraph mb={3} color="grey.600">
+         Đây là doanh thu tháng 3 năm 2023
       </Paragraph>
 
-      <H3 mt={3}>15,350.25</H3>
-      <Paragraph color="grey.600">Today’s Visit</Paragraph>
+      <Paragraph color="grey.600">Tổng doanh thu</Paragraph>
+      <H3 mb={3} color="info.main">{formatCurrency(2837700)}</H3>
 
-      <H3 mt={1.5}>$10,360.66</H3>
-      <Paragraph color="grey.600">Today’s total sales</Paragraph>
+      <Paragraph color="grey.600">Doanh thu sau VAT(8%)</Paragraph>
+      <H3 mb={1.5} color="info.main">{formatCurrency(2837700)}</H3>
 
       <Box
         sx={{

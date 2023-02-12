@@ -50,27 +50,7 @@ const Section3 = () => {
           </Card2>
         </Grid>
 
-        <Grid item xl={3} lg={3} md={6} xs={12}>
-          <Card2 title="Total Order" percentage="2.65%" amount="$12,260">
-            <ReactApexChart
-              type="area"
-              height={80}
-              series={totalOrderseries}
-              options={totalOrderChartOptions(theme)}
-            />
-          </Card2>
-        </Grid>
-
-        <Grid item xl={3} lg={3} md={6} xs={12}>
-          <Card2 title="Market Share" percentage="2.65%" amount="$12,260">
-            <ReactApexChart
-              height={130}
-              type="radialBar"
-              series={[44, 55, 67]}
-              options={marketShareChartOptions(theme)}
-            />
-          </Card2>
-        </Grid>
+       
       </Grid>
     </Box>
   );

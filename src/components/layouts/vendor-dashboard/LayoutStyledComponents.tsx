@@ -70,11 +70,11 @@ const ListIconWrapper = styled(Box)(({ theme }) => ({
   },
 }));
 
-const ExternalLink = styled("a")(() => ({
-  overflow: "hidden",
+const ExternalLink = styled("a")(({ theme }) => ({
   whiteSpace: "pre",
   marginBottom: "8px",
   textDecoration: "none",
+  color: theme.palette.info.main,
 }));
 
 const StyledText = styled(Span)<Compact>(({ compact }) => ({

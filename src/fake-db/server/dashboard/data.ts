@@ -1,7 +1,7 @@
 export const cardList = [
   {
     id: 1,
-    title: "Order",
+    title: "Số lượng tiếp cận thông tin công ty",
     amount1: "32,350",
     amount2: "$9,350",
     color: "info.main",
@@ -16,23 +16,7 @@ export const cardList = [
     percentage: "2.65%",
     status: "down",
   },
-  {
-    id: 3,
-    title: "Gross Sale",
-    amount1: "$12,460.25",
-    amount2: "$11,350",
-    color: "success.main",
-    percentage: "10.25%",
-  },
-  {
-    id: 4,
-    title: "Total Shipping Cost",
-    amount1: "$6,240",
-    amount2: "$4,350",
-    color: "error.main",
-    percentage: "13.15%",
-    status: "down",
-  },
+  
 ];
 
 export const recentPurchase = [

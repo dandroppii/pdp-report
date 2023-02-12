@@ -26,6 +26,7 @@ type TableHeaderProps = {
   hideSelectBtn?: boolean;
   onRequestSort: (id: string) => void;
   onSelectAllClick?: (checked: boolean, defaulSelect: string) => void;
+  hasSort?:  boolean;
 };
 // ----------------------------------------------------------------------
 
@@ -39,10 +40,11 @@ const TableHeader: FC<TableHeaderProps> = (props) => {
     onRequestSort,
     onSelectAllClick = () => {},
     hideSelectBtn = false,
+    hasSort = false
   } = props;
 
   return (
-    <TableHead sx={{ backgroundColor: "grey.200" }}>
+    <TableHead sx={{ backgroundColor: "grey.500" }}>
       <TableRow>
         {!hideSelectBtn && (
           <StyledTableCell align="left">
@@ -68,7 +70,7 @@ const TableHeader: FC<TableHeaderProps> = (props) => {
               direction={orderBy === headCell.id ? order : "asc"}
               sx={{ "& .MuiTableSortLabel-icon": { opacity: 1 } }}
               IconComponent={() => (
-                <UpDown sx={{ fontSize: 14, ml: 1, color: "grey.600" }} />
+                hasSort ? <UpDown sx={{ fontSize: 14, ml: 1, color: "grey.600" }} /> : <></>
               )}
             >
               {headCell.label}

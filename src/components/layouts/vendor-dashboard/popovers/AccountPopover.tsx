@@ -72,11 +72,6 @@ const AccountPopover = () => {
         </Box>
 
         <Divider />
-        <MenuItem>Profile</MenuItem>
-        <MenuItem>My Orders</MenuItem>
-        <MenuItem>Settings</MenuItem>
-
-        <Divider />
         <MenuItem>Logout</MenuItem>
       </Menu>
     </Box>

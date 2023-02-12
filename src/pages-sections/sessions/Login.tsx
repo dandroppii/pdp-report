@@ -2,12 +2,11 @@ import { Card, CardProps } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import BazaarButton from "components/BazaarButton";
 import BazaarTextField from "components/BazaarTextField";
-import { H3, Small } from "components/Typography";
+import { H1, Small } from "components/Typography";
 import { useFormik } from "formik";
 import React, { useCallback, useState } from "react";
 import * as yup from "yup";
 import EyeToggleButton from "./EyeToggleButton";
-import SocialButtons from "./SocialButtons";
 
 const fbStyle = { background: "#3B5998", color: "white" };
 const googleStyle = { background: "#4285F4", color: "white" };
@@ -53,20 +52,9 @@ const Login = () => {
   return (
     <Wrapper elevation={3} passwordVisibility={passwordVisibility}>
       <form onSubmit={handleSubmit}>
-        <H3 textAlign="center" mb={1}>
-          Welcome To Ecommerce
-        </H3>
-        <Small
-          mb={4.5}
-          display="block"
-          fontSize="12px"
-          fontWeight="600"
-          color="grey.800"
-          textAlign="center"
-        >
-          Log in with email & password
-        </Small>
-
+        <H1 textAlign="center" mb={4}>
+          Đăng nhập
+        </H1>
         <BazaarTextField
           mb={1.5}
           fullWidth
@@ -77,7 +65,7 @@ const Login = () => {
           onBlur={handleBlur}
           value={values.email}
           onChange={handleChange}
-          label="Email or Phone Number"
+          label="Tên đăng nhập"
           placeholder="exmple@mail.com"
           error={!!touched.email && !!errors.email}
           helperText={touched.email && errors.email}
@@ -88,7 +76,7 @@ const Login = () => {
           fullWidth
           size="small"
           name="password"
-          label="Password"
+          label="Mật khẩu"
           autoComplete="on"
           variant="outlined"
           onBlur={handleBlur}
@@ -119,7 +107,6 @@ const Login = () => {
         </BazaarButton>
       </form>
 
-      <SocialButtons redirect="/signup" redirectText="Sign Up" />
     </Wrapper>
   );
 };

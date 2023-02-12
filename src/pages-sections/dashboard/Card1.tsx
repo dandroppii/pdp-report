@@ -3,38 +3,34 @@ import { Card } from "@mui/material";
 import { FlexBetween, FlexBox } from "components/flex-box";
 import { H3, H6, Paragraph } from "components/Typography";
 import React, { FC } from "react";
+import { formatCurrency } from "utils/currency";
 
 // ========================================================
 type Card1Props = {
   color: string;
   title: string;
-  amount1: string | number;
-  amount2: string | number;
-  percentage: string | number;
+  traffic: number;
+  price: number;
   status?: "up" | "down";
 };
 // ========================================================
 
 const Card1: FC<Card1Props> = (props) => {
-  const { status, color, title, amount1, amount2, percentage } = props;
+  const { title, traffic, price } = props;
 
   return (
     <Card sx={{ p: 2 }}>
-      <H6 mb={1} color="grey.600">
-        {title}
-      </H6>
-      <H3 mb={0.3}>{amount1}</H3>
-
-      <FlexBetween>
-        <Paragraph fontWeight={500} color="grey.500">
-          {amount2}
-        </Paragraph>
-
-        <FlexBox alignItems="center" color={color}>
-          {status === "up" && <ArrowDropUp />}
-          {status === "down" && <ArrowDropDown />}
-          <Paragraph fontSize={12}>{percentage}</Paragraph>
-        </FlexBox>
+      <FlexBetween alignItems={"flex-end"} mb={2}>
+        <H6 color="grey.600">
+          {title}
+        </H6>
+        <H3 color="info.main">{traffic}</H3>
+      </FlexBetween>
+      <FlexBetween alignItems={"flex-end"}>
+        <H6 color="grey.600">
+          Doanh thu
+        </H6>
+        <H3 color="info.main">{formatCurrency(price * traffic)}</H3>
       </FlexBetween>
     </Card>
   );

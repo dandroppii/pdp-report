@@ -7,8 +7,8 @@ import React, { FC } from "react";
 // =========================================================
 type Card2Props = {
   title: string;
-  percentage: string;
-  amount: string | number;
+  percentage?: string;
+  amount?: string | number;
 };
 // =========================================================
 
@@ -16,29 +16,26 @@ const Card2: FC<Card2Props> = ({ children, title, amount, percentage }) => {
   return (
     <Card
       sx={{
-        p: 3,
+        p: 2,
         pr: 1,
-        gap: 2,
+        gap: 1,
         height: "100%",
         display: "flex",
-        alignItems: "flex-end",
-        justifyContent: "space-between",
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
       <Box flexShrink={0} height="inherit">
         <FlexBox
           flexDirection="column"
-          justifyContent="space-between"
+          justifyContent="center"
+          alignItems= "center"
           height="inherit"
+          gap={1}
         >
           <H6 color="grey.600">{title}</H6>
-
           <Box>
-            <H3>{amount}</H3>
-            <FlexBox mt={0.3} alignItems="center" color="info.main">
-              <ArrowDropUp />
-              <Paragraph fontSize={12}>{percentage}</Paragraph>
-            </FlexBox>
+            <H3 color="info.main">{amount}</H3>
           </Box>
         </FlexBox>
       </Box>
