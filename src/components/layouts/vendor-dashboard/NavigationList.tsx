@@ -4,7 +4,7 @@ export const navigations = [
   {
     name: "Tổng quan",
     icon: duotone.Dashboard,
-    path: "/dashboard",
+    path: "/",
   },
   {
     name: "Traffic công ty",
