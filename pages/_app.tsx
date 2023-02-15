@@ -16,6 +16,10 @@ import { LocalizationProvider } from '@mui/x-date-pickers-pro';
 import { AdapterDateFns } from '@mui/x-date-pickers-pro/AdapterDateFns';
 import 'date-fns/locale/vi';
 import vi from 'date-fns/locale/vi';
+import { AlertProvider } from "contexts/AlertContext";
+import { AuthContextProvider } from "contexts/AuthContext";
+import { NextIntlProvider } from "next-intl";
+import { STORAGE_LOCALE_KEY } from "constance/key-storage";
 
 type MyAppProps = AppProps & {
   Component: NextPage & {
@@ -30,6 +34,25 @@ Router.events.on("routeChangeError", () => nProgress.done());
 // small change
 nProgress.configure({ showSpinner: false });
 // registerLocale('nl', nl);
+const loadTranslations = async () => {
+  const defaultLocale = process.env.LOCALE === 'en' ? 'en-US' : 'vi-VN';
+  const localLocale =
+    typeof window !== 'undefined' ? window?.localStorage?.getItem(STORAGE_LOCALE_KEY) : '';
+  !localLocale &&
+    typeof window !== 'undefined' &&
+    window?.localStorage.setItem(STORAGE_LOCALE_KEY, defaultLocale);
+  const locale = localLocale || defaultLocale;
+  const settingLocale = locale === 'en' ? 'en-US' : 'vi-VN';
+  const messages = await import(`../translations/${settingLocale}/all.json`);
+  return messages;
+};
+
+const translationMessages = await loadTranslations();
+
+interface IntlPageProps {
+  messages: Record<string, string>;
+  now: number;
+}
 
 const App = ({ Component, pageProps }: MyAppProps) => {
   const AnyComponent = Component as any;
@@ -43,7 +66,36 @@ const App = ({ Component, pageProps }: MyAppProps) => {
     }
   }, []);
 
+  if(typeof window === 'undefined') return<></>
+
   return (
+    <NextIntlProvider
+      // To achieve consistent date, time and number formatting
+      // across the app, you can define a set of global formats.
+      formats={{
+        dateTime: {
+          short: {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+            weekday: 'short'
+          },
+        },
+      }}
+      // Messages can be received from individual pages or configured
+      // globally in this module (`App.getInitialProps`). Note that in
+      // the latter case the messages are available as a top-level prop
+      // and not nested within `pageProps`.
+      messages={translationMessages ?? {}}
+      // Providing an explicit value for `now` ensures consistent formatting of
+      // relative values regardless of the server or client environment.
+      now={new Date((pageProps as IntlPageProps)?.now)}
+      // Also an explicit time zone is helpful to ensure dates render the
+      // same way on the client as on the server, which might be located
+      // in a different time zone.
+      timeZone={Intl.DateTimeFormat().resolvedOptions().timeZone}
+      onError={() => {}}
+    >
     <Fragment>
       <Head>
         <meta charSet="utf-8" />
@@ -57,16 +109,21 @@ const App = ({ Component, pageProps }: MyAppProps) => {
         <OpenGraphTags />
       </Head>
 
-      <SettingsProvider>
-        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
-          <AppProvider>
-            <MuiTheme>
-              <RTL>{getLayout(<AnyComponent {...pageProps} />)}</RTL>
-            </MuiTheme>
-          </AppProvider>
-        </LocalizationProvider>
-      </SettingsProvider>
+      <MuiTheme>
+          <AlertProvider>
+            <AuthContextProvider>
+              <AppProvider>
+                <SettingsProvider>
+                <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
+                  <RTL>{getLayout(<AnyComponent {...pageProps} />)}</RTL>
+                </LocalizationProvider>
+              </SettingsProvider>
+            </AppProvider>
+          </AuthContextProvider>
+        </AlertProvider>
+      </MuiTheme>
     </Fragment>
+    </NextIntlProvider>
   );
 };
 

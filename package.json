@@ -10,7 +10,8 @@
     "start": "next start",
     "size": "node --max_old_space_size=4096",
     "fix:prettier": "prettier --write .",
-    "lint": "next lint"
+    "lint": "next lint",
+    "translate": "node ./scripts/manage-translations.js"
   },
   "lint-staged": {
     "*.+(js|jsx)": [
@@ -21,6 +22,7 @@
     ]
   },
   "dependencies": {
+    "@dwarvesf/react-utils": "^0.4.1",
     "@emotion/cache": "^11.4.0",
     "@emotion/react": "^11.5.0",
     "@emotion/server": "^11.4.0",
@@ -38,11 +40,19 @@
     "cross-env": "^7.0.3",
     "currency.js": "^2.0.4",
     "date-fns": "^2.25.0",
+    "dotenv": "^16.0.3",
+    "flat": "^5.0.2",
     "formik": "^2.2.9",
+    "fs-extra": "^11.1.0",
+    "isomorphic-unfetch": "^4.0.2",
+    "json2csv": "^6.0.0-alpha.2",
     "merge": "^2.1.1",
+    "mitt": "^3.0.0",
     "next": "^12.0.1",
+    "next-intl": "^2.10.2",
     "nprogress": "^0.2.0",
     "pure-react-carousel": "^1.27.6",
+    "query-string": "^8.1.0",
     "react": "^17.0.1",
     "react-apexcharts": "^1.4.0",
     "react-dom": "17.0.2",

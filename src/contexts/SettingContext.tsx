@@ -23,7 +23,7 @@ const SettingsProvider = ({ children }: settingsProviderProps) => {
 
   const updateSettings = (updatedSetting: SettingsOptions) => {
     setSettings(updatedSetting);
-    window.localStorage.setItem(
+    window?.localStorage.setItem(
       "bazaar_settings",
       JSON.stringify(updatedSetting)
     );
@@ -32,7 +32,7 @@ const SettingsProvider = ({ children }: settingsProviderProps) => {
   useEffect(() => {
     if (!window) return null;
 
-    const getItem = window.localStorage.getItem("bazaar_settings");
+    const getItem = window?.localStorage?.getItem("bazaar_settings");
 
     if (getItem) setSettings(JSON.parse(getItem));
   }, []);

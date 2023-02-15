@@ -5,12 +5,12 @@ import Container from "@mui/material/Container";
 import InputBase from "@mui/material/InputBase";
 import Toolbar from "@mui/material/Toolbar";
 import { FlexBox, FlexRowCenter } from "components/flex-box";
-import Globe from "components/icons/Globe";
 import Toggle from "components/icons/Toggle";
 import { useRouter } from "next/router";
 import { FC } from "react";
 import AccountPopover from "./popovers/AccountPopover";
 import { DatePicker } from '@mui/x-date-pickers-pro';
+import { Paragraph } from "components/Typography";
 
 
 // custom styled components
@@ -80,15 +80,32 @@ const DashboardNavbar: FC<DashboardNavbarProps> = ({ handleDrawerToggle }) => {
           )}
 
           <Box flexGrow={1} />
-         
+
           <FlexBox alignItems="center" gap={2}>
-          <DatePicker views={['year', 'month']}
+          <Paragraph> Từ </Paragraph>
+          <DatePicker 
               minDate={new Date('2021-03-01')}
               maxDate={new Date('2023-03-01')}
               value={new Date('2023-03-01')}
-              onChange={() => {}}
-              renderInput={(params) => <TextField {...params}  helperText={null}
-               />}
+              onChange={() => { }}
+              dayOfWeekFormatter={(day) => {
+                console.log("🚀 ~ file: DashboardNavbar.tsx:152 ~ day", day)
+                return day.toUpperCase()}}
+              renderInput={(params) => <TextField {...params} helperText={null}
+              />}
+            ></DatePicker>
+            <Paragraph> đến </Paragraph>
+
+            <DatePicker 
+              minDate={new Date('2021-03-01')}
+              maxDate={new Date('2023-03-01')}
+              value={new Date('2023-03-01')}
+              onChange={() => { }}
+              dayOfWeekFormatter={(day) => {
+                console.log("🚀 ~ file: DashboardNavbar.tsx:152 ~ day", day)
+                return day.toUpperCase()}}
+              renderInput={(params) => <TextField {...params} helperText={null}
+              />}
             ></DatePicker>
             <AccountPopover />
           </FlexBox>
@@ -97,4 +114,6 @@ const DashboardNavbar: FC<DashboardNavbarProps> = ({ handleDrawerToggle }) => {
     </DashboardNavbarRoot>
   );
 };
+              
+
 export default DashboardNavbar;

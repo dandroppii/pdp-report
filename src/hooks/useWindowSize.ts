@@ -5,17 +5,17 @@ const useWindowSize = () => {
   const [width, setWidth] = useState(0);
 
   const windowListener = debounce(() => {
-    if (window) setWidth(window.innerWidth);
+    if (window) setWidth(window?.innerWidth);
   }, 250);
 
   useEffect(() => {
     if (window) {
-      setWidth(window.innerWidth);
-      window.addEventListener("resize", windowListener);
+      setWidth(window?.innerWidth);
+      window?.addEventListener("resize", windowListener);
     }
     return () => {
       windowListener.cancel();
-      window && window.removeEventListener("resize", windowListener);
+      window && window?.removeEventListener("resize", windowListener);
     };
   }, [windowListener]);
 

@@ -1,0 +1,80 @@
+{
+  "namespaces": "auth",
+  "login_slogan": {
+    "key": "auth:login_slogan",
+    "messages": {
+      "en": "Welcome To",
+      "vi": "Chào Mừng Đến Với"
+    }
+  },
+  "paging_of": {
+    "key": "auth:paging_of",
+    "messages": {
+      "en": "of",
+      "vi": "of"
+    }
+  },
+  "paging_product": {
+    "key": "auth:paging_product",
+    "messages": {
+      "en": "products",
+      "vi": "sản phẩm"
+    }
+  },
+  "login": {
+    "key": "auth:login",
+    "messages": {
+      "en": "Login",
+      "vi": "Đăng Nhập"
+    }
+  },
+  "sign_up": {
+    "key": "auth:sign_up",
+    "messages": {
+      "en": "Sign Up",
+      "vi": "Đăng Ký"
+    }
+  },
+  "sign_up_now": {
+    "key": "auth:sign_up_now",
+    "messages": {
+      "en": "Sign Up Now",
+      "vi": "Đăng Ký Ngay"
+    }
+  },
+  "no_account": {
+    "key": "auth:no_account",
+    "messages": {
+      "en": "Don't have account?",
+      "vi": "Không có tài khoản?"
+    }
+  },
+  "create_account": {
+    "key": "auth:create_account",
+    "messages": {
+      "en": "Create Your Account",
+      "vi": "Tạo Tài Khoản"
+    }
+  },
+  "please_fill_all_fields": {
+    "key": "auth:please_fill_all_fields",
+    "messages": {
+      "en": "Please fill all fields to continue",
+      "vi": "Vui lòng điền vào tất cả các trường để tiếp tục"
+    }
+  },
+  "create_account_success": {
+    "key": "auth:create_account_success",
+    "messages": {
+      "en": "Create account successfully. Let's log in to continue your experience!",
+      "vi": "Tạo tài khoản thành công. Hãy đăng nhập để tiếp tục trải nghiệm tại mua sắm tại Droppii"
+    }
+  },
+  "login_success": {
+    "key": "auth:login_success",
+    "messages": {
+      "en": "Login Successfully!",
+      "vi": "Đăng nhập thành công!"
+    }
+  }
+}
