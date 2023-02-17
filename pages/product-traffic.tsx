@@ -54,6 +54,7 @@ export default function ProductTraffic({ productTraffic }: ProductTrafficProps) 
     <Box py={4}>
       <H1 mb={4} textTransform="uppercase">Số lượng tiếp cận thông tin sản phẩm</H1>
 
+
       <Grid container spacing={3} mb={4}>
         <Grid item xl={4} lg={4} md={4} xs={12}>
           <Card2 title="Lượt truy cập" amount={475}>
