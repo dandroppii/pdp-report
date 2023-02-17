@@ -112,3 +112,19 @@ export interface Pageable {
   pageSize: number;
   totalElements: number;
 }
+
+export interface PdpInformations {
+  "id": string;
+  "name": string;
+  "fullName": string;
+  "pdpLabel": string;
+  "email": string;
+  "phone": string;
+  "totalProductsSellingQuantity": number;
+  "gapoGroupUrl": string;
+  "address": string;
+  "background": string;
+  "backgroundUrl": string;
+  "avatarUrl": string;
+  "avatar": string
+}

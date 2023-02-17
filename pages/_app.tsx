@@ -99,10 +99,10 @@ const App = ({ Component, pageProps }: MyAppProps) => {
     <Fragment>
       <Head>
         <meta charSet="utf-8" />
-        <title>Bazaar - Next.js Ecommerce Template</title>
+        <title>Supplier Dashboard</title>
         <meta
           name="description"
-          content="React Next.js ecommerce template. Build SEO friendly Online store, delivery app and Multivendor store"
+          content="Supplier Dashboard"
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />

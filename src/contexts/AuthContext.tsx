@@ -29,7 +29,7 @@ const [Provider, useAuthContext] = createContext<AuthContextValues>({
 
 const AuthContextProvider = ({ children }: WithChildren) => {
   const t = useTranslations();
-  const [isLogin, setIsLogin] = useState(true);
+  const [isLogin, setIsLogin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<UserResponseData>();
   const router = useRouter()
@@ -50,8 +50,8 @@ const AuthContextProvider = ({ children }: WithChildren) => {
 
   useEffect(() => {
     if (!window?.localStorage?.getItem(STORAGE_TOKEN_KEY)) {
-      setIsLogin(false);
-      router.push('/login')
+      setIsLogin(true);
+      // router.push('/login')
     } else {
       checkUser();
     }

@@ -17,6 +17,10 @@ export function formatCurrency(amount: number): string {
   })}`;
 }
 
+export function getCurrencySuffix(): string {
+  return process.env.LOCALE === 'en' ?'$' : '₫' ;
+}
+
 export function shortenCurrency(amount: number, t: any): string {
   if (amount >= 1e15) {
     return `${parseFloat((amount / 1e14).toFixed()) / 10} ${t('currency_quadrillion')}`.replace(

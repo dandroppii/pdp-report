@@ -3,7 +3,8 @@ import { Card } from "@mui/material";
 import { FlexBetween, FlexBox } from "components/flex-box";
 import { H3, H6, Paragraph } from "components/Typography";
 import React, { FC } from "react";
-import { formatCurrency } from "utils/currency";
+import { formatCurrency, getCurrencySuffix } from "utils/currency";
+import CountUp from 'react-countup';
 
 // ========================================================
 type Card1Props = {
@@ -24,13 +25,16 @@ const Card1: FC<Card1Props> = (props) => {
         <H6 color="grey.600">
           {title}
         </H6>
-        <H3 color="info.main">{traffic}</H3>
+        <H3 color="info.main">
+        <CountUp end={traffic} duration={0.5} separator="." />
+          </H3>
       </FlexBetween>
       <FlexBetween alignItems={"flex-end"}>
         <H6 color="grey.600">
           Doanh thu
         </H6>
-        <H3 color="info.main">{formatCurrency(price * traffic)}</H3>
+        <H3 color="info.main">
+        <CountUp end={price * traffic} duration={0.5} suffix={` ${getCurrencySuffix()}`} separator="." /></H3>
       </FlexBetween>
     </Card>
   );

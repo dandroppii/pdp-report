@@ -4,6 +4,7 @@ import BazaarButton from "components/BazaarButton";
 import BazaarTextField from "components/BazaarTextField";
 import { H1, Small } from "components/Typography";
 import { useFormik } from "formik";
+import { useTranslations } from "next-intl";
 import React, { useCallback, useState } from "react";
 import * as yup from "yup";
 import EyeToggleButton from "./EyeToggleButton";
@@ -12,7 +13,7 @@ const fbStyle = { background: "#3B5998", color: "white" };
 const googleStyle = { background: "#4285F4", color: "white" };
 
 type WrapperProps = { passwordVisibility?: boolean };
-
+export const IS_ALPHA_NUMERIC_REGEX = /^[a-zA-Z0-9]+$/
 export const Wrapper = styled<React.FC<WrapperProps & CardProps>>(
   ({ children, passwordVisibility, ...rest }) => (
     <Card {...rest}>{children}</Card>
@@ -32,6 +33,7 @@ export const Wrapper = styled<React.FC<WrapperProps & CardProps>>(
 }));
 
 const Login = () => {
+  const t = useTranslations();
   const [passwordVisibility, setPasswordVisibility] = useState(false);
 
   const togglePasswordVisibility = useCallback(() => {
@@ -42,12 +44,36 @@ const Login = () => {
     console.log(values);
   };
 
-  const { values, errors, touched, handleBlur, handleChange, handleSubmit } =
-    useFormik({
-      initialValues,
-      onSubmit: handleFormSubmit,
-      validationSchema: formSchema,
-    });
+  const {
+    values,
+    errors,
+    touched,
+    handleBlur,
+    handleChange,
+    handleSubmit,
+    setFieldValue,
+    dirty,
+    isValid,
+  } = useFormik({
+    initialValues: {
+      username: '',
+      password: '',
+    },
+    onSubmit: handleFormSubmit,
+    validationSchema: yup.object({
+      username: yup
+      .string()
+      .required(t('username_required'))
+      .min(5, t('password_length_validation'))
+      .max(50, t('password_length_validation'))
+      .matches(IS_ALPHA_NUMERIC_REGEX, t('no_symbol_validation')),
+      password: yup
+      .string()
+      .required(t('password_required'))
+      .min(5, t('password_length_validation'))
+      .max(50, t('password_length_validation')),
+    }),
+  });
 
   return (
     <Wrapper elevation={3} passwordVisibility={passwordVisibility}>
@@ -58,17 +84,16 @@ const Login = () => {
         <BazaarTextField
           mb={1.5}
           fullWidth
-          name="email"
+          name="username"
           size="small"
-          type="email"
           variant="outlined"
           onBlur={handleBlur}
-          value={values.email}
+          value={values.username}
           onChange={handleChange}
           label="Tên đăng nhập"
-          placeholder="exmple@mail.com"
-          error={!!touched.email && !!errors.email}
-          helperText={touched.email && errors.email}
+          placeholder="Nhập tên đăng nhập"
+          error={!!touched.username && !!errors.username}
+          helperText={touched.username && errors.username}
         />
 
         <BazaarTextField
@@ -102,6 +127,7 @@ const Login = () => {
           color="primary"
           variant="contained"
           sx={{ mb: "1.65rem", height: 44 }}
+          disabled={!(dirty && isValid)}
         >
           Login
         </BazaarButton>

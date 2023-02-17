@@ -3,16 +3,18 @@ import { Box, Card } from "@mui/material";
 import { FlexBox } from "components/flex-box";
 import { H3, H6, Paragraph } from "components/Typography";
 import React, { FC } from "react";
-
+import CountUp from 'react-countup';
+import { getCurrencySuffix } from "utils/currency";
 // =========================================================
 type Card2Props = {
   title: string;
   percentage?: string;
-  amount?: string | number;
+  amount?: number;
+  currency?: boolean
 };
 // =========================================================
 
-const Card2: FC<Card2Props> = ({ children, title, amount, percentage }) => {
+const Card2: FC<Card2Props> = ({ children, title, amount, currency }) => {
   return (
     <Card
       sx={{
@@ -35,7 +37,9 @@ const Card2: FC<Card2Props> = ({ children, title, amount, percentage }) => {
         >
           <H6 color="grey.600">{title}</H6>
           <Box>
-            <H3 color="info.main">{amount}</H3>
+            <H3 color="info.main">
+            <CountUp end={amount} duration={0.5} suffix={` ${currency ? getCurrencySuffix() : ''}`} separator="." />
+              </H3>
           </Box>
         </FlexBox>
       </Box>

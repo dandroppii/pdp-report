@@ -10,7 +10,7 @@ interface SEOProps {
 const SEO: FC<SEOProps> = ({
   title,
   description,
-  sitename = "Bazaar Next.js Ecommerce",
+  sitename = "Supplier Dashboard",
 }) => {
   return (
     <Head>

@@ -56,15 +56,15 @@ export default function ProductTraffic({ productTraffic }: ProductTrafficProps) 
 
       <Grid container spacing={3} mb={4}>
         <Grid item xl={4} lg={4} md={4} xs={12}>
-          <Card2 title="Lượt truy cập" amount="475">
+          <Card2 title="Lượt truy cập" amount={475}>
           </Card2>
         </Grid>
         <Grid item xl={4} lg={4} md={4} xs={12}>
-          <Card2 title="Đơn giá" amount={formatCurrency(3000)}>
+          <Card2 title="Đơn giá" amount={3000} currency>
           </Card2>
         </Grid>
         <Grid item xl={4} lg={4} md={4} xs={12}>
-          <Card2 title="Doanh thu" amount={formatCurrency(3000000)}>
+          <Card2 title="Doanh thu" amount={3000000} currency>
           </Card2>
         </Grid>
       </Grid>

@@ -2,9 +2,14 @@ import { Box, Card } from "@mui/material";
 import { H3, H2, Paragraph } from "components/Typography";
 import NextImage from "next/image";
 import React from "react";
-import { formatCurrency } from "utils/currency";
+import { currencies, formatCurrency, getCurrencySuffix } from "utils/currency";
+import CountUp from 'react-countup';
+import { useAppContext } from "contexts/AppContext";
+import { formatDatetime } from "utils/datetime";
+
 
 const WishCard = () => {
+  const { state: { pdpInformations, pdpReport, fromDate, toDate } } = useAppContext()
   return (
     <Card
       sx={{
@@ -17,17 +22,19 @@ const WishCard = () => {
       }}
     >
       <H2 color="info.main" mb={0.5}>
-        Xin chào KUCHEN
+        Xin chào {pdpInformations.name}
       </H2>
-      <Paragraph mb={3} color="grey.600">
-         Đây là doanh thu tháng 3 năm 2023
+      <Paragraph mb={2} color="grey.600">
+        Đây là doanh thu từ {formatDatetime(fromDate, 'dd/MM/yyyy')} đến  {formatDatetime(toDate, 'dd/MM/yyyy')}
       </Paragraph>
 
       <Paragraph color="grey.600">Tổng doanh thu</Paragraph>
-      <H3 mb={3} color="info.main">{formatCurrency(2837700)}</H3>
+      <H3 mb={2} color="info.main">
+        <CountUp end={pdpReport?.totalAmount} duration={0.5} suffix={` ${getCurrencySuffix()}`} separator="." />
+      </H3>
 
-      <Paragraph color="grey.600">Doanh thu sau VAT(8%)</Paragraph>
-      <H3 mb={1.5} color="info.main">{formatCurrency(2837700)}</H3>
+      <Paragraph color="grey.600">Doanh thu sau VAT({pdpReport?.tax}%)</Paragraph>
+      <H3 color="info.main"><CountUp end={pdpReport?.totalAmountAfterTax} duration={0.5} suffix={` ${getCurrencySuffix()}`} separator="." /></H3>
 
       <Box
         sx={{
