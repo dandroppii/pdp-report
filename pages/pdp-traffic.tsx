@@ -1,31 +1,27 @@
-import { RemoveRedEye } from "@mui/icons-material";
-import { Box, Card, Grid, Stack, Table, TableContainer } from "@mui/material";
-import TableBody from "@mui/material/TableBody";
-import Card1 from "pages-sections/dashboard/Card1";
-import TableHeader from "components/data-table/TableHeader";
-import TablePagination from "components/data-table/TablePagination";
-import VendorDashboardLayout from "components/layouts/vendor-dashboard";
-import Scrollbar from "components/Scrollbar";
-import { H1 } from "components/Typography";
-import currency from "currency.js";
-import useMuiTable from "hooks/useMuiTable";
-import { GetStaticProps } from "next";
-import {
-  StyledIconButton,
-  StyledTableCell,
-  StyledTableRow,
-} from "pages-sections/admin";
-import React, { ReactElement } from "react";
-import api from "utils/api/dashboard";
-import Card2 from "pages-sections/dashboard/Card2";
-import { formatCurrency } from "utils/currency";
-import { formatDatetime } from "utils/datetime";
-import CountUp from 'react-countup';
+import { Box, Card, debounce, Grid, Stack, Table, TableContainer } from '@mui/material';
+import TableBody from '@mui/material/TableBody';
+import TableHeader from 'components/data-table/TableHeader';
+import TablePagination from 'components/data-table/TablePagination';
+import VendorDashboardLayout from 'components/layouts/vendor-dashboard';
+import Scrollbar from 'components/Scrollbar';
+import { H1 } from 'components/Typography';
+import useMuiTable from 'hooks/useMuiTable';
+import { StyledTableCell, StyledTableRow } from 'pages-sections/admin';
+import React, { ReactElement } from 'react';
+import Card2 from 'pages-sections/dashboard/Card2';
+import { formatDatetime } from 'utils/datetime';
+import { useAppContext } from 'contexts/AppContext';
+import { useState } from 'react';
+import { PDPTrafficItem } from 'types/common';
+import { useCallback } from 'react';
+import { GET_PDP_TRAFFICS_RESPONSE } from 'constance/mockPdpData';
+import { useEffect } from 'react';
+import DRowSkeleton from 'pages-sections/admin/DOrderSkeleton';
 
 const tableHeading = [
-  { id: "no", label: "No", align: "left" },
-  { id: "startTime", label: "Thời gian", align: "left" },
-  { id: "userAgent", label: "Thiết bị", align: "left" },
+  { id: 'no', label: 'No', align: 'left' },
+  { id: 'startTime', label: 'Thời gian', align: 'center' },
+  { id: 'userAgent', label: 'Thiết bị', align: 'center' },
 ];
 
 // =============================================================================
@@ -34,37 +30,75 @@ PdpTraffic.getLayout = function getLayout(page: ReactElement) {
 };
 // =============================================================================
 
-type PdpTrafficProps = { pdpTraffic: any[] };
+type PdpTrafficProps = {};
 
 // =============================================================================
 
-export default function PdpTraffic({ pdpTraffic }: PdpTrafficProps) {
+export default function PdpTraffic({}: PdpTrafficProps) {
   const {
-    order,
-    orderBy,
-    selected,
-    rowsPerPage,
-    filteredList,
-    handleChangePage,
-    handleRequestSort,
-  } = useMuiTable({ listData: pdpTraffic});
+    state: { fromDate, toDate, pdpReport },
+  } = useAppContext();
+
+  const [pdpTraffic, setPdpTraffic] = useState<PDPTrafficItem[]>([]);
+  const [totalPage, setTotalPage] = useState<number>(1);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const getPdpTraffic = useCallback((pageNumber: number) => {
+    setLoading(true);
+    try {
+      const response = GET_PDP_TRAFFICS_RESPONSE;
+      setLoading(false);
+      if (response.statusCode === 0) {
+        setPdpTraffic(response.data);
+        setTotalPage(response.pageable.totalPages);
+        setCurrentPage(pageNumber);
+      }
+    } catch (error) {
+      setLoading(false);
+    }
+  }, []);
+
+  const debounceChange = useCallback(debounce(getPdpTraffic, 300), []);
+
+  useEffect(() => {
+    debounceChange(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fromDate, toDate]);
+
+  const { order, orderBy, selected, filteredList, handleRequestSort } = useMuiTable({
+    listData: pdpTraffic,
+  });
 
   return (
     <Box py={4}>
-      <H1 mb={4} textTransform="uppercase">Số lượng tiếp cận thông tin công ty</H1>
+      <H1 mb={4} textTransform="uppercase">
+        Số lượng tiếp cận thông tin công ty
+      </H1>
 
       <Grid container spacing={3} mb={4}>
         <Grid item xl={4} lg={4} md={4} xs={12}>
-        <Card2 title="Lượt truy cập" amount={475}>
-          </Card2>
+          <Card2
+            title="Lượt truy cập"
+            amount={pdpReport?.collaboratorSummary?.company?.totalExpense}
+          ></Card2>
         </Grid>
         <Grid item xl={4} lg={4} md={4} xs={12}>
-        <Card2 title="Đơn giá" amount={3000} currency >
-          </Card2>
+          <Card2
+            title="Đơn giá"
+            amount={pdpReport?.collaboratorSummary?.company?.expensePerItem}
+            currency
+          ></Card2>
         </Grid>
         <Grid item xl={4} lg={4} md={4} xs={12}>
-        <Card2 title="Doanh thu" amount={3000000} currency>
-          </Card2>
+          <Card2
+            title="Doanh thu"
+            amount={
+              pdpReport?.collaboratorSummary?.company?.expensePerItem *
+              pdpReport?.collaboratorSummary?.company?.totalExpense
+            }
+            currency
+          ></Card2>
         </Grid>
       </Grid>
 
@@ -83,17 +117,21 @@ export default function PdpTraffic({ pdpTraffic }: PdpTrafficProps) {
               />
 
               <TableBody>
-                {filteredList.map((item, index) => (
-                  <StyledTableRow role="checkbox" key={index}>
-                    <StyledTableCell align="left">{item.no}</StyledTableCell>
-                    <StyledTableCell align="center">
-                      {formatDatetime(item.startTime)}
-                    </StyledTableCell>
-                    <StyledTableCell align="center">
-                      {item.userAgent}
-                    </StyledTableCell>
-                  </StyledTableRow>
-                ))}
+                {loading ? (
+                  <DRowSkeleton numberOfCol={3}></DRowSkeleton>
+                ) : (
+                  filteredList.map((item, index) => (
+                    <StyledTableRow role="checkbox" key={index}>
+                      <StyledTableCell align="left">
+                        {(currentPage - 1) * 20 + index + 1}
+                      </StyledTableCell>
+                      <StyledTableCell align="center">
+                        {formatDatetime(item.visitTime)}
+                      </StyledTableCell>
+                      <StyledTableCell align="center">{item.visitType}</StyledTableCell>
+                    </StyledTableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </TableContainer>
@@ -101,16 +139,14 @@ export default function PdpTraffic({ pdpTraffic }: PdpTrafficProps) {
 
         <Stack alignItems="center" my={4}>
           <TablePagination
-            onChange={handleChangePage}
-            count={Math.ceil(pdpTraffic.length / rowsPerPage)}
+            onChange={(_e, page) => {
+              debounceChange(page);
+            }}
+            count={totalPage}
+            page={currentPage}
           />
         </Stack>
       </Card>
     </Box>
   );
 }
-
-export const getStaticProps: GetStaticProps = async () => {
-  const pdpTraffic = await api.getPdpTraffic();
-  return { props: { pdpTraffic } };
-};

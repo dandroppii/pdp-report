@@ -1,11 +1,11 @@
-import { useTranslations } from 'next-intl'
-import { ReactNode } from 'react'
+import { useTranslations } from 'next-intl';
+import { ReactNode } from 'react';
 
-export type WithChildren<T = {}> = T & { children: ReactNode }
+export type WithChildren<T = {}> = T & { children: ReactNode };
 
-export type FileWithPreview = File & { preview?: string }
+export type FileWithPreview = File & { preview?: string };
 
-export type UseTranslationsReturn = ReturnType<typeof useTranslations>
+export type UseTranslationsReturn = ReturnType<typeof useTranslations>;
 
 export interface UserResponseData {
   id: string;
@@ -114,17 +114,75 @@ export interface Pageable {
 }
 
 export interface PdpInformations {
-  "id": string;
-  "name": string;
-  "fullName": string;
-  "pdpLabel": string;
-  "email": string;
-  "phone": string;
-  "totalProductsSellingQuantity": number;
-  "gapoGroupUrl": string;
-  "address": string;
-  "background": string;
-  "backgroundUrl": string;
-  "avatarUrl": string;
-  "avatar": string
+  id: string;
+  name: string;
+  fullName: string;
+  pdpLabel: string;
+  email: string;
+  phone: string;
+  totalProductsSellingQuantity: number;
+  gapoGroupUrl: string;
+  address: string;
+  background: string;
+  backgroundUrl: string;
+  avatarUrl: string;
+  avatar: string;
+}
+
+export interface PdpReport {
+  customerSummary: {
+    revenue: number;
+    company: {
+      expensePerItem: number;
+      totalExpense: number;
+    };
+    product: {
+      expensePerItem: number;
+      totalExpense: number;
+    };
+    totalCustomer: number;
+    totalAcceptanceRecord: number;
+  };
+  collaboratorSummary: {
+    revenue: number;
+    company: {
+      expensePerItem: number;
+      totalExpense: number;
+    };
+    product: {
+      expensePerItem: number;
+      totalExpense: number;
+    };
+    totalCollaborator: number;
+  };
+  acceptanceRecordStatusSummary: {
+    totalAcceptanceRecordCreated: number;
+    totalAcceptanceRecordIsNew: number;
+    totalAcceptanceRecordIsWaitingConfirm: number;
+    totalAcceptanceRecordIsWaitingForSign: number;
+    totalAcceptanceRecordIsCompleted: number;
+    totalAcceptanceRecordIsArchive: number;
+    totalAcceptanceRecordIsCanceled: number;
+  };
+  monthYearFilter: string;
+}
+
+export interface ProductTrafficItem {
+  id: string;
+  supplierId: string;
+  price: number;
+  visitTime: number;
+  visitType: string;
+  productName: string;
+  productLink: string;
+}
+
+export interface PDPTrafficItem {
+  id: string;
+  supplierId: string;
+  price: number;
+  visitTime: number;
+  visitType: string;
+  productName: string;
+  productLink: string;
 }

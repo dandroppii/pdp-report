@@ -30,11 +30,11 @@ const WishCard = () => {
 
       <Paragraph color="grey.600">Tổng doanh thu</Paragraph>
       <H3 mb={2} color="info.main">
-        <CountUp end={pdpReport?.totalAmount} duration={0.5} suffix={` ${getCurrencySuffix()}`} separator="." />
+        <CountUp end={pdpReport?.collaboratorSummary?.revenue} duration={0.5} suffix={` ${getCurrencySuffix()}`} separator="." />
       </H3>
 
-      <Paragraph color="grey.600">Doanh thu sau VAT({pdpReport?.tax}%)</Paragraph>
-      <H3 color="info.main"><CountUp end={pdpReport?.totalAmountAfterTax} duration={0.5} suffix={` ${getCurrencySuffix()}`} separator="." /></H3>
+      <Paragraph color="grey.600">Doanh thu sau VAT({8}%)</Paragraph>
+      <H3 color="info.main"><CountUp end={pdpReport?.collaboratorSummary?.revenue * 0.92} duration={0.5} suffix={` ${getCurrencySuffix()}`} separator="." /></H3>
 
       <Box
         sx={{

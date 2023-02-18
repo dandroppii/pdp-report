@@ -1,32 +1,26 @@
-import { RemoveRedEye } from "@mui/icons-material";
-import { Box, Card, Grid, Stack, Table, TableContainer } from "@mui/material";
-import TableBody from "@mui/material/TableBody";
-import Card1 from "pages-sections/dashboard/Card1";
-import TableHeader from "components/data-table/TableHeader";
-import TablePagination from "components/data-table/TablePagination";
-import VendorDashboardLayout from "components/layouts/vendor-dashboard";
-import Scrollbar from "components/Scrollbar";
-import { H1 } from "components/Typography";
-import currency from "currency.js";
-import useMuiTable from "hooks/useMuiTable";
-import { GetStaticProps } from "next";
-import {
-  StyledIconButton,
-  StyledTableCell,
-  StyledTableRow,
-} from "pages-sections/admin";
-import React, { ReactElement } from "react";
-import api from "utils/api/dashboard";
-import Card2 from "pages-sections/dashboard/Card2";
-import { formatCurrency } from "utils/currency";
-import { formatDatetime } from "utils/datetime";
-import { ExternalLink } from "components/layouts/vendor-dashboard/LayoutStyledComponents";
+import { Box, Card, debounce, Grid, Stack, Table, TableContainer } from '@mui/material';
+import TableBody from '@mui/material/TableBody';
+import TableHeader from 'components/data-table/TableHeader';
+import TablePagination from 'components/data-table/TablePagination';
+import VendorDashboardLayout from 'components/layouts/vendor-dashboard';
+import Scrollbar from 'components/Scrollbar';
+import { H1 } from 'components/Typography';
+import useMuiTable from 'hooks/useMuiTable';
+import { StyledTableCell, StyledTableRow } from 'pages-sections/admin';
+import React, { ReactElement, useCallback, useEffect, useState } from 'react';
+import Card2 from 'pages-sections/dashboard/Card2';
+import { formatDatetime } from 'utils/datetime';
+import { GET_PRODUCT_TRAFFICS_RESPONSE } from 'constance/mockPdpData';
+import { useAppContext } from 'contexts/AppContext';
+import { ProductTrafficItem } from 'types/common';
+import DRowSkeleton from 'pages-sections/admin/DOrderSkeleton';
+import { ExternalLink } from 'components/layouts/vendor-dashboard/LayoutStyledComponents';
 
 const tableHeading = [
-  { id: "no", label: "No", align: "left" },
-  { id: "productName", label: "Sản phẩm", align: "left" },
-  { id: "startTime", label: "Thời gian", align: "left" },
-  { id: "userAgent", label: "Thiết bị", align: "left" },
+  { id: 'no', label: 'No', align: 'left' },
+  { id: 'productName', label: 'Sản phẩm', align: 'center' },
+  { id: 'startTime', label: 'Thời gian', align: 'center' },
+  { id: 'userAgent', label: 'Thiết bị', align: 'center' },
 ];
 
 // =============================================================================
@@ -35,38 +29,75 @@ ProductTraffic.getLayout = function getLayout(page: ReactElement) {
 };
 // =============================================================================
 
-type ProductTrafficProps = { productTraffic: any[] };
+type ProductTrafficProps = {};
 
 // =============================================================================
 
-export default function ProductTraffic({ productTraffic }: ProductTrafficProps) {
+export default function ProductTraffic({}: ProductTrafficProps) {
   const {
-    order,
-    orderBy,
-    selected,
-    rowsPerPage,
-    filteredList,
-    handleChangePage,
-    handleRequestSort,
-  } = useMuiTable({ listData: productTraffic });
+    state: { fromDate, toDate, pdpReport },
+  } = useAppContext();
+
+  const [pdpTraffic, setPdpTraffic] = useState<ProductTrafficItem[]>([]);
+  const [totalPage, setTotalPage] = useState<number>(1);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const getProductTraffic = useCallback((pageNumber: number) => {
+    setLoading(true);
+    try {
+      const response = GET_PRODUCT_TRAFFICS_RESPONSE;
+      setLoading(false);
+      if (response.statusCode === 0) {
+        setPdpTraffic(response.data);
+        setTotalPage(response.pageable.totalPages);
+        setCurrentPage(pageNumber);
+      }
+    } catch (error) {
+      setLoading(false);
+    }
+  }, []);
+
+  const debounceChange = useCallback(debounce(getProductTraffic, 300), []);
+
+  useEffect(() => {
+    debounceChange(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fromDate, toDate]);
+
+  const { order, orderBy, selected, filteredList, handleRequestSort } = useMuiTable({
+    listData: pdpTraffic,
+  });
 
   return (
     <Box py={4}>
-      <H1 mb={4} textTransform="uppercase">Số lượng tiếp cận thông tin sản phẩm</H1>
-
+      <H1 mb={4} textTransform="uppercase">
+        Số lượng tiếp cận sản phẩm
+      </H1>
 
       <Grid container spacing={3} mb={4}>
         <Grid item xl={4} lg={4} md={4} xs={12}>
-          <Card2 title="Lượt truy cập" amount={475}>
-          </Card2>
+          <Card2
+            title="Lượt truy cập"
+            amount={pdpReport?.collaboratorSummary?.product?.totalExpense}
+          ></Card2>
         </Grid>
         <Grid item xl={4} lg={4} md={4} xs={12}>
-          <Card2 title="Đơn giá" amount={3000} currency>
-          </Card2>
+          <Card2
+            title="Đơn giá"
+            amount={pdpReport?.collaboratorSummary?.product?.expensePerItem}
+            currency
+          ></Card2>
         </Grid>
         <Grid item xl={4} lg={4} md={4} xs={12}>
-          <Card2 title="Doanh thu" amount={3000000} currency>
-          </Card2>
+          <Card2
+            title="Doanh thu"
+            amount={
+              pdpReport?.collaboratorSummary?.product?.expensePerItem *
+              pdpReport?.collaboratorSummary?.product?.totalExpense
+            }
+            currency
+          ></Card2>
         </Grid>
       </Grid>
 
@@ -79,32 +110,38 @@ export default function ProductTraffic({ productTraffic }: ProductTrafficProps) 
                 hideSelectBtn
                 orderBy={orderBy}
                 heading={tableHeading}
-                rowCount={productTraffic.length}
+                rowCount={pdpTraffic.length}
                 numSelected={selected.length}
                 onRequestSort={handleRequestSort}
               />
 
               <TableBody>
-                {filteredList.map((item, index) => (
-                  <StyledTableRow role="checkbox" key={index}>
-                    <StyledTableCell align="left">{item.no}</StyledTableCell>
-                    <StyledTableCell align="left">
-                      <ExternalLink
-                      color="blue.main"
-                        href={item.productUrl}
-                        rel="noopener noreferrer"
-                        target="_blank"
-                        title={item.productName}
-                      >{item.productName}</ExternalLink>
+                {loading ? (
+                  <DRowSkeleton numberOfCol={4}></DRowSkeleton>
+                ) : (
+                  filteredList.map((item, index) => (
+                    <StyledTableRow key={index}>
+                      <StyledTableCell align="left">
+                        {(currentPage - 1) * 20 + index + 1}
                       </StyledTableCell>
-                    <StyledTableCell align="center">
-                      {formatDatetime(item.startTime)}
-                    </StyledTableCell>
-                    <StyledTableCell align="center">
-                      {item.userAgent}
-                    </StyledTableCell>
-                  </StyledTableRow>
-                ))}
+                      <StyledTableCell align="left">
+                        <ExternalLink
+                          color="blue.main"
+                          href={item.productLink}
+                          rel="noopener noreferrer"
+                          target="_blank"
+                          title={item.productName}
+                        >
+                          {item.productName}
+                        </ExternalLink>
+                      </StyledTableCell>
+                      <StyledTableCell align="center">
+                        {formatDatetime(item.startTime)}
+                      </StyledTableCell>
+                      <StyledTableCell align="center">{item.userAgent}</StyledTableCell>
+                    </StyledTableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </TableContainer>
@@ -112,16 +149,14 @@ export default function ProductTraffic({ productTraffic }: ProductTrafficProps) 
 
         <Stack alignItems="center" my={4}>
           <TablePagination
-            onChange={handleChangePage}
-            count={Math.ceil(productTraffic.length / rowsPerPage)}
+            onChange={(_e, page) => {
+              debounceChange(page);
+            }}
+            count={totalPage}
+            page={currentPage}
           />
         </Stack>
       </Card>
     </Box>
   );
 }
-
-export const getStaticProps: GetStaticProps = async () => {
-  const productTraffic = await api.getProductTraffic();
-  return { props: { productTraffic } };
-};
