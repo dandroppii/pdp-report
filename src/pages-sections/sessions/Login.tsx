@@ -121,7 +121,7 @@ const Login = () => {
           sx={{ mb: '1.65rem', height: 44 }}
           disabled={!(dirty && isValid)}
         >
-          Login
+          Đăng nhập
         </BazaarButton>
       </form>
     </Wrapper>
