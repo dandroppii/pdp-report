@@ -130,51 +130,23 @@ export interface PdpInformations {
 }
 
 export interface PdpReport {
-  customerSummary: {
-    revenue: number;
-    company: {
-      expensePerItem: number;
-      totalExpense: number;
-    };
-    product: {
-      expensePerItem: number;
-      totalExpense: number;
-    };
-    totalCustomer: number;
-    totalAcceptanceRecord: number;
-  };
-  collaboratorSummary: {
-    revenue: number;
-    company: {
-      expensePerItem: number;
-      totalExpense: number;
-    };
-    product: {
-      expensePerItem: number;
-      totalExpense: number;
-    };
-    totalCollaborator: number;
-  };
-  acceptanceRecordStatusSummary: {
-    totalAcceptanceRecordCreated: number;
-    totalAcceptanceRecordIsNew: number;
-    totalAcceptanceRecordIsWaitingConfirm: number;
-    totalAcceptanceRecordIsWaitingForSign: number;
-    totalAcceptanceRecordIsCompleted: number;
-    totalAcceptanceRecordIsArchive: number;
-    totalAcceptanceRecordIsCanceled: number;
-  };
-  monthYearFilter: string;
+  visitType: string;
+  totalVisitInDuration: number;
+  revenueInDuration: number;
+  currentPrice: number;
+  avgPricePerItem: number;
 }
 
-export interface ProductTrafficItem {
+export interface TrafficItem {
   id: string;
   supplierId: string;
   price: number;
+  taxPercent: number;
   visitTime: number;
   visitType: string;
-  productName: string;
-  productLink: string;
+  productName: null;
+  productLink: null;
+  userAgent: string;
 }
 
 export interface PDPTrafficItem {

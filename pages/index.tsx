@@ -1,13 +1,15 @@
 import { Box, Grid } from '@mui/material';
 import VendorDashboardLayout from 'components/layouts/vendor-dashboard';
+import { Paragraph } from 'components/Typography';
 import { useAppContext } from 'contexts/AppContext';
-import { GetStaticProps } from 'next';
+import { useAuthContext } from 'contexts/AuthContext';
+import DPageSkeleton from 'pages-sections/admin/PageLoadingSkeleton';
 import Card1 from 'pages-sections/dashboard/Card1';
 import CompanyCard from 'pages-sections/dashboard/CompanyCard';
 import WishCard from 'pages-sections/dashboard/WishCard';
+import { useEffect } from 'react';
 import { useMemo } from 'react';
 import { ReactElement } from 'react';
-import api from 'utils/api/dashboard';
 
 // =============================================================================
 VendorDashboard.getLayout = function getLayout(page: ReactElement) {
@@ -21,33 +23,37 @@ type DashboardProps = {
 
 // =============================================================================
 
-export default function VendorDashboard(props: DashboardProps) {
+export default function VendorDashboard() {
   const {
-    state: { pdpReport },
+    state: { pdpReport, productReport },
   } = useAppContext();
+
   const cardList = useMemo(() => {
     return [
       {
         id: 1,
-        title: 'Traffic công ty tháng 3',
-        traffic: pdpReport?.collaboratorSummary?.company?.totalExpense,
-        price: pdpReport?.collaboratorSummary?.company?.expensePerItem,
+        title: 'Traffic công ty',
+        traffic: pdpReport?.totalVisitInDuration,
+        price: pdpReport?.avgPricePerItem,
         color: 'info.main',
         status: '',
       },
       {
         id: 2,
-        title: 'Traffic sản phẩm tháng 3',
-        traffic: pdpReport?.collaboratorSummary?.product?.totalExpense,
-        price: pdpReport?.collaboratorSummary?.product?.expensePerItem,
+        title: 'Traffic sản phẩm',
+        traffic: productReport?.totalVisitInDuration,
+        price: productReport?.avgPricePerItem,
         color: 'info.main',
         status: '',
       },
     ];
-  }, [pdpReport]);
+  }, [pdpReport, productReport]);
 
   return (
-    <Box py={4}>
+    <Box py={2}>
+      <Paragraph fontStyle="italic" fontSize={14} mb={2} textAlign="center" color="grey.600">
+        Dữ liệu sẽ được cập nhật chính xác trong vòng 72h tới
+      </Paragraph>
       <Grid container spacing={3}>
         <Grid item md={6} xs={12}>
           <WishCard />
@@ -73,9 +79,3 @@ export default function VendorDashboard(props: DashboardProps) {
     </Box>
   );
 }
-
-export const getStaticProps: GetStaticProps = async () => {
-  const cardList = await api.getAllCard();
-
-  return { props: { cardList } };
-};

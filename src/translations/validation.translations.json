@@ -1,0 +1,234 @@
+{
+  "namespaces": "validation",
+  "required": {
+    "key": "validation:required",
+    "messages": {
+      "en": "Required",
+      "vi": "Vui lòng nhập thông tin"
+    }
+  },
+  "phone_required": {
+    "key": "validation:phone_required",
+    "messages": {
+      "en": "Phone number is required",
+      "vi": "Vui lòng nhập số điện thoại"
+    }
+  },
+  "username_required": {
+    "key": "validation:username_required",
+    "messages": {
+      "en": "Username number is required",
+      "vi": "Vui lòng nhập tên đăng nhập"
+    }
+  },
+  "address_detail_required": {
+    "key": "validation:address_detail_required",
+    "messages": {
+      "en": "Address detail is required",
+      "vi": "Vui lòng nhập số nhà, tên đường"
+    }
+  },
+  "chose_address_required": {
+    "key": "validation:chose_address_required",
+    "messages": {
+      "en": "Delivery address is required",
+      "vi": "Vui lòng chọn địa chỉ giao hàng"
+    }
+  },
+  "fullname_required": {
+    "key": "validation:fullname_required",
+    "messages": {
+      "en": "Fullname is required",
+      "vi": "Vui lòng nhập họ và tên"
+    }
+  },
+  "email_required": {
+    "key": "validation:email_required",
+    "messages": {
+      "en": "Email is required",
+      "vi": "Vui lòng nhập email"
+    }
+  },
+  "province_city_required": {
+    "key": "validation:province_city_required",
+    "messages": {
+      "en": "Province/City is required",
+      "vi": "Vui lòng chọn tỉnh/thành phố"
+    }
+  },
+  "district_required": {
+    "key": "validation:district_required",
+    "messages": {
+      "en": "District is required",
+      "vi": "Vui lòng chọn quận/huyện"
+    }
+  },
+  "ward_required": {
+    "key": "validation:ward_required",
+    "messages": {
+      "en": "Ward is required",
+      "vi": "Vui lòng chọn phường/xã"
+    }
+  },
+  "enter_max_characters": {
+    "key": "validation:enter_max_characters",
+    "messages": {
+      "en": "Please enter up to {max} characters",
+      "vi": "Vui lòng nhập tối đa {max} ký tự"
+    }
+  },
+  "enter_min_characters": {
+    "key": "validation:enter_min_characters",
+    "messages": {
+      "en": "Please enter at least {min} characters",
+      "vi": "Vui lòng nhập tối thiểu {min} ký tự"
+    }
+  },
+  "only_number_letter_validation": {
+    "key": "validation:only_number_letter_validation",
+    "messages": {
+      "en": "Enter numbers or letters",
+      "vi": "Chỉ nhập số hoặc chữ"
+    }
+  },
+  "password_required": {
+    "key": "validation:password_required",
+    "messages": {
+      "en": "Password is required",
+      "vi": "Vui lòng nhập mật khẩu"
+    }
+  },
+  "old_password_required": {
+    "key": "validation:old_password_required",
+    "messages": {
+      "en": "Old password is required",
+      "vi": "Vui lòng nhập mật khẩu cũ"
+    }
+  },
+  "new_password_required": {
+    "key": "validation:new_password_required",
+    "messages": {
+      "en": "New password is required",
+      "vi": "Vui lòng nhập mật khẩu mới"
+    }
+  },
+  "re_password_required": {
+    "key": "validation:re_password_required",
+    "messages": {
+      "en": "Please re-enter password",
+      "vi": "Vui lòng xác nhận lại mật khẩu"
+    }
+  },
+  "password_length_validation": {
+    "key": "validation:password_length_validation",
+    "messages": {
+      "en": "Please enter 5 to 50 characters",
+      "vi": "Vui lòng nhập 5 đến 50 ký tự"
+    }
+  },
+  "email_validation": {
+    "key": "validation:email_validation",
+    "messages": {
+      "en": "Invalid email",
+      "vi": "Email không đúng định dạng"
+    }
+  },
+  "duplicate_password_validation": {
+    "key": "validation:duplicate_password_validation",
+    "messages": {
+      "en": "Password must not be the same as the old password",
+      "vi": "Mật khẩu không được trùng với mật khẩu cũ"
+    }
+  },
+  "confirm_password_validation": {
+    "key": "validation:confirm_password_validation",
+    "messages": {
+      "en": "Re-entered password is incorrect",
+      "vi": "Mật khẩu nhập lại không chính xác"
+    }
+  },
+  "no_symbol_validation": {
+    "key": "validation:no_symbol_validation",
+    "messages": {
+      "en": "Should not contain special characters",
+      "vi": "Viết liền không dấu, không chứa kí tự đặc biệt"
+    }
+  },
+  "agreement_required": {
+    "key": "validation:agreement_required",
+    "messages": {
+      "en": "You have to agree with our Terms and Conditions",
+      "vi": "Vui lòng xác nhận các Điều khoản và Điều kiện "
+    }
+  },
+  "support_type_required": {
+    "key": "validation:support_type_required",
+    "messages": {
+      "en": "Support type is required",
+      "vi": "Vui lòng chọn loại hỗ trợ"
+    }
+  },
+  "support_message_required": {
+    "key": "validation:support_message_required",
+    "messages": {
+      "en": "Support message is required",
+      "vi": "Vui lòng nhập nội dung hỗ trợ"
+    }
+  },
+  "support_message_length_validation": {
+    "key": "validation:support_message_length_validation",
+    "messages": {
+      "en": "Please enter 5 to 50 characters",
+      "vi": "Vui lòng nhập 5 đến 300 ký tự"
+    }
+  },
+  "warehouse_required": {
+    "key": "validation:warehouse_required",
+    "messages": {
+      "en": "Warehouse is required",
+      "vi": "Vui lòng chọn kho hàng"
+    }
+  },
+  "delivery_option_required": {
+    "key": "validation:delivery_option_required",
+    "messages": {
+      "en": "Delivery option is required",
+      "vi": "Vui lòng chọn đơn vị vận chuyển"
+    }
+  },
+  "payment_people_required": {
+    "key": "validation:payment_people_required",
+    "messages": {
+      "en": "Payment people is required",
+      "vi": "Vui lòng chọn người chịu phí vận chuyển"
+    }
+  },
+  "payment_method_required": {
+    "key": "validation:payment_method_required",
+    "messages": {
+      "en": "Payment method is required",
+      "vi": "Vui lòng chọn phương thức thanh toán"
+    }
+  },
+  "phone_validation": {
+    "key": "validation:phone_validation",
+    "messages": {
+      "en": "Please enter valid phone number",
+      "vi": "Vui lòng nhập số điện thoại hợp lệ"
+    }
+  },
+  "phone_length_validation": {
+    "key": "validation:phone_length_validation",
+    "messages": {
+      "en": "Enter from 9 to 12 characters",
+      "vi": "Vui lòng nhập 9 đến 12 ký tự"
+    }
+  },
+  "file_length_validation": {
+    "key": "validation:file_length_validation",
+    "messages": {
+      "en": "Please upload at least one file",
+      "vi": "Vui lòng upload ít nhất 1 hình"
+    }
+  }
+}

@@ -1,6 +1,7 @@
 export const ENDPOINT = {
-  LOGIN: '',
-  GET_PROFILE: '',
-  GET_PDP_TRAFFICS: '',
-  GET_PRODUCT_TRAFFICS: '',
+  LOGIN: '/identity-service/v1/identity/get-token',
+  GET_ID: '/order-service/v1/back-office/mco/affiliate/supplier',
+  GET_PROFILE: (id: string) => `/product-service/v1/mco/pdp/${id}`,
+  GET_TRAFFICS: '/order-service/v1/back-office/mco/affiliate/tracking',
+  GET_SUMMARY: '/order-service/v1/back-office/mco/affiliate/summary',
 };

@@ -1,38 +1,32 @@
-import { Box, Card, Grid } from '@mui/material';
-import { H3, H2, Paragraph, H4 } from 'components/Typography';
-import NextImage from 'next/image';
+import { Card, Grid, Skeleton } from '@mui/material';
+import { H2, Paragraph, H5 } from 'components/Typography';
 import React from 'react';
-import { currencies, formatCurrency, getCurrencySuffix } from 'utils/currency';
-import CountUp from 'react-countup';
-import { useAppContext } from 'contexts/AppContext';
-import { formatDatetime } from 'utils/datetime';
 import { useMemo } from 'react';
+import { useAuthContext } from 'contexts/AuthContext';
 
 const CompanyCard = () => {
-  const {
-    state: { pdpInformations, pdpReport, fromDate, toDate },
-  } = useAppContext();
+  const { user, isPdpLoading } = useAuthContext();
 
   const info = useMemo(() => {
     return [
       {
         title: 'Tên công ty',
-        value: pdpInformations?.fullName,
+        value: user?.fullName,
       },
       {
         title: 'Email',
-        value: pdpInformations?.email,
+        value: user?.email,
       },
       {
         title: 'Số điện thoại',
-        value: pdpInformations?.phone,
+        value: user?.phone,
       },
       {
         title: 'Địa chỉ',
-        value: pdpInformations?.address,
+        value: user?.address,
       },
     ];
-  }, [pdpInformations]);
+  }, [user]);
   return (
     <Card
       sx={{
@@ -52,7 +46,9 @@ const CompanyCard = () => {
         {info?.map((item, index) => (
           <Grid item md={6} xs={12} key={index}>
             <Paragraph color="grey.600">{item.title}</Paragraph>
-            <H4 fontWeight={500}>{item.value}</H4>
+            <H5 color="grey.600" fontWeight={500}>
+              {isPdpLoading ? <Skeleton variant="text" sx={{ width: 100 }} /> : item.value}
+            </H5>
           </Grid>
         ))}
       </Grid>

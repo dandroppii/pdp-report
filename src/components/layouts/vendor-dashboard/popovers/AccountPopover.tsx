@@ -1,6 +1,7 @@
 import { Avatar, Box, IconButton, Menu, MenuItem, styled } from '@mui/material';
 import { H6, Small } from 'components/Typography';
 import { useAppContext } from 'contexts/AppContext';
+import { useAuthContext } from 'contexts/AuthContext';
 import React, { useState } from 'react';
 
 // styled components
@@ -12,9 +13,8 @@ const Divider = styled(Box)(({ theme }) => ({
 const AccountPopover = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  const {
-    state: { pdpInformations },
-  } = useAppContext();
+
+  const { logout, user } = useAuthContext();
   const handleClose = () => setAnchorEl(null);
   const handleClick = event => setAnchorEl(event.currentTarget);
 
@@ -27,7 +27,7 @@ const AccountPopover = () => {
         aria-expanded={open ? 'true' : undefined}
         aria-controls={open ? 'account-menu' : undefined}
       >
-        <Avatar alt={pdpInformations?.fullName} src="/assets/images/pdp_logo.png" />
+        <Avatar alt={user?.fullName} src="/assets/images/pdp_logo.png" />
       </IconButton>
 
       <Menu
@@ -70,12 +70,12 @@ const AccountPopover = () => {
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
         <Box px={2} pt={1}>
-          <H6>{pdpInformations?.name}</H6>
-          <Small color="grey.500">{pdpInformations?.email}</Small>
+          <H6>{user?.name}</H6>
+          <Small color="grey.500">{user?.email}</Small>
         </Box>
 
         <Divider />
-        <MenuItem>Đăng xuất</MenuItem>
+        <MenuItem onClick={logout}>Đăng xuất</MenuItem>
       </Menu>
     </Box>
   );

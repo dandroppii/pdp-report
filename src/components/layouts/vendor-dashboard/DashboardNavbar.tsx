@@ -1,19 +1,15 @@
-import { Search } from '@mui/icons-material';
-import { Box, Button, styled, TextField, Theme, useMediaQuery } from '@mui/material';
+import { Box, styled, TextField, Theme, useMediaQuery } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Container from '@mui/material/Container';
-import InputBase from '@mui/material/InputBase';
 import Toolbar from '@mui/material/Toolbar';
 import { FlexBox, FlexRowCenter } from 'components/flex-box';
 import Toggle from 'components/icons/Toggle';
-import { useRouter } from 'next/router';
 import { FC, useCallback } from 'react';
 import AccountPopover from './popovers/AccountPopover';
 import { DatePicker } from '@mui/x-date-pickers-pro';
 import { Paragraph } from 'components/Typography';
-import { useAlertContext } from 'contexts/AlertContext';
-import { useState } from 'react';
 import { useAppContext } from 'contexts/AppContext';
+
 
 // custom styled components
 const DashboardNavbarRoot = styled(AppBar)(({ theme }) => ({

@@ -2,25 +2,23 @@
 import { useCallback, useEffect, useState } from 'react';
 import { createContext } from '@dwarvesf/react-utils';
 
-import { UserResponseData, WithChildren } from '../types/common';
+import { PdpInformations, UserResponseData, WithChildren } from '../types/common';
 import { identityService, services } from 'api';
 import { useTranslations } from 'next-intl';
 import { useAlertContext } from './AlertContext';
 import { FetcherError } from 'libs/fetcher';
 import { STATUS_CODE_NO_AUTH } from 'utils/constants';
 import emitter, { API_REQUEST } from 'libs/emitter';
-import { 
-  STORAGE_REFRESH_TOKEN_KEY,
-  STORAGE_TOKEN_KEY, } from 'constance/key-storage';
+import { STORAGE_REFRESH_TOKEN_KEY, STORAGE_TOKEN_KEY } from 'constance/key-storage';
 import { useRouter } from 'next/router';
 
 interface AuthContextValues {
   isLogin: boolean;
   isLoading?: boolean;
-  user?: UserResponseData;
+  user?: PdpInformations;
   login: (username: string, password: string) => Promise<any>;
   logout: () => void;
-  invalidateUser: () => ReturnType<typeof identityService.getCurrentUser>;
+  isPdpLoading: boolean;
 }
 
 const [Provider, useAuthContext] = createContext<AuthContextValues>({
@@ -31,8 +29,9 @@ const AuthContextProvider = ({ children }: WithChildren) => {
   const t = useTranslations();
   const [isLogin, setIsLogin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState<UserResponseData>();
-  const router = useRouter()
+  const [isPdpLoading, setIsPdpLoading] = useState(true);
+  const [user, setUser] = useState<PdpInformations>();
+  const router = useRouter();
   // const refreshTokenTimeout = useRef<ReturnType<typeof window?.setTimeout>>();
   const { showAlertError, showAlertSuccess } = useAlertContext();
 
@@ -41,17 +40,13 @@ const AuthContextProvider = ({ children }: WithChildren) => {
     window?.localStorage?.removeItem(STORAGE_REFRESH_TOKEN_KEY);
     setIsLogin(false);
     setUser(undefined);
-    router.push('/login')
+    router.push('/login');
   }, [router]);
-
-  // const refreshToken = useCallback(async () => {
-  //   setIsLogin(true);
-  // }, []);
 
   useEffect(() => {
     if (!window?.localStorage?.getItem(STORAGE_TOKEN_KEY)) {
-      setIsLogin(true);
-      // router.push('/login')
+      setIsLogin(false);
+      router.push('/login');
     } else {
       checkUser();
     }
@@ -79,6 +74,36 @@ const AuthContextProvider = ({ children }: WithChildren) => {
     };
   }, [logout]);
 
+  const checkUser = useCallback(async () => {
+    setIsPdpLoading(true);
+    await checkInvalidToken();
+
+    try {
+      const response = await identityService.getCurrentUserId();
+      setIsPdpLoading(false);
+      if (response?.data) {
+        const user = await identityService.getCurrentUser(response?.data);
+        if (user?.data) {
+          setUser(user?.data);
+          setIsLoading(false);
+          setIsLogin(true);
+          router.push('/');
+        } else {
+          logout();
+        }
+      } else {
+        logout();
+      }
+    } catch (error: any) {
+      setIsPdpLoading(false);
+      const { statusCode } = error as FetcherError; //
+
+      if (statusCode === STATUS_CODE_NO_AUTH) {
+        return logout();
+      }
+    }
+  }, [logout, checkInvalidToken, router]);
+
   const login = useCallback(
     async (username: string, password: string) => {
       try {
@@ -93,6 +118,7 @@ const AuthContextProvider = ({ children }: WithChildren) => {
           window?.localStorage.setItem(STORAGE_REFRESH_TOKEN_KEY, data.refreshToken);
           setIsLogin(true);
           showAlertSuccess(t('login_success'));
+          checkUser();
           return true;
         } else {
           showAlertError(message);
@@ -103,37 +129,8 @@ const AuthContextProvider = ({ children }: WithChildren) => {
         return false;
       }
     },
-    [showAlertError, showAlertSuccess, t]
+    [showAlertError, showAlertSuccess, t, checkUser]
   );
-
-  const invalidateUser = useCallback(async () => {
-    const response = await identityService.getCurrentUser();
-    if (response?.data) {
-      setUser(response.data);
-    }
-    return response;
-  }, []);
-
-  const checkUser = useCallback(async () => {
-    await checkInvalidToken();
-
-    try {
-      const user = await identityService.getCurrentUser();
-      if (user?.data) {
-        setUser(user?.data);
-        setIsLoading(false);
-        setIsLogin(true);
-      } else {
-        logout();
-      }
-    } catch (error: any) {
-      const { statusCode } = error as FetcherError; //
-
-      if (statusCode === STATUS_CODE_NO_AUTH) {
-        return logout();
-      }
-    }
-  }, [logout, checkInvalidToken]);
 
   useEffect(() => {
     if (!isLogin) {
@@ -145,7 +142,8 @@ const AuthContextProvider = ({ children }: WithChildren) => {
     }
 
     checkUser();
-  }, [isLogin, checkInvalidToken, logout, checkUser]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Provider
@@ -155,7 +153,7 @@ const AuthContextProvider = ({ children }: WithChildren) => {
         isLoading,
         login,
         logout,
-        invalidateUser,
+        isPdpLoading,
       }}
     >
       {children}

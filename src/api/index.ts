@@ -1,10 +1,8 @@
 import { STORAGE_TOKEN_KEY } from 'constance/key-storage';
 import { identityService } from './identity';
+import { pdpService } from './pdp';
 
-const list = [
-  identityService,
-  
-];
+const list = [identityService, pdpService];
 
 const services = {
   setAuthToken: (token: string) => {
@@ -14,12 +12,12 @@ const services = {
     list.forEach(service => service.clearAuthToken());
   },
 };
-if(typeof window !== 'undefined') {
+if (typeof window !== 'undefined') {
   const token = window?.localStorage?.getItem(STORAGE_TOKEN_KEY);
   if (token) {
     services.setAuthToken(token);
   }
-  
+
   window?.addEventListener('storage', event => {
     const { key, newValue } = event;
     if (key === STORAGE_TOKEN_KEY && newValue) {
@@ -28,10 +26,4 @@ if(typeof window !== 'undefined') {
   });
 }
 
-
-
-export {
-  identityService,
-  services,
-  
-};
+export { identityService, services, pdpService };

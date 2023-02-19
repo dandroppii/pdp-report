@@ -5,18 +5,18 @@ type DatetimeFormat =
   | 'dd/MM/yyyy'
   | 'dd/MM/yyyy HH:mm'
   | 'HH:mm dd/MM/yyyy'
-  | 'HH:mm:ss DD/M/yyyy'
+  | 'HH:mm:ss dd/M/yyyy'
   | 'HH:mm:ss dd/MM/yyyy'
-  | 'yyyy-MM-DD'
+  | 'yyyy-MM-dd'
   | 'dd-MM-yyyy'
   | 'HH:mm dd-MM-yyyy'
-  | 'HH:mm DD-MM-yyyy'
   | 'dd/MM/yyyy';
 
 export function formatDatetime(date: number, f: DatetimeFormat = 'dd/MM/yyyy HH:mm') {
   try {
     return format(new Date(date), f);
   } catch (error) {
+    console.log("🚀 ~ file: datetime.ts:20 ~ formatDatetime ~ error", error)
     return '';
   }
 }

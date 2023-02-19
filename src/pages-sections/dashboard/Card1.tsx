@@ -1,10 +1,11 @@
 import { ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
-import { Card } from '@mui/material';
+import { Card, Skeleton } from '@mui/material';
 import { FlexBetween, FlexBox } from 'components/flex-box';
 import { H3, H6, Paragraph, Span } from 'components/Typography';
 import React, { FC } from 'react';
 import { formatCurrency, getCurrencySuffix } from 'utils/currency';
 import CountUp from 'react-countup';
+import { useAppContext } from 'contexts/AppContext';
 
 // ========================================================
 type Card1Props = {
@@ -18,6 +19,9 @@ type Card1Props = {
 
 const Card1: FC<Card1Props> = props => {
   const { title, traffic, price } = props;
+  const {
+    state: { pdpReportLoading, productReportLoading },
+  } = useAppContext();
 
   return (
     <Card sx={{ p: 2 }}>
@@ -25,19 +29,27 @@ const Card1: FC<Card1Props> = props => {
         <H6 color="grey.600">{title}</H6>
         <FlexBox alignItems={'flex-end'}>
           <H3 color="info.main">
-            <CountUp end={traffic} duration={0.5} separator="." />
+            {pdpReportLoading || productReportLoading ? (
+              <Skeleton variant="text" sx={{ width: 100 }} />
+            ) : (
+              <CountUp end={traffic} duration={0.5} separator="." />
+            )}
           </H3>
         </FlexBox>
       </FlexBetween>
       <FlexBetween alignItems={'flex-end'}>
         <H6 color="grey.600">Doanh thu</H6>
         <H3 color="info.main">
-          <CountUp
-            end={price * traffic}
-            duration={0.5}
-            suffix={` ${getCurrencySuffix()}`}
-            separator="."
-          />
+          {pdpReportLoading || productReportLoading ? (
+            <Skeleton variant="text" sx={{ width: 100 }} />
+          ) : (
+            <CountUp
+              end={price * traffic}
+              duration={0.5}
+              suffix={` ${getCurrencySuffix()}`}
+              separator="."
+            />
+          )}
         </H3>
       </FlexBetween>
     </Card>
