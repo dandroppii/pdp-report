@@ -8,7 +8,7 @@ import { useAppContext } from 'contexts/AppContext';
 import { formatDatetime } from 'utils/datetime';
 import { useAuthContext } from 'contexts/AuthContext';
 
-const WishCard = () => {
+const Revenue = () => {
   const {
     state: { pdpReport, fromDate, toDate, productReport, pdpReportLoading, productReportLoading },
   } = useAppContext();
@@ -56,14 +56,25 @@ const WishCard = () => {
         )}
       </H3>
       <H6 color="grey.600">VAT</H6>
-      <H3 mb={2} color="info.main">8%</H3>
+      <H3 mb={2} color="info.main">
+        {pdpReportLoading || productReportLoading ? (
+          <Skeleton variant="text" sx={{ width: '40%' }} />
+        ) : (
+          <CountUp
+            end={report?.revenue * 0.1 || 0}
+            duration={0.5}
+            suffix={` ${getCurrencySuffix()}`}
+            separator="."
+          />
+        )}
+      </H3>
       <H6 color="grey.600">Tổng tiền thanh toán</H6>
       <H3 color="info.main">
         {pdpReportLoading || productReportLoading ? (
           <Skeleton variant="text" sx={{ width: '40%' }} />
         ) : (
           <CountUp
-            end={report?.revenue * 0.92 || 0}
+            end={report?.revenue * 0.9 || 0}
             duration={0.5}
             suffix={` ${getCurrencySuffix()}`}
             separator="."
@@ -90,4 +101,4 @@ const WishCard = () => {
   );
 };
 
-export default WishCard;
+export default Revenue;

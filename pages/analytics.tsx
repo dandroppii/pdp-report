@@ -98,7 +98,7 @@ export default function AnalyticsPage({}: AnalyticsPageProps) {
       getProductReport(fromDate, toDate)
     );
 
-    Promise.all(obsProduct)
+    const promiseProduct = Promise.all(obsProduct)
       .then((res: PdpReport[]) => {
         setProductReport(res);
       })
@@ -110,6 +110,9 @@ export default function AnalyticsPage({}: AnalyticsPageProps) {
         setPdpReport(res);
       })
       .catch(() => {});
+      return () => {
+        promiseProduct.finally()
+      }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -118,14 +121,14 @@ export default function AnalyticsPage({}: AnalyticsPageProps) {
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <Analytics
-            title={`Lượt tiếp cận thông tin công ty trong năm ${currentYear}`}
+            title={`Số lượng tiếp cận thông tin công ty trong năm ${currentYear}`}
             series={pdpReportSeries}
             descriptions="* Đơn vị: lượt"
           />
         </Grid>
         <Grid item xs={12}>
           <Analytics
-            title={`Lượt tiếp cận thông tin sản phẩm trong năm ${currentYear}`}
+            title={`Số lượng tiếp cận thông tin sản phẩm trong năm ${currentYear}`}
             series={productReportSeries}
             descriptions="* Đơn vị: lượt"
           />

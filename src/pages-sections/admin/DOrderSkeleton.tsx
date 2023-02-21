@@ -7,8 +7,8 @@ const DRowSkeleton: FC<{ numberOfCol: number }> = ({ numberOfCol }) => {
   const rows = new Array(15).fill(1);
   return (
     <>
-      {rows.map(i => (
-        <StyledTableRow sx={{ my: '1rem', padding: '6px 18px' }} key={i}>
+      {rows.map((i, idx) => (
+        <StyledTableRow sx={{ my: '1rem', padding: '6px 18px' }} key={`skeleton_${i}_${idx}`}>
           {cols.map((_item, idx) => (
             <StyledTableCell align="left" key={`row_${idx}`}>
               <Skeleton variant="text" sx={{ fontSize: '1rem', width: '100%' }} />

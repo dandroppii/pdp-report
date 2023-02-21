@@ -6,7 +6,7 @@ import { useAuthContext } from 'contexts/AuthContext';
 import DPageSkeleton from 'pages-sections/admin/PageLoadingSkeleton';
 import Card1 from 'pages-sections/dashboard/Card1';
 import CompanyCard from 'pages-sections/dashboard/CompanyCard';
-import WishCard from 'pages-sections/dashboard/WishCard';
+import Revenue from 'pages-sections/dashboard/Revenue';
 import { useEffect } from 'react';
 import { useMemo } from 'react';
 import { ReactElement } from 'react';
@@ -32,7 +32,7 @@ export default function VendorDashboard() {
     return [
       {
         id: 1,
-        title: 'Traffic công ty',
+        title: 'Số lượng tiếp cận thông tin công ty',
         traffic: pdpReport?.totalVisitInDuration,
         price: pdpReport?.avgPricePerItem,
         color: 'info.main',
@@ -40,7 +40,7 @@ export default function VendorDashboard() {
       },
       {
         id: 2,
-        title: 'Traffic sản phẩm',
+        title: 'Số lượng tiếp cận thông tin sản phẩm',
         traffic: productReport?.totalVisitInDuration,
         price: productReport?.avgPricePerItem,
         color: 'info.main',
@@ -56,10 +56,10 @@ export default function VendorDashboard() {
       </Paragraph>
       <Grid container spacing={3}>
         <Grid item md={6} xs={12}>
-          <WishCard />
+          <Revenue />
         </Grid>
 
-        <Grid container item md={6} xs={12} spacing={3}>
+        <Grid container item md={6} xs={12} spacing={2}>
           {cardList.map(item => (
             <Grid item xs={12} key={item.id}>
               <Card1
