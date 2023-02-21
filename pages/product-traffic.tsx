@@ -81,7 +81,7 @@ export default function ProductTraffic({}: ProductTrafficProps) {
   return (
     <Box py={2}>
       <H1 my={2} textTransform="uppercase" textAlign={'center'}>
-        Số lượng tiếp cận sản phẩm
+        Số lượng tiếp cận thông tin sản phẩm
       </H1>
 
       <Paragraph fontStyle="italic" fontSize={14} mb={3} textAlign="center" color="grey.600">
@@ -110,7 +110,7 @@ export default function ProductTraffic({}: ProductTrafficProps) {
             amount={productReport?.totalVisitInDuration * productReport?.avgPricePerItem}
             currency
             loading={loading}
-            description="* Chưa bao gồm thuế GTGT"
+            description="* Chưa bao gồm VAT"
           ></Card2>
         </Grid>
       </Grid>

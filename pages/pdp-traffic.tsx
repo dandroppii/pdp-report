@@ -111,7 +111,7 @@ export default function PdpTraffic({}: PdpTrafficProps) {
             amount={pdpReport?.totalVisitInDuration * pdpReport?.avgPricePerItem}
             currency
             loading={loading}
-            description="* Chưa bao gồm thuế GTGT"
+            description="* Chưa bao gồm VAT"
           ></Card2>
         </Grid>
       </Grid>

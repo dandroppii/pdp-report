@@ -1,5 +1,5 @@
 import { Card, Grid, Skeleton } from '@mui/material';
-import { H2, Paragraph, H5 } from 'components/Typography';
+import { H2, Paragraph, H5, H6 } from 'components/Typography';
 import React from 'react';
 import { useMemo } from 'react';
 import { useAuthContext } from 'contexts/AuthContext';
@@ -45,7 +45,7 @@ const CompanyCard = () => {
       <Grid container spacing={2}>
         {info?.map((item, index) => (
           <Grid item md={6} xs={12} key={index}>
-            <Paragraph color="grey.600">{item.title}</Paragraph>
+            <H6 color="grey.600">{item.title}</H6>
             <H5 color="grey.600" fontWeight={500}>
               {isPdpLoading ? <Skeleton variant="text" sx={{ width: 100 }} /> : item.value}
             </H5>

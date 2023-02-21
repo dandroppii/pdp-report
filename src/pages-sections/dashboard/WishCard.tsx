@@ -1,5 +1,5 @@
 import { Box, Card, Skeleton } from '@mui/material';
-import { H3, H2, Paragraph } from 'components/Typography';
+import { H3, H2, Paragraph, H6 } from 'components/Typography';
 import NextImage from 'next/image';
 import React, { useMemo } from 'react';
 import { currencies, formatCurrency, getCurrencySuffix } from 'utils/currency';
@@ -41,7 +41,7 @@ const WishCard = () => {
         {formatDatetime(new Date(toDate).getTime(), 'dd/MM/yyyy')}
       </Paragraph>
 
-      <Paragraph color="grey.600">Tổng Phí dịch vụ (chưa VAT)</Paragraph>
+      <H6 color="grey.600">Tổng Phí dịch vụ (chưa VAT)</H6>
 
       <H3 mb={2} color="info.main">
         {pdpReportLoading || productReportLoading ? (
@@ -55,9 +55,9 @@ const WishCard = () => {
           />
         )}
       </H3>
-      <Paragraph color="grey.600">Thuế GTGT</Paragraph>
-      <H3 color="info.main">8%</H3>
-      <Paragraph color="grey.600">Tổng tiền thanh toán</Paragraph>
+      <H6 color="grey.600">VAT</H6>
+      <H3 mb={2} color="info.main">8%</H3>
+      <H6 color="grey.600">Tổng tiền thanh toán</H6>
       <H3 color="info.main">
         {pdpReportLoading || productReportLoading ? (
           <Skeleton variant="text" sx={{ width: '40%' }} />
