@@ -151,7 +151,7 @@ const DashboardSidebar: FC<DashboardSidebarProps> = (props) => {
             alt="Logo"
             width="auto"
             height={24}
-            src="/assets/images/logo.svg"
+            src="/assets/images/logo-mco.svg"
             style={{ marginLeft: 8 }}
           />
         </Box>
@@ -176,12 +176,13 @@ const DashboardSidebar: FC<DashboardSidebarProps> = (props) => {
           src={
             COMPACT
               ? "/assets/images/bazaar-white-sm.svg"
-              : "/assets/images/logo.svg"
+              : "/assets/images/logo-mco.svg"
           }
           sx={{
             borderRadius: 0,
             width: "auto",
             marginLeft: COMPACT ? undefined : 1,
+            height: 50
           }}
         />
 
