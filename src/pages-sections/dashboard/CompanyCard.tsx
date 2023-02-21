@@ -14,11 +14,11 @@ const CompanyCard = () => {
         value: user?.fullName,
       },
       {
-        title: 'Email',
+        title: 'Email liên hệ',
         value: user?.email,
       },
       {
-        title: 'Số điện thoại',
+        title: 'Số điện thoại liên hệ',
         value: user?.phone,
       },
       {

@@ -87,7 +87,7 @@ const AuthContextProvider = ({ children }: WithChildren) => {
           setUser(user?.data);
           setIsLoading(false);
           setIsLogin(true);
-          router.push('/');
+          // router.push('/');
         } else {
           logout();
         }
@@ -102,7 +102,7 @@ const AuthContextProvider = ({ children }: WithChildren) => {
         return logout();
       }
     }
-  }, [logout, checkInvalidToken, router]);
+  }, [logout, checkInvalidToken]);
 
   const login = useCallback(
     async (username: string, password: string) => {

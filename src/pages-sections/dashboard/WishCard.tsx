@@ -41,7 +41,7 @@ const WishCard = () => {
         {formatDatetime(new Date(toDate).getTime(), 'dd/MM/yyyy')}
       </Paragraph>
 
-      <Paragraph color="grey.600">Tổng doanh thu</Paragraph>
+      <Paragraph color="grey.600">Tổng Phí dịch vụ (chưa VAT)</Paragraph>
 
       <H3 mb={2} color="info.main">
         {pdpReportLoading || productReportLoading ? (
@@ -55,9 +55,9 @@ const WishCard = () => {
           />
         )}
       </H3>
-
-      <Paragraph color="grey.600">Doanh thu sau VAT({8}%)</Paragraph>
-
+      <Paragraph color="grey.600">Thuế GTGT</Paragraph>
+      <H3 color="info.main">8%</H3>
+      <Paragraph color="grey.600">Tổng tiền thanh toán</Paragraph>
       <H3 color="info.main">
         {pdpReportLoading || productReportLoading ? (
           <Skeleton variant="text" sx={{ width: '40%' }} />

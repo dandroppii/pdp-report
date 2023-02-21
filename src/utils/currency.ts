@@ -18,7 +18,7 @@ export function formatCurrency(amount: number): string {
 }
 
 export function getCurrencySuffix(): string {
-  return process.env.LOCALE === 'en' ?'$' : '₫' ;
+  return process.env.LOCALE === 'en' ?'$' : 'đồng' ;
 }
 
 export function shortenCurrency(amount: number, t: any): string {

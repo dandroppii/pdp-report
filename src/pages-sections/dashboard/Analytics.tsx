@@ -1,36 +1,28 @@
-import { KeyboardArrowDown } from "@mui/icons-material";
-import {
-  Card,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-  styled,
-  useTheme,
-} from "@mui/material";
-import { FlexBetween } from "components/flex-box";
-import { H5 } from "components/Typography";
-import dynamic from "next/dynamic";
-import { useState } from "react";
-import { analyticsChartOptions } from "./chartsOptions";
+import { Card, Select, styled, useTheme } from '@mui/material';
+import { FlexBetween } from 'components/flex-box';
+import { H2, Paragraph } from 'components/Typography';
+import dynamic from 'next/dynamic';
+import { useMemo } from 'react';
+import { analyticsChartOptions } from './chartsOptions';
 
 // apext chart instance
-const ReactApexChart = dynamic(() => import("react-apexcharts"), {
+const ReactApexChart = dynamic(() => import('react-apexcharts'), {
   ssr: false,
 });
 
 const categories = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
+  'Tháng 1',
+  'Tháng 2',
+  'Tháng 3',
+  'Tháng 4',
+  'Tháng 5',
+  'Tháng 6',
+  'Tháng 7',
+  'Tháng 8',
+  'Tháng 9',
+  'Tháng 10',
+  'Tháng 11',
+  'Tháng 12',
 ];
 
 // styled component
@@ -38,54 +30,55 @@ const StyledSelect = styled(Select)(({ theme }) => ({
   fontSize: 14,
   fontWeight: 500,
   color: theme.palette.grey[600],
-  "& fieldset": { border: "0 !important" },
-  "& .MuiSelect-select": { padding: 0, paddingRight: "8px !important" },
+  '& fieldset': { border: '0 !important' },
+  '& .MuiSelect-select': { padding: 0, paddingRight: '8px !important' },
 }));
 
-const Analytics = () => {
+const Analytics = ({
+  title,
+  series,
+  descriptions,
+  isCurrency,
+  hideLabel
+}: {
+  title: string;
+  series: {
+    name: string;
+    data: number[];
+  }[];
+  descriptions: string;
+  isCurrency?: boolean;
+  hideLabel?:boolean
+}) => {
   const theme = useTheme();
-  const [selectType, setSelectType] = useState("yearly");
-
-  const series = [
-    {
-      name: "Sales",
-      data: [
-        15000, 45000, 12000, 50000, 75000, 13000, 30000, 99000, 75000, 90000,
-        55000, 15000,
-      ],
-    },
-    {
-      name: "Expense",
-      data: [
-        1500, 48000, 19000, 59000, 25000, 9000, 36000, 9000, 79000, 70000,
-        57000, 5000,
-      ],
-    },
-  ];
+  const maxValue = useMemo(() => {
+    const values = [];
+    series.forEach(s => {
+      values.push(...s.data);
+    });
+    const max = Math.max(...values);
+    const length = `${Math.ceil(max)}`.length;
+    const div = +`1${new Array(length - 1 || 1).fill(0).join('')}`;
+    return Math.ceil(max / div) * div;
+  }, [series]);
 
   return (
     <Card sx={{ p: 3 }}>
       <FlexBetween>
-        <H5>Analytics</H5>
-
-        <StyledSelect
-          value={selectType}
-          IconComponent={() => <KeyboardArrowDown />}
-          onChange={(e: SelectChangeEvent<string>) =>
-            setSelectType(e.target.value)
-          }
-        >
-          <MenuItem value="yearly">Yearly</MenuItem>
-          <MenuItem value="monthly">Monthly</MenuItem>
-          <MenuItem value="Weekily">Weekily</MenuItem>
-        </StyledSelect>
+        <H2>{title}</H2>
       </FlexBetween>
+      <Paragraph color="grey.600" fontStyle={'italic'}>
+        * Dữ liệu sẽ được cập nhật chính xác vào cuối tháng
+      </Paragraph>
+      <Paragraph color="grey.600" fontStyle={'italic'}>
+        {descriptions}
+      </Paragraph>
 
       <ReactApexChart
         type="bar"
         height={300}
         series={series}
-        options={analyticsChartOptions(theme, categories)}
+        options={analyticsChartOptions(theme, categories, maxValue, isCurrency, hideLabel)}
       />
     </Card>
   );

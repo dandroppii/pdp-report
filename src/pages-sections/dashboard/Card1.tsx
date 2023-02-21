@@ -33,12 +33,12 @@ const Card1: FC<Card1Props> = props => {
               <Skeleton variant="text" sx={{ width: 100 }} />
             ) : (
               <CountUp end={traffic} duration={0.5} separator="." />
-            )}
+            )} lượt
           </H3>
         </FlexBox>
       </FlexBetween>
       <FlexBetween alignItems={'flex-end'}>
-        <H6 color="grey.600">Doanh thu</H6>
+        <H6 color="grey.600">Phí dịch vụ (chưa VAT)</H6>
         <H3 color="info.main">
           {pdpReportLoading || productReportLoading ? (
             <Skeleton variant="text" sx={{ width: 100 }} />

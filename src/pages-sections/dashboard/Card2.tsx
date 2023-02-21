@@ -1,4 +1,4 @@
-import { ArrowDropUp } from '@mui/icons-material';
+import { ArrowDropUp, Description } from '@mui/icons-material';
 import { Box, Card, Skeleton } from '@mui/material';
 import { FlexBox } from 'components/flex-box';
 import { H3, H6, Paragraph } from 'components/Typography';
@@ -12,10 +12,11 @@ type Card2Props = {
   amount?: number;
   currency?: boolean;
   loading?: boolean;
+  description?: string;
 };
 // =========================================================
 
-const Card2: FC<Card2Props> = ({ children, title, amount, currency, loading }) => {
+const Card2: FC<Card2Props> = ({ children, title, amount, currency, loading, description }) => {
   return (
     <Card
       sx={{
@@ -24,14 +25,14 @@ const Card2: FC<Card2Props> = ({ children, title, amount, currency, loading }) =
         gap: 1,
         height: '100%',
         display: 'flex',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         justifyContent: 'center',
       }}
     >
       <Box flexShrink={0} height="inherit">
         <FlexBox
           flexDirection="column"
-          justifyContent="center"
+          justifyContent="flex-start"
           alignItems="center"
           height="inherit"
           gap={1}
@@ -51,6 +52,9 @@ const Card2: FC<Card2Props> = ({ children, title, amount, currency, loading }) =
               )}
             </H3>
           </Box>
+          <Paragraph fontSize={12} color="grey.600" fontStyle={'italic'}>
+            {description}
+          </Paragraph>
         </FlexBox>
       </Box>
 

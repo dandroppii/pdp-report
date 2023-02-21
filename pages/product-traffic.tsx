@@ -91,14 +91,14 @@ export default function ProductTraffic({}: ProductTrafficProps) {
       <Grid container spacing={3} mb={4}>
         <Grid item xl={4} lg={4} md={4} xs={12}>
           <Card2
-            title="Lượt truy cập"
+            title="Số lượt truy cập"
             amount={productReport?.totalVisitInDuration}
             loading={loading}
           ></Card2>
         </Grid>
         <Grid item xl={4} lg={4} md={4} xs={12}>
           <Card2
-            title="Đơn giá trung bình"
+            title="Đơn giá dịch vụ"
             amount={productReport?.avgPricePerItem}
             currency
             loading={loading}
@@ -106,10 +106,11 @@ export default function ProductTraffic({}: ProductTrafficProps) {
         </Grid>
         <Grid item xl={4} lg={4} md={4} xs={12}>
           <Card2
-            title="Doanh thu chưa VAT"
+            title="Phí dịch vụ"
             amount={productReport?.totalVisitInDuration * productReport?.avgPricePerItem}
             currency
             loading={loading}
+            description="* Chưa bao gồm thuế GTGT"
           ></Card2>
         </Grid>
       </Grid>

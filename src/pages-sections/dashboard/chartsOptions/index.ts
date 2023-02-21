@@ -1,18 +1,19 @@
-import { Theme } from "@mui/material";
-import { ApexOptions } from "apexcharts";
+import { Theme } from '@mui/material';
+import { ApexOptions } from 'apexcharts';
+import { formatCurrency } from 'utils/currency';
 
 export const weeklyChartOptions = (theme: Theme): ApexOptions => ({
   grid: { show: false },
   chart: {
-    background: "transparent",
+    background: 'transparent',
     toolbar: { show: false },
     fontFamily: theme.typography.fontFamily,
   },
   colors: [theme.palette.info.main],
   dataLabels: { enabled: false },
   states: {
-    active: { filter: { type: "none" } },
-    hover: { filter: { type: "none" } },
+    active: { filter: { type: 'none' } },
+    hover: { filter: { type: 'none' } },
   },
   theme: { mode: theme.palette.mode },
   xaxis: {
@@ -38,44 +39,44 @@ export const weeklyChartOptions = (theme: Theme): ApexOptions => ({
     y: { formatter: (val: number) => `$${val}` },
   },
   plotOptions: {
-    bar: { columnWidth: "50%", borderRadius: 5 },
+    bar: { columnWidth: '50%', borderRadius: 5 },
   },
 });
 
 export const productShareChartOptions = (theme: Theme): ApexOptions => ({
-  chart: { background: "transparent" },
+  chart: { background: 'transparent' },
   colors: [theme.palette.info.main],
   plotOptions: {
     radialBar: {
-      hollow: { size: "50%", margin: 0 },
+      hollow: { size: '50%', margin: 0 },
       dataLabels: {
         name: { show: false },
         value: {
           offsetY: 6,
-          fontSize: "14px",
-          fontWeight: "600",
+          fontSize: '14px',
+          fontWeight: '600',
           fontFamily: theme.typography.fontFamily,
         },
       },
     },
   },
-  labels: ["Target"],
+  labels: ['Target'],
   theme: { mode: theme.palette.mode },
-  states: { hover: { filter: { type: "none" } } },
+  states: { hover: { filter: { type: 'none' } } },
 });
 
 export const totalOrderChartOptions = (theme: Theme): ApexOptions => ({
   grid: { show: false },
   chart: {
-    background: "transparent",
+    background: 'transparent',
     toolbar: { show: false },
     fontFamily: theme.typography.fontFamily,
   },
   colors: [theme.palette.info.main],
   dataLabels: { enabled: false },
   states: {
-    active: { filter: { type: "none" } },
-    hover: { filter: { type: "none" } },
+    active: { filter: { type: 'none' } },
+    hover: { filter: { type: 'none' } },
   },
   theme: { mode: theme.palette.mode },
   xaxis: {
@@ -101,27 +102,23 @@ export const totalOrderChartOptions = (theme: Theme): ApexOptions => ({
     y: { formatter: (val: number) => `$${val}` },
   },
   plotOptions: {
-    bar: { columnWidth: "50%", borderRadius: 5 },
+    bar: { columnWidth: '50%', borderRadius: 5 },
   },
 });
 
 export const marketShareChartOptions = (theme: Theme): ApexOptions => ({
-  chart: { background: "transparent", fontFamily: theme.typography.fontFamily },
-  colors: [
-    theme.palette.info.main,
-    theme.palette.warning.main,
-    theme.palette.primary.main,
-  ],
+  chart: { background: 'transparent', fontFamily: theme.typography.fontFamily },
+  colors: [theme.palette.info.main, theme.palette.warning.main, theme.palette.primary.main],
   plotOptions: {
     radialBar: {
-      hollow: { size: "30%", margin: 0 },
+      hollow: { size: '30%', margin: 0 },
       dataLabels: {
         name: { show: false },
-        value: { offsetY: 6, fontSize: "14px", fontWeight: "600" },
+        value: { offsetY: 6, fontSize: '14px', fontWeight: '600' },
         total: {
           show: true,
-          fontSize: "14px",
-          fontWeight: "600",
+          fontSize: '14px',
+          fontWeight: '600',
           formatter: function (w) {
             return w.globals.seriesTotals.reduce((a, b) => a + b, 0);
           },
@@ -129,27 +126,42 @@ export const marketShareChartOptions = (theme: Theme): ApexOptions => ({
       },
     },
   },
-  labels: ["Samsung", "Symphony", "Iphone"],
+  labels: ['Samsung', 'Symphony', 'Iphone'],
   theme: { mode: theme.palette.mode },
-  states: { hover: { filter: { type: "none" } } },
+  states: { hover: { filter: { type: 'none' } } },
 });
 
 export const analyticsChartOptions = (
   theme: Theme,
-  categories: any
-): ApexOptions => ({
+  categories: any,
+  max: number,
+  isCurrency: boolean,
+  hideLabel: boolean
+): any => ({
   chart: {
-    background: "transparent",
+    background: 'transparent',
     toolbar: { show: false },
     fontFamily: theme.typography.fontFamily,
   },
   colors: [theme.palette.info.main, theme.palette.grey[600]],
-  dataLabels: { enabled: false },
+  dataLabels: {
+    enabled: !hideLabel,
+    position: 'top',
+    offsetY: -40,
+    formatter: function (val, opts) {
+      return val ? (isCurrency ? formatCurrency(val) : val) : '';
+    },
+    style: {
+      fontSize: '14px',
+      fontWeight: 600,
+      colors: ['#304758'],
+    },
+  },
   grid: { show: true, borderColor: theme.palette.grey[300] },
   states: {
-    active: { filter: { type: "none" } },
-    hover: { filter: { type: "none" } },
-    normal: { filter: { type: "none" } },
+    active: { filter: { type: 'none' } },
+    hover: { filter: { type: 'none' } },
+    normal: { filter: { type: 'none' } },
   },
   theme: { mode: theme.palette.mode },
   xaxis: {
@@ -157,28 +169,34 @@ export const analyticsChartOptions = (
     axisTicks: { show: false },
     categories: categories,
     labels: {
-      style: { fontSize: "14px", colors: theme.palette.grey[600] },
+      style: { fontSize: '14px', colors: theme.palette.grey[600] },
     },
   },
   yaxis: {
     min: 0,
     show: true,
-    max: 100000,
-    tickAmount: 6,
-    opposite: theme.direction === "rtl",
+    max: max,
+    tickAmount: 5,
+    opposite: theme.direction === 'rtl',
     labels: {
-      style: { fontSize: "14px", colors: theme.palette.grey[600] },
-      formatter: (value) => `${(value / 1000).toFixed(0)}K`,
+      style: { fontSize: '14px', colors: theme.palette.grey[600] },
+      formatter: val => (val ? (isCurrency ? formatCurrency(val) : val) : ''),
     },
   },
   tooltip: { x: { show: false } },
-  stroke: { width: 7, colors: ["transparent"] },
+  stroke: { width: 7, colors: ['transparent'] },
   plotOptions: {
-    bar: { borderRadius: 5, columnWidth: "45%" },
+    bar: {
+      borderRadius: 5,
+      columnWidth: '45%',
+      dataLabels: {
+        position: 'top', // top, center, bottom
+      },
+    },
   },
   legend: {
-    position: "top",
-    fontSize: "14px",
+    position: 'top',
+    fontSize: '14px',
     markers: { radius: 50 },
     onItemClick: { toggleDataSeries: false },
     itemMargin: { horizontal: 10 },
@@ -189,7 +207,13 @@ export const analyticsChartOptions = (
       breakpoint: 900,
       options: {
         plotOptions: {
-          bar: { columnWidth: "55%", borderRadius: 5 },
+          bar: {
+            columnWidth: '55%',
+            borderRadius: 5,
+            dataLabels: {
+              position: 'top', // top, center, bottom
+            },
+          },
         },
       },
     },
@@ -197,25 +221,25 @@ export const analyticsChartOptions = (
       breakpoint: 700,
       options: {
         chart: { height: 550 },
-        stroke: { width: 5, colors: ["transparent"] },
+        stroke: { width: 5, colors: ['transparent'] },
         plotOptions: {
-          bar: { horizontal: true, columnWidth: "35%", borderRadius: 5 },
+          bar: { horizontal: true, columnWidth: '35%', borderRadius: 5 },
         },
         xaxis: {
           min: 0,
-          max: 100000,
-          tickAmount: 6,
+          max: max,
+          tickAmount: 5,
           labels: {
             show: true,
-            style: { fontSize: "14px", colors: theme.palette.grey[600] },
-            formatter: (value) => `${(value / 1000).toFixed(0)}K`,
+            style: { fontSize: '14px', colors: theme.palette.grey[600] },
+            formatter: val => (val ? (isCurrency ? formatCurrency(val) : val) : ''),
           },
         },
         yaxis: {
           show: true,
           labels: {
             show: true,
-            style: { fontSize: "14px", colors: theme.palette.grey[600] },
+            style: { fontSize: '14px', colors: theme.palette.grey[600] },
           },
         },
       },

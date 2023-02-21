@@ -92,14 +92,14 @@ export default function PdpTraffic({}: PdpTrafficProps) {
       <Grid container spacing={3} mb={4}>
         <Grid item xl={4} lg={4} md={4} xs={12}>
           <Card2
-            title="Lượt truy cập"
+            title="Số lượt truy cập"
             amount={pdpReport?.totalVisitInDuration}
             loading={loading}
           ></Card2>
         </Grid>
         <Grid item xl={4} lg={4} md={4} xs={12}>
           <Card2
-            title="Đơn giá"
+            title="Đơn giá dịch vụ"
             amount={pdpReport?.avgPricePerItem}
             currency
             loading={loading}
@@ -107,10 +107,11 @@ export default function PdpTraffic({}: PdpTrafficProps) {
         </Grid>
         <Grid item xl={4} lg={4} md={4} xs={12}>
           <Card2
-            title="Doanh thu"
+            title="Phí dịch vụ"
             amount={pdpReport?.totalVisitInDuration * pdpReport?.avgPricePerItem}
             currency
             loading={loading}
+            description="* Chưa bao gồm thuế GTGT"
           ></Card2>
         </Grid>
       </Grid>
