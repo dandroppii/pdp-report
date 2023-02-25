@@ -56,12 +56,7 @@ const Login = () => {
       },
       onSubmit: handleFormSubmit,
       validationSchema: yup.object({
-        username: yup
-          .string()
-          .required(t('username_required'))
-          .min(5, t('password_length_validation'))
-          .max(50, t('password_length_validation'))
-          .matches(IS_ALPHA_NUMERIC_REGEX, t('no_symbol_validation')),
+        username: yup.string().required(t('username_required')),
         password: yup
           .string()
           .required(t('password_required'))
