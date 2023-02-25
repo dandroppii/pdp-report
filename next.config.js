@@ -5,6 +5,11 @@ function getLocale() {
 
 
 module.exports = {
+  env: {
+    BASE_URL: process.env.BASE_URL,
+    LOCALE: process.env.LOCALE,
+    WEB_URL: process.env.WEB_URL
+  },
   devIndicators: {},
   publicRuntimeConfig: {
     // Available on both server and client
