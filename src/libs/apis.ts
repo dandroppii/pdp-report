@@ -9,7 +9,7 @@ export class Client {
     ...this.headers,
   };
 
-  baseUrl: string = process.env.BASE_URL || 'https://apidev.droppii.com';
+  baseUrl: string = process.env.BASE_URL;
 
   public get formDataHeaders(): Headers {
     const cloned = Object.assign({}, this.privateHeaders);
