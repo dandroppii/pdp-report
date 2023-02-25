@@ -6,7 +6,7 @@ import { BaseResponse, LoginResponseData, PdpInformations, UserResponseData } fr
 
 class IdentityService extends Client {
   public login(params: { UserName: string; Password: string }) {
-    return fetcher<BaseResponse<LoginResponseData>>(`${this.baseUrl}${ENDPOINT.LOGIN}`, {
+    return fetcher<BaseResponse<LoginResponseData>>(`${process.env.BASE_URL}${ENDPOINT.LOGIN}`, {
       headers: this.headers,
       method: 'POST',
       body: JSON.stringify(params),
@@ -14,13 +14,13 @@ class IdentityService extends Client {
   }
 
   public getCurrentUser(id: string) {
-    return fetcher<BaseResponse<PdpInformations>>(`${this.baseUrl}${ENDPOINT.GET_PROFILE(id)}`, {
+    return fetcher<BaseResponse<PdpInformations>>(`${process.env.BASE_URL}${ENDPOINT.GET_PROFILE(id)}`, {
       headers: this.privateHeaders,
     });
   }
 
   public getCurrentUserId() {
-    return fetcher<BaseResponse<string>>(`${this.baseUrl}${ENDPOINT.GET_ID}`, {
+    return fetcher<BaseResponse<string>>(`${process.env.BASE_URL}${ENDPOINT.GET_ID}`, {
       headers: this.privateHeaders,
     });
   }

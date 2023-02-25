@@ -13,7 +13,7 @@ import {
 class PdpService extends Client {
   public getPdpReport(params: { fromDate: string; toDate: string; type: 'PDP' | 'PRODUCT' }) {
     return fetcher<BaseResponse<PdpReport>>(
-      `${this.baseUrl}${ENDPOINT.GET_SUMMARY}?${qs.stringify(params)}`,
+      `${process.env.BASE_URL}${ENDPOINT.GET_SUMMARY}?${qs.stringify(params)}`,
       {
         headers: this.privateHeaders,
       }
@@ -27,7 +27,7 @@ class PdpService extends Client {
     page: number;
   }) {
     return fetcher<BaseResponse<TrafficItem[]>>(
-      `${this.baseUrl}${ENDPOINT.GET_TRAFFICS}?${qs.stringify(params)}`,
+      `${process.env.BASE_URL}${ENDPOINT.GET_TRAFFICS}?${qs.stringify(params)}`,
       {
         headers: this.privateHeaders,
       }
