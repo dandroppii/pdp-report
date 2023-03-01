@@ -74,7 +74,7 @@ const Revenue = () => {
           <Skeleton variant="text" sx={{ width: '40%' }} />
         ) : (
           <CountUp
-            end={report?.revenue * 0.9 || 0}
+            end={report?.revenue * 1.1 || 0}
             duration={0.5}
             suffix={` ${getCurrencySuffix()}`}
             separator="."
