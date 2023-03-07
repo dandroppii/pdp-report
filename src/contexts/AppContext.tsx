@@ -174,9 +174,7 @@ export const AppProvider: React.FC = ({ children }) => {
       getProductReport(fromDate, toDate);
       getPdpReport(fromDate, toDate);
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fromDate, toDate, isLogin]);
+  }, [fromDate, toDate, isLogin, getProductReport, getPdpReport]);
 
   return <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>;
 };
