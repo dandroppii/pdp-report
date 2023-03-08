@@ -49,7 +49,7 @@ const Revenue = () => {
         ) : (
           <CountUp
             end={report?.revenue || 0}
-            duration={0.5}
+            duration={0.1}
             suffix={` ${getCurrencySuffix()}`}
             separator="."
           />
@@ -62,7 +62,7 @@ const Revenue = () => {
         ) : (
           <CountUp
             end={report?.revenue * 0.1 || 0}
-            duration={0.5}
+            duration={0.1}
             suffix={` ${getCurrencySuffix()}`}
             separator="."
           />
@@ -75,7 +75,7 @@ const Revenue = () => {
         ) : (
           <CountUp
             end={report?.revenue * 1.1 || 0}
-            duration={0.5}
+            duration={0.1}
             suffix={` ${getCurrencySuffix()}`}
             separator="."
           />
