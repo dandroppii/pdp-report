@@ -32,7 +32,7 @@ const Card1: FC<Card1Props> = props => {
             {pdpReportLoading || productReportLoading ? (
               <Skeleton variant="text" sx={{ width: 100 }} />
             ) : (
-              <CountUp end={traffic} duration={0.5} separator="." />
+              <CountUp end={traffic} duration={0.05} separator="." />
             )} lượt
           </H3>
         </FlexBox>
@@ -45,7 +45,7 @@ const Card1: FC<Card1Props> = props => {
           ) : (
             <CountUp
               end={price * traffic}
-              duration={0.5}
+              duration={0.05}
               suffix={` ${getCurrencySuffix()}`}
               separator="."
             />
