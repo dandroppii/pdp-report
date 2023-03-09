@@ -1,4 +1,13 @@
-import { Box, Card, debounce, Grid, Stack, Table, TableContainer } from '@mui/material';
+import {
+  Box,
+  Card,
+  CircularProgress,
+  debounce,
+  Grid,
+  Stack,
+  Table,
+  TableContainer,
+} from '@mui/material';
 import TableBody from '@mui/material/TableBody';
 import TableHeader from 'components/data-table/TableHeader';
 import TablePagination from 'components/data-table/TablePagination';
@@ -83,7 +92,14 @@ export default function ProductTraffic({}: ProductTrafficProps) {
       </H1>
 
       <Paragraph fontStyle="italic" fontSize={14} mb={3} textAlign="center" color="grey.600">
-        Dữ liệu sẽ được cập nhật chính xác trong vòng 72h tới
+        {loading ? (
+          <>
+            <CircularProgress color="primary" size={20} sx={{ marginRight: '10px', marginBottom: '-5px' }} />
+            Đang tải dữ liệu, vui lòng đợi trong giây lát
+          </>
+        ) : (
+          <>Dữ liệu sẽ được cập nhật chính xác trong vòng 72h tới</>
+        )}
       </Paragraph>
 
       <Grid container spacing={3} mb={4}>

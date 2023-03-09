@@ -1,4 +1,4 @@
-import { Box, Grid } from '@mui/material';
+import { Box, CircularProgress, Grid } from '@mui/material';
 import VendorDashboardLayout from 'components/layouts/vendor-dashboard';
 import { Paragraph } from 'components/Typography';
 import { useAppContext } from 'contexts/AppContext';
@@ -25,7 +25,7 @@ type DashboardProps = {
 
 export default function VendorDashboard() {
   const {
-    state: { pdpReport, productReport },
+    state: { pdpReport, productReport, pdpReportLoading, productReportLoading },
   } = useAppContext();
 
   const cardList = useMemo(() => {
@@ -52,7 +52,14 @@ export default function VendorDashboard() {
   return (
     <Box py={2}>
       <Paragraph fontStyle="italic" fontSize={14} mb={2} textAlign="center" color="grey.600">
-        Dữ liệu sẽ được cập nhật chính xác trong vòng 72h tới
+        {pdpReportLoading || productReportLoading ? (
+          <>
+            <CircularProgress color="primary" size={20} sx={{ marginRight: '10px', marginBottom: '-5px' }} />
+            Đang tải dữ liệu, vui lòng đợi trong giây lát
+          </>
+        ) : (
+          <>Dữ liệu sẽ được cập nhật chính xác trong vòng 72h tới</>
+        )}
       </Paragraph>
       <Grid container spacing={3}>
         <Grid item md={6} xs={12}>
