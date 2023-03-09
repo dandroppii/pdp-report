@@ -10,7 +10,6 @@ import { DatePicker } from '@mui/x-date-pickers-pro';
 import { Paragraph } from 'components/Typography';
 import { useAppContext } from 'contexts/AppContext';
 
-
 // custom styled components
 const DashboardNavbarRoot = styled(AppBar)(({ theme }) => ({
   zIndex: 11,
@@ -46,7 +45,7 @@ type DashboardNavbarProps = {
 
 const DashboardNavbar: FC<DashboardNavbarProps> = ({ handleDrawerToggle }) => {
   const {
-    state: { fromDate, toDate },
+    state: { fromDate, toDate, pdpReportLoading, productReportLoading },
     dispatch,
   } = useAppContext();
   const downLg = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
@@ -81,6 +80,7 @@ const DashboardNavbar: FC<DashboardNavbarProps> = ({ handleDrawerToggle }) => {
             <Paragraph> Từ </Paragraph>
             <DatePicker
               // minDate={new Date('2021-03-01')}
+              disabled={pdpReportLoading || productReportLoading}
               maxDate={toDate}
               value={fromDate}
               onChange={handeChangeFromDate}
@@ -92,6 +92,7 @@ const DashboardNavbar: FC<DashboardNavbarProps> = ({ handleDrawerToggle }) => {
             <Paragraph> đến </Paragraph>
 
             <DatePicker
+              disabled={pdpReportLoading || productReportLoading}
               minDate={fromDate}
               maxDate={new Date()}
               value={toDate}

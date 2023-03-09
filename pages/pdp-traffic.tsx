@@ -1,4 +1,4 @@
-import { Box, Card, debounce, Grid, Stack, Table, TableContainer } from '@mui/material';
+import { Box, Card, Grid, Stack, Table, TableContainer } from '@mui/material';
 import TableBody from '@mui/material/TableBody';
 import TableHeader from 'components/data-table/TableHeader';
 import TablePagination from 'components/data-table/TablePagination';
@@ -68,10 +68,8 @@ export default function PdpTraffic({}: PdpTrafficProps) {
     [toDate, fromDate]
   );
 
-  const debounceChange = useCallback(debounce(getPdpTraffic, 300), []);
-
   useEffect(() => {
-    debounceChange(1);
+    getPdpTraffic(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fromDate, toDate]);
 
@@ -153,8 +151,9 @@ export default function PdpTraffic({}: PdpTrafficProps) {
 
         <Stack alignItems="center" my={4}>
           <TablePagination
+            disabled={loading}
             onChange={(_e, page) => {
-              debounceChange(page);
+              getPdpTraffic(page);
             }}
             count={totalPage}
             page={currentPage}

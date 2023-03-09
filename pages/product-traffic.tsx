@@ -67,10 +67,8 @@ export default function ProductTraffic({}: ProductTrafficProps) {
     [toDate, fromDate]
   );
 
-  const debounceChange = useCallback(debounce(getProductTraffic, 300), []);
-
   useEffect(() => {
-    debounceChange(1);
+    getProductTraffic(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fromDate, toDate]);
 
@@ -163,8 +161,9 @@ export default function ProductTraffic({}: ProductTrafficProps) {
 
         <Stack alignItems="center" my={4}>
           <TablePagination
+            disabled={loading}
             onChange={(_e, page) => {
-              debounceChange(page);
+              getProductTraffic(page);
             }}
             count={totalPage}
             page={currentPage}
