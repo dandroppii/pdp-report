@@ -14,7 +14,6 @@ export const layoutConstant = {
   mobileHeaderHeight: 64,
 };
 
-
 export const ACTION_NAME = {
   TOGGLE_ALERT: 'TOGGLE_ALERT',
 };
@@ -24,3 +23,4 @@ export const STATUS_CODE_NO_AUTH = 401;
 export const ITEM_PER_PAGE = 12;
 export const ITEM_PER_SLIDE = 10;
 export const PAGE_START = 1;
+export const MAX_ITEM_PER_SHEET = 5000;

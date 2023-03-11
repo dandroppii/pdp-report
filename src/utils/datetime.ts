@@ -10,13 +10,14 @@ type DatetimeFormat =
   | 'yyyy-MM-dd'
   | 'dd-MM-yyyy'
   | 'HH:mm dd-MM-yyyy'
-  | 'dd/MM/yyyy';
+  | 'dd/MM/yyyy'
+  | 'yyyyMMdd';
 
 export function formatDatetime(date: number, f: DatetimeFormat = 'dd/MM/yyyy HH:mm') {
   try {
     return format(new Date(date), f);
   } catch (error) {
-    console.log("🚀 ~ file: datetime.ts:20 ~ formatDatetime ~ error", error)
+    console.log('🚀 ~ file: datetime.ts:20 ~ formatDatetime ~ error', error);
     return '';
   }
 }

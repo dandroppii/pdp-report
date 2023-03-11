@@ -39,7 +39,7 @@ const Analytics = ({
   series,
   descriptions,
   isCurrency,
-  hideLabel
+  hideLabel,
 }: {
   title: string;
   series: {
@@ -48,7 +48,7 @@ const Analytics = ({
   }[];
   descriptions: string;
   isCurrency?: boolean;
-  hideLabel?:boolean
+  hideLabel?: boolean;
 }) => {
   const theme = useTheme();
   const maxValue = useMemo(() => {
@@ -63,7 +63,11 @@ const Analytics = ({
   }, [series]);
 
   return (
-    <Card sx={{ p: 3 }}>
+    <Card
+      sx={{
+        p: 3,
+      }}
+    >
       <FlexBetween>
         <H2>{title}</H2>
       </FlexBetween>
@@ -76,6 +80,7 @@ const Analytics = ({
 
       <ReactApexChart
         type="bar"
+        width={1000}
         height={300}
         series={series}
         options={analyticsChartOptions(theme, categories, maxValue, isCurrency, hideLabel)}

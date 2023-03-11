@@ -1,6 +1,7 @@
 import { Theme } from '@mui/material';
 import { ApexOptions } from 'apexcharts';
 import { formatCurrency } from 'utils/currency';
+import { formatNumber } from 'utils/number';
 
 export const weeklyChartOptions = (theme: Theme): ApexOptions => ({
   grid: { show: false },
@@ -149,7 +150,7 @@ export const analyticsChartOptions = (
     position: 'top',
     offsetY: -40,
     formatter: function (val, opts) {
-      return val ? (isCurrency ? formatCurrency(val) : val) : '';
+      return val ? (isCurrency ? formatCurrency(val) : formatNumber(val)) : '';
     },
     style: {
       fontSize: '14px',
@@ -169,7 +170,8 @@ export const analyticsChartOptions = (
     axisTicks: { show: false },
     categories: categories,
     labels: {
-      style: { fontSize: '14px', colors: theme.palette.grey[600] },
+      style: { fontSize: '14px', colors: theme.palette.grey[600],
+     },
     },
   },
   yaxis: {
@@ -180,7 +182,7 @@ export const analyticsChartOptions = (
     opposite: theme.direction === 'rtl',
     labels: {
       style: { fontSize: '14px', colors: theme.palette.grey[600] },
-      formatter: val => (val ? (isCurrency ? formatCurrency(val) : val) : ''),
+      formatter: val => (val ? (isCurrency ? formatCurrency(val) : formatNumber(val)) : ''),
     },
   },
   tooltip: { x: { show: false } },
@@ -232,7 +234,7 @@ export const analyticsChartOptions = (
           labels: {
             show: true,
             style: { fontSize: '14px', colors: theme.palette.grey[600] },
-            formatter: val => (val ? (isCurrency ? formatCurrency(val) : val) : ''),
+            formatter: val => (val ? (isCurrency ? formatCurrency(val) : formatNumber(val)) : ''),
           },
         },
         yaxis: {

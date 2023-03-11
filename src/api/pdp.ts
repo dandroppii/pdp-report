@@ -28,11 +28,13 @@ class PdpService extends Client {
     toDate: string;
     type: 'PDP' | 'PRODUCT';
     page: number;
+    size?: number;
   }) {
     return fetcher<BaseResponse<TrafficItem[]>>(
       `${process.env.BASE_URL}${ENDPOINT.GET_TRAFFICS}?${qs.stringify({
         ...params,
         sortField: 'visitTime',
+        size: params.size || 20,
       })}`,
       {
         headers: this.privateHeaders,

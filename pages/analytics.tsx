@@ -110,23 +110,41 @@ export default function AnalyticsPage({}: AnalyticsPageProps) {
         setPdpReport(res);
       })
       .catch(() => {});
-      return () => {
-        promiseProduct.finally()
-      }
+    return () => {
+      promiseProduct.finally();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <Box py={2}>
       <Grid container spacing={3}>
-        <Grid item xs={12}>
+        <Grid
+          item
+          xs={12}
+          sx={{
+            '@media print': {
+              'page-break-after': 'always',
+              display: 'block',
+            },
+          }}
+        >
           <Analytics
             title={`Số lượng tiếp cận thông tin công ty trong năm ${currentYear}`}
             series={pdpReportSeries}
             descriptions="* Đơn vị: lượt"
           />
         </Grid>
-        <Grid item xs={12}>
+        <Grid
+          item
+          xs={12}
+          sx={{
+            '@media print': {
+              'page-break-after': 'always',
+              display: 'block',
+            },
+          }}
+        >
           <Analytics
             title={`Số lượng tiếp cận thông tin sản phẩm trong năm ${currentYear}`}
             series={productReportSeries}

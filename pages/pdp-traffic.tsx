@@ -1,10 +1,23 @@
-import { Box, Card, CircularProgress, Grid, Stack, Table, TableContainer } from '@mui/material';
+import {
+  Box,
+  Card,
+  CircularProgress,
+  Dialog,
+  DialogContent,
+  Grid,
+  LinearProgress,
+  Stack,
+  Table,
+  TableContainer,
+  styled,
+  Button,
+} from '@mui/material';
 import TableBody from '@mui/material/TableBody';
 import TableHeader from 'components/data-table/TableHeader';
 import TablePagination from 'components/data-table/TablePagination';
 import VendorDashboardLayout from 'components/layouts/vendor-dashboard';
 import Scrollbar from 'components/Scrollbar';
-import { H1, Paragraph } from 'components/Typography';
+import { H1, H2, Paragraph } from 'components/Typography';
 import useMuiTable from 'hooks/useMuiTable';
 import { StyledTableCell, StyledTableRow } from 'pages-sections/admin';
 import React, { ReactElement } from 'react';
@@ -14,10 +27,15 @@ import { useAppContext } from 'contexts/AppContext';
 import { useState } from 'react';
 import { PDPTrafficItem } from 'types/common';
 import { useCallback } from 'react';
-import { GET_PDP_TRAFFICS_RESPONSE } from 'constance/mockPdpData';
 import { useEffect } from 'react';
 import DRowSkeleton from 'pages-sections/admin/DOrderSkeleton';
 import { pdpService } from 'api';
+import { exportToExcel } from 'react-json-to-excel';
+import { useAuthContext } from 'contexts/AuthContext';
+import { convertToSlug } from 'utils/utils';
+import { MAX_ITEM_PER_SHEET } from 'utils/constants';
+import { FlexBox } from 'components/flex-box';
+import toast, { Toaster } from 'react-hot-toast';
 
 const tableHeading = [
   { id: 'no', label: 'No', align: 'left' },
@@ -31,6 +49,30 @@ PdpTraffic.getLayout = function getLayout(page: ReactElement) {
 };
 // =============================================================================
 
+export const ContentWrapper = styled(Box)(({ theme }) => ({
+  textAlign: 'center',
+
+  '& .carousel:hover': {
+    cursor: 'pointer',
+    '& .carousel__back-button': { opacity: 1, left: 10 },
+    '& .carousel__next-button': { opacity: 1, right: 10 },
+  },
+  '& .carousel__next-button, & .carousel__back-button': {
+    opacity: 0,
+    boxShadow: 'none',
+    transition: 'all 0.3s',
+    background: 'transparent',
+    color: theme.palette.primary.main,
+    ':disabled': { color: theme.palette.grey[500] },
+    ':hover': {
+      color: theme.palette.primary.main,
+      backgroundColor: 'transparent',
+    },
+  },
+  '& .carousel__back-button': { left: 0 },
+  '& .carousel__next-button': { right: 0 },
+}));
+
 type PdpTrafficProps = {};
 
 // =============================================================================
@@ -39,11 +81,20 @@ export default function PdpTraffic({}: PdpTrafficProps) {
   const {
     state: { fromDate, toDate, pdpReport },
   } = useAppContext();
+  const { user } = useAuthContext();
 
   const [pdpTraffic, setPdpTraffic] = useState<PDPTrafficItem[]>([]);
   const [totalPage, setTotalPage] = useState<number>(1);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPageDownload, setTotalPageDownload] = useState<number>(100);
+  const [percent, setPercent] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+
+  const resetDownload = useCallback(() => {
+    setPercent(0);
+    setOpenDialog(false);
+  }, []);
 
   const getPdpTraffic = useCallback(
     async (pageNumber: number) => {
@@ -60,6 +111,7 @@ export default function PdpTraffic({}: PdpTrafficProps) {
           setPdpTraffic(response.data);
           setTotalPage(response.pageable.totalPages);
           setCurrentPage(pageNumber);
+          setTotalPageDownload(Math.ceil(response.pageable.totalElements / MAX_ITEM_PER_SHEET));
         }
       } catch (error) {
         setLoading(false);
@@ -67,6 +119,87 @@ export default function PdpTraffic({}: PdpTrafficProps) {
     },
     [toDate, fromDate]
   );
+
+  const triggerDownloadReport = useCallback(
+    data => {
+      try {
+        const fileName = `traffic_cong_ty_${convertToSlug(
+          user.fullName
+        )}_report_tu_${formatDatetime(fromDate.getTime(), 'yyyyMMdd')}_den_${formatDatetime(
+          toDate.getTime(),
+          'yyyyMMdd'
+        )}`;
+        exportToExcel(
+          [
+            {
+              sheetName: 'Tổng quan',
+              details: [
+                {
+                  'Số lượt truy cập': pdpReport?.totalVisitInDuration,
+                  'Đơn giá dịch vụ': pdpReport?.avgPricePerItem,
+                  'Phí dịch vụ': pdpReport?.totalVisitInDuration * pdpReport?.avgPricePerItem,
+                },
+              ],
+            },
+            ...data,
+          ],
+          fileName,
+          true
+        );
+        resetDownload();
+        toast.success('Tải báo cáo thành công!');
+      } catch (error) {
+        toast.error(error.message);
+        resetDownload();
+      }
+    },
+    [fromDate, toDate, user.fullName, resetDownload, pdpReport]
+  );
+
+  const getPdpTrafficDownload = useCallback(
+    async (pageNumber: number) => {
+      try {
+        const response = await pdpService.getPdpTraffics({
+          fromDate: formatDatetime(fromDate.getTime(), 'yyyy-MM-dd'),
+          toDate: formatDatetime(toDate.getTime(), 'yyyy-MM-dd'),
+          type: 'PDP',
+          page: pageNumber,
+          size: MAX_ITEM_PER_SHEET,
+        });
+        if (response.statusCode === 0) {
+          const page = response.pageable.pageNumber;
+          setPercent(page + 1);
+          const startIndex = (page - 1) * MAX_ITEM_PER_SHEET;
+          const newSheet = {
+            sheetName: `${startIndex + 1} - ${startIndex + response.data.length}`,
+            details: response.data.map((item, index) => ({
+              STT: startIndex + index + 1,
+              'Thời gian': formatDatetime(item.visitTime),
+              'Thiết bị': item.userAgent,
+            })),
+          };
+          return newSheet;
+        } else {
+          return [];
+        }
+      } catch (error) {
+        toast.error('Lỗi khi tải dữ liệu. Vui lòng thử lại sau vài phút!');
+        resetDownload();
+      }
+    },
+    [toDate, fromDate, resetDownload]
+  );
+
+  const startDownload = useCallback(async () => {
+    setOpenDialog(true);
+    setPercent(0);
+    const dataDownload = [];
+    for (let i = 0; i < totalPageDownload; i++) {
+      const res = await getPdpTrafficDownload(i + 1);
+      dataDownload.push(res);
+    }
+    triggerDownloadReport(dataDownload);
+  }, [getPdpTrafficDownload, totalPageDownload, triggerDownloadReport]);
 
   useEffect(() => {
     getPdpTraffic(1);
@@ -86,7 +219,11 @@ export default function PdpTraffic({}: PdpTrafficProps) {
       <Paragraph fontStyle="italic" fontSize={14} mb={3} textAlign="center" color="grey.600">
         {loading ? (
           <>
-            <CircularProgress color="primary" size={20} sx={{ marginRight: '10px', marginBottom: '-5px' }} />
+            <CircularProgress
+              color="primary"
+              size={20}
+              sx={{ marginRight: '10px', marginBottom: '-5px' }}
+            />
             Đang tải dữ liệu, vui lòng đợi trong giây lát
           </>
         ) : (
@@ -122,6 +259,11 @@ export default function PdpTraffic({}: PdpTrafficProps) {
       </Grid>
 
       <Card>
+        <FlexBox justifyContent={'flex-end'} m={1}>
+          <Button variant="contained" color="primary" onClick={startDownload} disabled={loading}>
+            Tải báo cáo
+          </Button>
+        </FlexBox>
         <Scrollbar>
           <TableContainer sx={{ minWidth: 1100 }}>
             <Table>
@@ -167,6 +309,26 @@ export default function PdpTraffic({}: PdpTrafficProps) {
           />
         </Stack>
       </Card>
+
+      <Dialog open={openDialog} maxWidth={false} sx={{ zIndex: 1501 }}>
+        <DialogContent sx={{ maxWidth: 500, width: '100%', p: '40px' }}>
+          <ContentWrapper>
+            <H2>Đang chuẩn bị dữ liệu </H2>
+            <Paragraph my={2}>
+              Báo cáo của bạn sẽ được tự động tải xuống sau vài giây. Vui lòng không tắt trình
+              duyệt!
+            </Paragraph>
+          </ContentWrapper>
+          <Box mt={3}>
+            <LinearProgress
+              variant="buffer"
+              value={(100 * percent) / totalPageDownload}
+              valueBuffer={(100 * percent) / totalPageDownload}
+            />
+          </Box>
+        </DialogContent>
+      </Dialog>
+      <Toaster toastOptions={{ duration: 4000 }} />
     </Box>
   );
 }

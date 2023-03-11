@@ -157,4 +157,11 @@ export interface PDPTrafficItem {
   visitType: string;
   productName: string;
   productLink: string;
+  userAgent: string;
+}
+
+export interface PDPTrafficItemForDownload {
+  STT: number;
+  'Thời gian': string;
+  'Thiết bị': string;
 }

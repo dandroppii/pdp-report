@@ -18,6 +18,9 @@ const DashboardNavbarRoot = styled(AppBar)(({ theme }) => ({
   backgroundColor: '#ffffff',
   boxShadow: theme.shadows[2],
   color: theme.palette.text.primary,
+  '@media print': {
+    display: 'none',
+  },
 }));
 
 const StyledToolBar = styled(Toolbar)(() => ({
@@ -41,6 +44,7 @@ const ToggleWrapper = styled(FlexRowCenter)(({ theme }) => ({
 type DashboardNavbarProps = {
   handleDrawerToggle: () => void;
 };
+``;
 // ===================================================================
 
 const DashboardNavbar: FC<DashboardNavbarProps> = ({ handleDrawerToggle }) => {
