@@ -79,9 +79,9 @@ type PdpTrafficProps = {};
 
 export default function PdpTraffic({}: PdpTrafficProps) {
   const {
-    state: { fromDate, toDate, pdpReport },
+    state: { fromDate, toDate, pdpReport, pdpId },
   } = useAppContext();
-  const { user } = useAuthContext();
+  const { user, isAdmin } = useAuthContext();
 
   const [pdpTraffic, setPdpTraffic] = useState<PDPTrafficItem[]>([]);
   const [totalPage, setTotalPage] = useState<number>(1);
@@ -105,6 +105,7 @@ export default function PdpTraffic({}: PdpTrafficProps) {
           toDate: formatDatetime(toDate.getTime(), 'yyyy-MM-dd'),
           type: 'PDP',
           page: pageNumber,
+          supplierId: pdpId,
         });
         setLoading(false);
         if (response.statusCode === 0) {
@@ -117,7 +118,7 @@ export default function PdpTraffic({}: PdpTrafficProps) {
         setLoading(false);
       }
     },
-    [toDate, fromDate]
+    [toDate, fromDate, pdpId]
   );
 
   const triggerDownloadReport = useCallback(
@@ -202,9 +203,9 @@ export default function PdpTraffic({}: PdpTrafficProps) {
   }, [getPdpTrafficDownload, totalPageDownload, triggerDownloadReport]);
 
   useEffect(() => {
-    getPdpTraffic(1);
+    (!isAdmin || (isAdmin && pdpId)) && getPdpTraffic(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fromDate, toDate]);
+  }, [fromDate, toDate, pdpId, isAdmin]);
 
   const { order, orderBy, selected, filteredList, handleRequestSort } = useMuiTable({
     listData: pdpTraffic,

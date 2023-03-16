@@ -81,6 +81,18 @@ const DashboardNavbar: FC<DashboardNavbarProps> = ({ handleDrawerToggle }) => {
           <Box flexGrow={1} />
 
           <FlexBox alignItems="center" gap={2}>
+            <Paragraph> Chọn nhà cung cấp </Paragraph>
+            <DatePicker
+              disabled={pdpReportLoading || productReportLoading}
+              maxDate={toDate}
+              value={fromDate}
+              onChange={handeChangeFromDate}
+              dayOfWeekFormatter={day => {
+                return day.toUpperCase();
+              }}
+              renderInput={params => <TextField {...params} helperText={null} />}
+            ></DatePicker>
+            <Paragraph> đến </Paragraph>
             <Paragraph> Từ </Paragraph>
             <DatePicker
               // minDate={new Date('2021-03-01')}

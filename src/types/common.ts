@@ -127,6 +127,7 @@ export interface PdpInformations {
   backgroundUrl: string;
   avatarUrl: string;
   avatar: string;
+  isAdmin: boolean;
 }
 
 export interface PdpReport {
@@ -164,4 +165,9 @@ export interface PDPTrafficItemForDownload {
   STT: number;
   'Thời gian': string;
   'Thiết bị': string;
+}
+
+export interface ListPdp {
+  name: string;
+  id: string;
 }
