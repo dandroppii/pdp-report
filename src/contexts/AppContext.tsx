@@ -16,14 +16,17 @@ type initialState = {
   pdpReportLoading: boolean;
   productReportLoading: boolean;
   listPdp: ListPdp[];
-  pdpId: string;
+  selectedPdp: ListPdp;
   listPdpLoading: boolean;
 };
 
 type fromDateActionType = { type: 'SET_FROM_DATE'; payload: Date };
 type listPdpActionType = { type: 'SET_LIST_PDP'; payload: ListPdp[] };
 type listPdpLoadingActionType = { type: 'SET_LIST_PDP_LOADING'; payload: boolean };
-type pdpIdActionType = { type: 'SET_PDP_ID'; payload: string };
+type selectedPdpActionType = {
+  type: 'SET_SELECTED_PDP';
+  payload: ListPdp;
+};
 type toDateActionType = { type: 'SET_TO_DATE'; payload: Date };
 type pdpReportActionType = { type: 'SET_PDP_REPORT'; payload: PdpReport };
 type productReportActionType = { type: 'SET_PRODUCT_REPORT'; payload: PdpReport };
@@ -38,7 +41,7 @@ type ActionType =
   | productReportLoadingActionType
   | listPdpActionType
   | listPdpLoadingActionType
-  | pdpIdActionType;
+  | selectedPdpActionType;
 
 // =================================================================================
 
@@ -50,7 +53,7 @@ const initState: initialState = {
   pdpReportLoading: false,
   productReportLoading: true,
   listPdp: [],
-  pdpId: '',
+  selectedPdp: null,
   listPdpLoading: false,
 };
 
@@ -87,9 +90,9 @@ const reducer = (state: initialState, action: ActionType) => {
       return newState;
     }
 
-    case 'SET_PDP_ID': {
+    case 'SET_SELECTED_PDP': {
       const newState = produce(state, draftState => {
-        draftState.pdpId = action.payload;
+        draftState.selectedPdp = action.payload;
       });
       return newState;
     }
@@ -137,7 +140,7 @@ const reducer = (state: initialState, action: ActionType) => {
 
 export const AppProvider: React.FC = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initState);
-  const { fromDate, toDate, pdpId } = useMemo(() => {
+  const { fromDate, toDate, selectedPdp } = useMemo(() => {
     return state;
   }, [state]);
   const { isLogin, isAdmin } = useAuthContext();
@@ -156,7 +159,7 @@ export const AppProvider: React.FC = ({ children }) => {
       if (response.statusCode === 0) {
         dispatch({
           type: 'SET_LIST_PDP',
-          payload: response.data,
+          payload: response.data?.map(i => ({ id: i.id, name: i.fullName })),
         });
       }
     } catch (error) {
@@ -230,11 +233,17 @@ export const AppProvider: React.FC = ({ children }) => {
   const contextValue = useMemo(() => ({ state, dispatch }), [state, dispatch]);
 
   useEffect(() => {
-    if (isLogin && (!isAdmin || (isAdmin && pdpId))) {
-      getProductReport(fromDate, toDate, pdpId);
-      getPdpReport(fromDate, toDate, pdpId);
+    if (isLogin && (!isAdmin || (isAdmin && selectedPdp?.id))) {
+      getProductReport(fromDate, toDate, selectedPdp?.id);
+      getPdpReport(fromDate, toDate, selectedPdp?.id);
     }
-  }, [fromDate, toDate, isLogin, getProductReport, getPdpReport, isAdmin, pdpId]);
+  }, [fromDate, toDate, isLogin, getProductReport, getPdpReport, isAdmin, selectedPdp?.id]);
+
+  useEffect(() => {
+    if (isLogin && isAdmin) {
+      getListPdp();
+    }
+  }, [isLogin, isAdmin, getListPdp]);
 
   return <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>;
 };

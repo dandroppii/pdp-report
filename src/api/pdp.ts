@@ -5,6 +5,7 @@ import qs from 'query-string';
 import {
   BaseResponse,
   ListPdp,
+  ListPdpResponse,
   LoginResponseData,
   PdpReport,
   TrafficItem,
@@ -50,7 +51,7 @@ class PdpService extends Client {
   }
 
   public getListPdp() {
-    return fetcher<BaseResponse<ListPdp[]>>(
+    return fetcher<BaseResponse<ListPdpResponse[]>>(
       `${process.env.BASE_URL}${ENDPOINT.GET_LIST_PDP}?size=999`,
       {
         headers: this.privateHeaders,

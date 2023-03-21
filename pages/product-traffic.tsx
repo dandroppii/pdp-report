@@ -56,7 +56,7 @@ type ProductTrafficProps = {};
 
 export default function ProductTraffic({}: ProductTrafficProps) {
   const {
-    state: { fromDate, toDate, productReport, pdpId },
+    state: { fromDate, toDate, productReport, selectedPdp },
   } = useAppContext();
   const { user, isAdmin } = useAuthContext();
   const [productTraffic, setProductTraffic] = useState<TrafficItem[]>([]);
@@ -179,9 +179,9 @@ export default function ProductTraffic({}: ProductTrafficProps) {
   }, [getProductTrafficDownload, totalPageDownload, triggerDownloadReport]);
 
   useEffect(() => {
-    (!isAdmin || (isAdmin && pdpId)) && getProductTraffic(1);
+    (!isAdmin || (isAdmin && selectedPdp)) && getProductTraffic(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fromDate, toDate, pdpId, isAdmin]);
+  }, [fromDate, toDate, selectedPdp, isAdmin]);
 
   const { order, orderBy, selected, filteredList, handleRequestSort } = useMuiTable({
     listData: productTraffic,

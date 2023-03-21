@@ -171,3 +171,9 @@ export interface ListPdp {
   name: string;
   id: string;
 }
+
+export interface ListPdpResponse {
+  name: string;
+  id: string;
+  fullName: string;
+}
