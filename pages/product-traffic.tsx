@@ -151,6 +151,8 @@ export default function ProductTraffic({}: ProductTrafficProps) {
             sheetName: `${startIndex + 1} - ${startIndex + response.data.length}`,
             details: response.data.map((item, index) => ({
               STT: startIndex + index + 1,
+              'Sản phẩm': item.productName,
+              'Link sản phẩm': item.productLink,
               'Thời gian': formatDatetime(item.visitTime),
               'Thiết bị': item.userAgent,
             })),
