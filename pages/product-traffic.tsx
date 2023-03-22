@@ -128,6 +128,7 @@ export default function ProductTraffic({}: ProductTrafficProps) {
         resetDownload();
         toast.success('Tải báo cáo thành công!');
       } catch (error) {
+        console.log('🚀 ~ file: product-traffic.tsx:131 ~ ProductTraffic ~ error:', error);
         toast.error(error.message);
         resetDownload();
       }
@@ -164,6 +165,7 @@ export default function ProductTraffic({}: ProductTrafficProps) {
           return [];
         }
       } catch (error) {
+        console.log('🚀 ~ file: product-traffic.tsx:167 ~ error:', error);
         toast.error('Lỗi khi tải dữ liệu. Vui lòng thử lại sau vài phút!');
         resetDownload();
       }
@@ -172,21 +174,25 @@ export default function ProductTraffic({}: ProductTrafficProps) {
   );
 
   const startDownload = useCallback(async () => {
-    setOpenDialog(true);
-    setPercent(0);
-    const dataDownload = [];
-    for (let i = 0; i < totalPageDownload; i++) {
-      const index = Math.round(i / 40);
-      const res = await getProductTrafficDownload(i + 1);
-      if (dataDownload[index]) {
-        dataDownload[index].push(res);
-      } else {
-        dataDownload[index] = [res];
+    try {
+      setOpenDialog(true);
+      setPercent(0);
+      const dataDownload = [];
+      for (let i = 0; i < totalPageDownload; i++) {
+        const index = Math.round(i / 40);
+        const res = await getProductTrafficDownload(i + 1);
+        if (dataDownload[index]) {
+          dataDownload[index].push(res);
+        } else {
+          dataDownload[index] = [res];
+        }
       }
+      dataDownload.forEach((data, index) => {
+        triggerDownloadReport(data, index, dataDownload.length === 1);
+      });
+    } catch (error) {
+      console.log('🚀 ~ file: product-traffic.tsx:192 ~ startDownload ~ error:', error);
     }
-    dataDownload.forEach((data, index) => {
-      triggerDownloadReport(data, index, dataDownload.length === 1);
-    });
   }, [getProductTrafficDownload, totalPageDownload, triggerDownloadReport]);
 
   useEffect(() => {
