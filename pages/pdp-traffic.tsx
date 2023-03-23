@@ -122,31 +122,33 @@ export default function PdpTraffic({}: PdpTrafficProps) {
   );
 
   const triggerDownloadReport = useCallback(
-    data => {
+    (data, index, isOneFile) => {
       try {
-        const fileName = `traffic_cong_ty_${convertToSlug(
-          user.fullName
-        )}_report_tu_${formatDatetime(fromDate.getTime(), 'yyyyMMdd')}_den_${formatDatetime(
-          toDate.getTime(),
-          'yyyyMMdd'
-        )}`;
-        exportToExcel(
-          [
-            {
-              sheetName: 'Tổng quan',
-              details: [
-                {
-                  'Số lượt truy cập': pdpReport?.totalVisitInDuration,
-                  'Đơn giá dịch vụ': pdpReport?.avgPricePerItem,
-                  'Phí dịch vụ': pdpReport?.totalVisitInDuration * pdpReport?.avgPricePerItem,
-                },
-              ],
-            },
-            ...data,
-          ],
-          fileName,
-          true
-        );
+        const fileName = isOneFile
+          ? `traffic_cong_ty_${convertToSlug(user?.fullName)}_report_tu_${formatDatetime(
+              fromDate.getTime(),
+              'yyyyMMdd'
+            )}_den_${formatDatetime(toDate.getTime(), 'yyyyMMdd')}`
+          : `traffic_cong_ty_${convertToSlug(user?.fullName)}_report_tu_${formatDatetime(
+              fromDate.getTime(),
+              'yyyyMMdd'
+            )}_den_${formatDatetime(toDate.getTime(), 'yyyyMMdd')}_part_${index + 1}`;
+        const exportData = index
+          ? data
+          : [
+              {
+                sheetName: 'Tổng quan',
+                details: [
+                  {
+                    'Số lượt truy cập': pdpReport?.totalVisitInDuration,
+                    'Đơn giá dịch vụ': pdpReport?.avgPricePerItem,
+                    'Phí dịch vụ': pdpReport?.totalVisitInDuration * pdpReport?.avgPricePerItem,
+                  },
+                ],
+              },
+              ...data,
+            ];
+        exportToExcel(exportData, fileName, true);
         resetDownload();
         toast.success('Tải báo cáo thành công!');
       } catch (error) {
@@ -154,7 +156,7 @@ export default function PdpTraffic({}: PdpTrafficProps) {
         resetDownload();
       }
     },
-    [fromDate, toDate, user.fullName, resetDownload, pdpReport]
+    [fromDate, toDate, user?.fullName, resetDownload, pdpReport]
   );
 
   const getPdpTrafficDownload = useCallback(
@@ -196,10 +198,17 @@ export default function PdpTraffic({}: PdpTrafficProps) {
     setPercent(0);
     const dataDownload = [];
     for (let i = 0; i < totalPageDownload; i++) {
+      const index = Math.round(i / 40);
       const res = await getPdpTrafficDownload(i + 1);
-      dataDownload.push(res);
+      if (dataDownload[index]) {
+        dataDownload[index].push(res);
+      } else {
+        dataDownload[index] = [res];
+      }
     }
-    triggerDownloadReport(dataDownload);
+    dataDownload.forEach((data, index) => {
+      triggerDownloadReport(data, index, dataDownload.length === 1);
+    });
   }, [getPdpTrafficDownload, totalPageDownload, triggerDownloadReport]);
 
   useEffect(() => {

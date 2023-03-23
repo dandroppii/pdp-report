@@ -97,40 +97,43 @@ export default function ProductTraffic({}: ProductTrafficProps) {
   );
 
   const triggerDownloadReport = useCallback(
-    data => {
+    (data, index, isOneFile) => {
       try {
-        const fileName = `traffic_san_pham_${convertToSlug(
-          user.fullName
-        )}_report_tu_${formatDatetime(fromDate.getTime(), 'yyyyMMdd')}_den_${formatDatetime(
-          toDate.getTime(),
-          'yyyyMMdd'
-        )}`;
-        exportToExcel(
-          [
-            {
-              sheetName: 'Tổng quan',
-              details: [
-                {
-                  'Số lượt truy cập': productReport?.totalVisitInDuration,
-                  'Đơn giá dịch vụ': productReport?.avgPricePerItem,
-                  'Phí dịch vụ':
-                    productReport?.totalVisitInDuration * productReport?.avgPricePerItem,
-                },
-              ],
-            },
-            ...data,
-          ],
-          fileName,
-          true
-        );
+        const fileName = isOneFile
+          ? `traffic_san_pham_${convertToSlug(user?.fullName)}_report_tu_${formatDatetime(
+              fromDate.getTime(),
+              'yyyyMMdd'
+            )}_den_${formatDatetime(toDate.getTime(), 'yyyyMMdd')}`
+          : `traffic_san_pham_${convertToSlug(user?.fullName)}_report_tu_${formatDatetime(
+              fromDate.getTime(),
+              'yyyyMMdd'
+            )}_den_${formatDatetime(toDate.getTime(), 'yyyyMMdd')}_part_${index + 1}`;
+        const exportData = index
+          ? data
+          : [
+              {
+                sheetName: 'Tổng quan',
+                details: [
+                  {
+                    'Số lượt truy cập': productReport?.totalVisitInDuration,
+                    'Đơn giá dịch vụ': productReport?.avgPricePerItem,
+                    'Phí dịch vụ':
+                      productReport?.totalVisitInDuration * productReport?.avgPricePerItem,
+                  },
+                ],
+              },
+              ...data,
+            ];
+        exportToExcel(exportData, fileName, true);
         resetDownload();
         toast.success('Tải báo cáo thành công!');
       } catch (error) {
+        console.log('🚀 ~ file: product-traffic.tsx:131 ~ ProductTraffic ~ error:', error);
         toast.error(error.message);
         resetDownload();
       }
     },
-    [fromDate, toDate, user.fullName, resetDownload, productReport]
+    [fromDate, toDate, user?.fullName, resetDownload, productReport]
   );
 
   const getProductTrafficDownload = useCallback(
@@ -162,6 +165,7 @@ export default function ProductTraffic({}: ProductTrafficProps) {
           return [];
         }
       } catch (error) {
+        console.log('🚀 ~ file: product-traffic.tsx:167 ~ error:', error);
         toast.error('Lỗi khi tải dữ liệu. Vui lòng thử lại sau vài phút!');
         resetDownload();
       }
@@ -170,14 +174,25 @@ export default function ProductTraffic({}: ProductTrafficProps) {
   );
 
   const startDownload = useCallback(async () => {
-    setOpenDialog(true);
-    setPercent(0);
-    const dataDownload = [];
-    for (let i = 0; i < totalPageDownload; i++) {
-      const res = await getProductTrafficDownload(i + 1);
-      dataDownload.push(res);
+    try {
+      setOpenDialog(true);
+      setPercent(0);
+      const dataDownload = [];
+      for (let i = 0; i < totalPageDownload; i++) {
+        const index = Math.round(i / 40);
+        const res = await getProductTrafficDownload(i + 1);
+        if (dataDownload[index]) {
+          dataDownload[index].push(res);
+        } else {
+          dataDownload[index] = [res];
+        }
+      }
+      dataDownload.forEach((data, index) => {
+        triggerDownloadReport(data, index, dataDownload.length === 1);
+      });
+    } catch (error) {
+      console.log('🚀 ~ file: product-traffic.tsx:192 ~ startDownload ~ error:', error);
     }
-    triggerDownloadReport(dataDownload);
   }, [getProductTrafficDownload, totalPageDownload, triggerDownloadReport]);
 
   useEffect(() => {
