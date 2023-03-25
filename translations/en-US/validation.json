@@ -20,6 +20,7 @@
   "password_required": "Password is required",
   "payment_method_required": "Payment method is required",
   "payment_people_required": "Payment people is required",
+  "pdp_required": "Support type is required",
   "phone_length_validation": "Enter from 9 to 12 characters",
   "phone_required": "Phone number is required",
   "phone_validation": "Please enter valid phone number",

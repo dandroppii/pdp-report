@@ -17,10 +17,10 @@ import TableHeader from 'components/data-table/TableHeader';
 import TablePagination from 'components/data-table/TablePagination';
 import VendorDashboardLayout from 'components/layouts/vendor-dashboard';
 import Scrollbar from 'components/Scrollbar';
-import { H1, H2, Paragraph } from 'components/Typography';
+import { H1, H2, H4, Paragraph } from 'components/Typography';
 import useMuiTable from 'hooks/useMuiTable';
 import { StyledTableCell, StyledTableRow } from 'pages-sections/admin';
-import React, { ReactElement, useCallback, useEffect, useState } from 'react';
+import React, { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import Card2 from 'pages-sections/dashboard/Card2';
 import { formatDatetime } from 'utils/datetime';
 import { GET_PRODUCT_TRAFFICS_RESPONSE } from 'constance/mockPdpData';
@@ -32,16 +32,27 @@ import { pdpService } from 'api';
 import { MAX_ITEM_PER_SHEET } from 'utils/constants';
 import toast, { Toaster } from 'react-hot-toast';
 import { convertToSlug } from 'utils/utils';
+import { formatNumber } from 'utils/number';
 import { exportToExcel } from 'react-json-to-excel';
 import { useAuthContext } from 'contexts/AuthContext';
 import { ContentWrapper } from './pdp-traffic';
 import { FlexBox } from 'components/flex-box';
+import BazaarSwitch from 'components/BazaarSwitch';
+import { formatCurrency } from 'utils/currency';
+import ReactToPrint from 'react-to-print';
 
 const tableHeading = [
-  { id: 'no', label: 'No', align: 'left' },
+  { id: 'no', label: 'No', align: 'center', size: 'small' },
   { id: 'productName', label: 'Sản phẩm', align: 'left' },
   { id: 'startTime', label: 'Thời gian', align: 'center' },
   { id: 'userAgent', label: 'Thiết bị', align: 'center' },
+];
+
+const tableHeadingBasic = [
+  { id: 'no', label: 'No', align: 'center', size: 'small' },
+  { id: 'productName', label: 'Sản phẩm', align: 'left' },
+  { id: 'totalVisit', label: 'Số lượt truy cập', align: 'center' },
+  { id: 'cost', label: 'Chi phí', align: 'right' },
 ];
 
 // =============================================================================
@@ -63,9 +74,11 @@ export default function ProductTraffic({}: ProductTrafficProps) {
   const [totalPage, setTotalPage] = useState<number>(1);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isBasicMode, setIsBasicMode] = useState<boolean>(true);
   const [totalPageDownload, setTotalPageDownload] = useState<number>(100);
   const [percent, setPercent] = useState<number>(0);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const contentPrintRef = useRef();
 
   const resetDownload = useCallback(() => {
     setPercent(0);
@@ -204,9 +217,37 @@ export default function ProductTraffic({}: ProductTrafficProps) {
     listData: productTraffic,
   });
 
+  const productTrafficBasic = [
+    {
+      id: '9a16528c-d339-434e-b2eb-2382c366bc4e',
+      supplierId: '2db211d8-0baf-46c8-bd4d-d2fed8a7cf66',
+      price: 1100,
+      taxPercent: 10,
+      visitTime: 1675456467570,
+      visitType: 'PRODUCT',
+      productName: 'THIẾT BỊ LỌC NƯỚC MÀNG LỌC SỢI RỖNG  WATEK',
+      productLink:
+        'https://mco.com.vn/product/thiet-bi-loc-nuoc-mang-loc-soi-rong--watek?id=0a6c729a-40d8-484e-9010-5c7788761381&type=0&sId=2db211d8-0baf-46c8-bd4d-d2fed8a7cf66',
+      userAgent:
+        'Mozilla/5.0 (Linux; Android 12; SM-S906N Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/80.0.3987.119 Mobile Safari/537.36',
+      totalVisit: 1000,
+    },
+  ];
+
+  const {
+    order: orderBasic,
+    orderBy: orderByBasic,
+    selected: selectedBasic,
+    filteredList: filteredListBasic,
+    handleRequestSort: handleRequestSortBasic,
+  } = useMuiTable({
+    listData: productTrafficBasic,
+    pageSize: productTrafficBasic?.length,
+  });
+
   return (
     <Box py={2}>
-      <H1 my={2} textTransform="uppercase" textAlign={'center'}>
+      <H1 my={2} textTransform="uppercase" textAlign={'center'} color="grey.900">
         Số lượng tiếp cận thông tin sản phẩm
       </H1>
 
@@ -254,65 +295,181 @@ export default function ProductTraffic({}: ProductTrafficProps) {
 
       <Card>
         <FlexBox justifyContent={'flex-end'} m={1}>
-          <Button variant="contained" color="primary" onClick={startDownload} disabled={loading}>
-            Tải báo cáo
-          </Button>
+          <Box mr={2}>
+            Xem chi tiết{' '}
+            <BazaarSwitch
+              color="info"
+              checked={!isBasicMode}
+              onChange={e => {
+                setIsBasicMode(!e?.target?.checked);
+              }}
+            />
+          </Box>
+          {isBasicMode ? (
+            <ReactToPrint
+              documentTitle="Số lượng tiếp cận thông tin sản phẩm"
+              content={() => contentPrintRef.current}
+              trigger={() => (
+                <Button variant="contained" color="primary">
+                  Tải báo cáo
+                </Button>
+              )}
+            />
+          ) : (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={startDownload}
+              disabled={loading || !productTraffic.length}
+            >
+              In báo cáo
+            </Button>
+          )}
         </FlexBox>
-        <Scrollbar>
-          <TableContainer>
-            <Table>
-              <TableHeader
-                order={order}
-                hideSelectBtn
-                orderBy={orderBy}
-                heading={tableHeading}
-                rowCount={productTraffic.length}
-                numSelected={selected.length}
-                onRequestSort={handleRequestSort}
+        {isBasicMode ? (
+          <>
+            <Scrollbar>
+              <Box
+                ref={(element: any) => (contentPrintRef.current = element)}
+                sx={{
+                  '@media print': {
+                    '.MuiTableHead-root': {
+                      backgroundColor: 'transparent !important',
+                    },
+                    '.MuiTableContainer-root': {
+                      padding: '10px 30px 30px 30px',
+                    },
+                    'th, tr, td': {
+                      border: '1px solid !important',
+                      color: '#2B3445 !important',
+                    },
+                    a: {
+                      color: '#2B3445 !important',
+                    },
+                    h4: {
+                      display: 'block',
+                      marginTop: '30px',
+                    },
+                  },
+                }}
+              >
+                <H4
+                  my={2}
+                  textTransform="uppercase"
+                  textAlign={'center'}
+                  color="grey.900"
+                  sx={{ display: 'none' }}
+                >
+                  Số lượng tiếp cận thông tin sản phẩm từ{' '}
+                  {formatDatetime(fromDate.getTime(), 'dd/MM/yyyy')} đến{' '}
+                  {formatDatetime(toDate.getTime(), 'dd/MM/yyyy')}
+                </H4>
+
+                <TableContainer>
+                  <Table>
+                    <TableHeader
+                      order={orderBasic}
+                      hideSelectBtn
+                      orderBy={orderByBasic}
+                      heading={tableHeadingBasic}
+                      rowCount={productTrafficBasic.length}
+                      numSelected={selectedBasic.length}
+                      onRequestSort={handleRequestSortBasic}
+                    />
+
+                    <TableBody>
+                      {loading ? (
+                        <DRowSkeleton numberOfCol={4}></DRowSkeleton>
+                      ) : (
+                        filteredListBasic.map((item, index) => (
+                          <StyledTableRow key={index}>
+                            <StyledTableCell align="center" size="small">
+                              {index + 1}
+                            </StyledTableCell>
+                            <StyledTableCell align="left">
+                              <ExternalLink
+                                color="blue.main"
+                                href={item.productLink}
+                                rel="noopener noreferrer"
+                                target="_blank"
+                                title={item.productName}
+                              >
+                                {item.productName}
+                              </ExternalLink>
+                            </StyledTableCell>
+                            <StyledTableCell align="center">
+                              {formatNumber(item.totalVisit)}
+                            </StyledTableCell>
+                            <StyledTableCell align="right">
+                              {formatCurrency(item.totalVisit * item.price)}
+                            </StyledTableCell>
+                          </StyledTableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Box>
+            </Scrollbar>
+          </>
+        ) : (
+          <>
+            <Scrollbar>
+              <TableContainer>
+                <Table>
+                  <TableHeader
+                    order={order}
+                    hideSelectBtn
+                    orderBy={orderBy}
+                    heading={tableHeading}
+                    rowCount={productTraffic.length}
+                    numSelected={selected.length}
+                    onRequestSort={handleRequestSort}
+                  />
+
+                  <TableBody>
+                    {loading ? (
+                      <DRowSkeleton numberOfCol={4}></DRowSkeleton>
+                    ) : (
+                      filteredList.map((item, index) => (
+                        <StyledTableRow key={index}>
+                          <StyledTableCell align="left">
+                            {(currentPage - 1) * 20 + index + 1}
+                          </StyledTableCell>
+                          <StyledTableCell align="left">
+                            <ExternalLink
+                              color="blue.main"
+                              href={item.productLink}
+                              rel="noopener noreferrer"
+                              target="_blank"
+                              title={item.productName}
+                            >
+                              {item.productName}
+                            </ExternalLink>
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {formatDatetime(item.visitTime)}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">{item.userAgent}</StyledTableCell>
+                        </StyledTableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Scrollbar>
+            <Stack alignItems="center" my={4}>
+              <TablePagination
+                disabled={loading}
+                onChange={(_e, page) => {
+                  getProductTraffic(page);
+                }}
+                count={totalPage}
+                page={currentPage}
               />
-
-              <TableBody>
-                {loading ? (
-                  <DRowSkeleton numberOfCol={4}></DRowSkeleton>
-                ) : (
-                  filteredList.map((item, index) => (
-                    <StyledTableRow key={index}>
-                      <StyledTableCell align="left">
-                        {(currentPage - 1) * 20 + index + 1}
-                      </StyledTableCell>
-                      <StyledTableCell align="left">
-                        <ExternalLink
-                          color="blue.main"
-                          href={item.productLink}
-                          rel="noopener noreferrer"
-                          target="_blank"
-                          title={item.productName}
-                        >
-                          {item.productName}
-                        </ExternalLink>
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        {formatDatetime(item.visitTime)}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">{item.userAgent}</StyledTableCell>
-                    </StyledTableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Scrollbar>
-
-        <Stack alignItems="center" my={4}>
-          <TablePagination
-            disabled={loading}
-            onChange={(_e, page) => {
-              getProductTraffic(page);
-            }}
-            count={totalPage}
-            page={currentPage}
-          />
-        </Stack>
+            </Stack>
+          </>
+        )}
       </Card>
       <Dialog open={openDialog} maxWidth={false} sx={{ zIndex: 1501 }}>
         <DialogContent sx={{ maxWidth: 500, width: '100%', p: '40px' }}>

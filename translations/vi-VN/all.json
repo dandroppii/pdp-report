@@ -34,6 +34,7 @@
   "no_symbol_validation": "Viết liền không dấu, không chứa kí tự đặc biệt",
   "agreement_required": "Vui lòng xác nhận các Điều khoản và Điều kiện ",
   "support_type_required": "Vui lòng chọn loại hỗ trợ",
+  "pdp_required": "Vui lòng chọn nhà cung cấp",
   "support_message_required": "Vui lòng nhập nội dung hỗ trợ",
   "support_message_length_validation": "Vui lòng nhập 5 đến 300 ký tự",
   "warehouse_required": "Vui lòng chọn kho hàng",

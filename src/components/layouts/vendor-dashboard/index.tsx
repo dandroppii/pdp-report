@@ -24,7 +24,7 @@ const InnerWrapper = styled(Box)(({ theme }) => ({
   [theme.breakpoints.down(1550)]: { paddingLeft: '2rem', paddingRight: '2rem' },
 }));
 
-const VendorDashboardLayout = ({ children }) => {
+const VendorDashboardLayout = ({ children, adminFeature = false }) => {
   const [sidebarCompact, setSidebarCompact] = useState(0);
   const [showMobileSideBar, setShowMobileSideBar] = useState(0);
   const { isLogin, isLoading, isAdmin } = useAuthContext();
@@ -60,7 +60,7 @@ const VendorDashboardLayout = ({ children }) => {
       <BodyWrapper compact={sidebarCompact ? 1 : 0}>
         <DashboardNavbar handleDrawerToggle={handleMobileDrawerToggle} />
         <InnerWrapper>
-          {!isAdmin || (isAdmin && selectedPdp?.id) ? children : <RequirePdp />}
+          {!isAdmin || (isAdmin && (selectedPdp?.id || adminFeature)) ? children : <RequirePdp />}
         </InnerWrapper>
       </BodyWrapper>
     </Fragment>

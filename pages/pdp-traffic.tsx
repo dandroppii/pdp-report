@@ -222,7 +222,7 @@ export default function PdpTraffic({}: PdpTrafficProps) {
 
   return (
     <Box py={2}>
-      <H1 my={2} textTransform="uppercase" textAlign={'center'}>
+      <H1 my={2} textTransform="uppercase" textAlign={'center'} color="grey.900">
         Số lượng tiếp cận thông tin công ty
       </H1>
 
@@ -270,7 +270,12 @@ export default function PdpTraffic({}: PdpTrafficProps) {
 
       <Card>
         <FlexBox justifyContent={'flex-end'} m={1}>
-          <Button variant="contained" color="primary" onClick={startDownload} disabled={loading}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={startDownload}
+            disabled={loading || !pdpTraffic.length}
+          >
             Tải báo cáo
           </Button>
         </FlexBox>

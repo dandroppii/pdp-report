@@ -3,7 +3,7 @@ import { PDP_INFORMATION, PDP_REPORT } from 'constance/mockPdpData';
 import produce from 'immer';
 import React, { createContext, useContext, useEffect, useMemo, useReducer } from 'react';
 import { useCallback } from 'react';
-import { ListPdp, PdpInformations, PdpReport } from 'types/common';
+import { ListPdp, ListPdpResponse, PdpInformations, PdpReport } from 'types/common';
 import { formatDatetime } from 'utils/datetime';
 import { useAuthContext } from './AuthContext';
 
@@ -20,10 +20,12 @@ type initialState = {
   listPdpLoading: boolean;
   pdpProfile?: PdpInformations;
   pdpProfileLoading: boolean;
+  listPdpFull: ListPdpResponse[];
 };
 
 type fromDateActionType = { type: 'SET_FROM_DATE'; payload: Date };
 type listPdpActionType = { type: 'SET_LIST_PDP'; payload: ListPdp[] };
+type listPdpFullActionType = { type: 'SET_LIST_PDP_FULL'; payload: ListPdpResponse[] };
 type listPdpLoadingActionType = { type: 'SET_LIST_PDP_LOADING'; payload: boolean };
 type selectedPdpActionType = {
   type: 'SET_SELECTED_PDP';
@@ -55,6 +57,7 @@ type ActionType =
   | listPdpLoadingActionType
   | setPdpProfileActionType
   | setPdpProfileLoadingActionType
+  | listPdpFullActionType
   | selectedPdpActionType;
 
 // =================================================================================
@@ -71,6 +74,7 @@ const initState: initialState = {
   listPdpLoading: false,
   pdpProfile: null,
   pdpProfileLoading: false,
+  listPdpFull: [],
 };
 
 interface ContextProps {
@@ -95,6 +99,13 @@ const reducer = (state: initialState, action: ActionType) => {
     case 'SET_LIST_PDP': {
       const newState = produce(state, draftState => {
         draftState.listPdp = action.payload;
+      });
+      return newState;
+    }
+
+    case 'SET_LIST_PDP_FULL': {
+      const newState = produce(state, draftState => {
+        draftState.listPdpFull = action.payload;
       });
       return newState;
     }
@@ -189,6 +200,10 @@ export const AppProvider: React.FC = ({ children }) => {
         dispatch({
           type: 'SET_LIST_PDP',
           payload: response.data?.map(i => ({ id: i.id, name: i.fullName })),
+        });
+        dispatch({
+          type: 'SET_LIST_PDP_FULL',
+          payload: response.data,
         });
       }
     } catch (error) {

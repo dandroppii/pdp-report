@@ -176,4 +176,7 @@ export interface ListPdpResponse {
   name: string;
   id: string;
   fullName: string;
+  phone: string;
+  email: string;
+  status: string
 }

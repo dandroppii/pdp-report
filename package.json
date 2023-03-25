@@ -64,6 +64,7 @@
     "react-hot-toast": "^2.4.0",
     "react-json-to-excel": "^1.0.7",
     "react-scroll": "^1.8.4",
+    "react-to-print": "^2.14.12",
     "sharp": "^0.30.3",
     "simplebar-react": "^2.3.6",
     "stylis": "^4.1.1",

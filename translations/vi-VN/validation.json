@@ -20,6 +20,7 @@
   "password_required": "Vui lòng nhập mật khẩu",
   "payment_method_required": "Vui lòng chọn phương thức thanh toán",
   "payment_people_required": "Vui lòng chọn người chịu phí vận chuyển",
+  "pdp_required": "Vui lòng chọn nhà cung cấp",
   "phone_length_validation": "Vui lòng nhập 9 đến 12 ký tự",
   "phone_required": "Vui lòng nhập số điện thoại",
   "phone_validation": "Vui lòng nhập số điện thoại hợp lệ",

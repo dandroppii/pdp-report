@@ -34,6 +34,7 @@
   "no_symbol_validation": "Should not contain special characters",
   "agreement_required": "You have to agree with our Terms and Conditions",
   "support_type_required": "Support type is required",
+  "pdp_required": "Support type is required",
   "support_message_required": "Support message is required",
   "support_message_length_validation": "Please enter 5 to 50 characters",
   "warehouse_required": "Warehouse is required",
