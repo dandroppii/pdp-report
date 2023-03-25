@@ -3,30 +3,40 @@ import { H2, Paragraph, H5, H6 } from 'components/Typography';
 import React from 'react';
 import { useMemo } from 'react';
 import { useAuthContext } from 'contexts/AuthContext';
+import { useAppContext } from 'contexts/AppContext';
 
 const CompanyCard = () => {
-  const { user, isPdpLoading } = useAuthContext();
+  const {
+    state: { pdpProfileLoading, pdpProfile },
+  } = useAppContext();
+  const { user, isPdpLoading, isAdmin } = useAuthContext();
+
+  const profile = useMemo(() => (isAdmin ? pdpProfile : user), [pdpProfile, isAdmin, user]);
+  const isLoading = useMemo(
+    () => pdpProfileLoading || isPdpLoading,
+    [isPdpLoading, pdpProfileLoading]
+  );
 
   const info = useMemo(() => {
     return [
       {
         title: 'Tên công ty',
-        value: user?.fullName,
+        value: profile?.fullName,
       },
       {
         title: 'Email liên hệ',
-        value: user?.email,
+        value: profile?.email,
       },
       {
         title: 'Số điện thoại liên hệ',
-        value: user?.phone,
+        value: profile?.phone,
       },
       {
         title: 'Địa chỉ',
-        value: user?.address,
+        value: profile?.address,
       },
     ];
-  }, [user]);
+  }, [profile]);
   return (
     <Card
       sx={{
@@ -47,7 +57,7 @@ const CompanyCard = () => {
           <Grid item md={6} xs={12} key={index}>
             <H6 color="grey.600">{item.title}</H6>
             <H5 color="grey.600" fontWeight={500}>
-              {isPdpLoading ? <Skeleton variant="text" sx={{ width: 100 }} /> : item.value}
+              {isLoading ? <Skeleton variant="text" sx={{ width: 100 }} /> : item.value}
             </H5>
           </Grid>
         ))}

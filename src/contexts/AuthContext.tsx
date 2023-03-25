@@ -87,7 +87,7 @@ const AuthContextProvider = ({ children }: WithChildren) => {
         const user = await identityService.getCurrentUser(response?.data);
         if (user?.data) {
           setUser(user?.data);
-          setIsAdmin(true);
+          setIsAdmin(!!user?.data.isAdmin);
           setIsLoading(false);
           setIsLogin(true);
         } else {

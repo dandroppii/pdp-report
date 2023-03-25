@@ -97,7 +97,7 @@ const DashboardNavbar: FC<DashboardNavbarProps> = ({ handleDrawerToggle }) => {
                 handeChangePdp(value);
               }}
               renderInput={params => (
-                <TextField label="Chọn Nhà cung cấp" {...params} helperText={null} />
+                <TextField label="Chọn nhà cung cấp" {...params} helperText={null} />
               )}
             />
 

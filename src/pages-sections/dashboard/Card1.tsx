@@ -2,7 +2,7 @@ import { ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
 import { Card, Skeleton } from '@mui/material';
 import { FlexBetween, FlexBox } from 'components/flex-box';
 import { H3, H6, Paragraph, Span } from 'components/Typography';
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 import { formatCurrency, getCurrencySuffix } from 'utils/currency';
 import CountUp from 'react-countup';
 import { useAppContext } from 'contexts/AppContext';
@@ -23,24 +23,32 @@ const Card1: FC<Card1Props> = props => {
     state: { pdpReportLoading, productReportLoading },
   } = useAppContext();
 
+  const isLoading = useMemo(
+    () => pdpReportLoading || productReportLoading,
+    [pdpReportLoading, productReportLoading]
+  );
+
   return (
     <Card sx={{ p: 2 }}>
       <FlexBetween alignItems={'flex-end'} mb={2}>
         <H6 color="grey.600">{title}</H6>
         <FlexBox alignItems={'flex-end'}>
           <H3 color="info.main">
-            {pdpReportLoading || productReportLoading ? (
+            {isLoading ? (
               <Skeleton variant="text" sx={{ width: 100 }} />
             ) : (
-              <CountUp end={traffic} duration={0.05} separator="." />
-            )} lượt
+              <>
+                <CountUp end={traffic} duration={0.05} separator="." />
+                lượt
+              </>
+            )}
           </H3>
         </FlexBox>
       </FlexBetween>
       <FlexBetween alignItems={'flex-end'}>
         <H6 color="grey.600">Phí dịch vụ (chưa VAT)</H6>
         <H3 color="info.main">
-          {pdpReportLoading || productReportLoading ? (
+          {isLoading ? (
             <Skeleton variant="text" sx={{ width: 100 }} />
           ) : (
             <CountUp

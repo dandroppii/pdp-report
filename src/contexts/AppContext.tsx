@@ -1,4 +1,4 @@
-import { pdpService } from 'api';
+import { identityService, pdpService } from 'api';
 import { PDP_INFORMATION, PDP_REPORT } from 'constance/mockPdpData';
 import produce from 'immer';
 import React, { createContext, useContext, useEffect, useMemo, useReducer } from 'react';
@@ -18,6 +18,8 @@ type initialState = {
   listPdp: ListPdp[];
   selectedPdp: ListPdp;
   listPdpLoading: boolean;
+  pdpProfile?: PdpInformations;
+  pdpProfileLoading: boolean;
 };
 
 type fromDateActionType = { type: 'SET_FROM_DATE'; payload: Date };
@@ -31,7 +33,17 @@ type toDateActionType = { type: 'SET_TO_DATE'; payload: Date };
 type pdpReportActionType = { type: 'SET_PDP_REPORT'; payload: PdpReport };
 type productReportActionType = { type: 'SET_PRODUCT_REPORT'; payload: PdpReport };
 type pdpReportLoadingActionType = { type: 'SET_PDP_REPORT_LOADING'; payload: boolean };
+type s = { type: 'SET_PDP_REPORT_LOADING'; payload: boolean };
 type productReportLoadingActionType = { type: 'SET_PRODUCT_REPORT_LOADING'; payload: boolean };
+type setPdpProfileActionType = {
+  type: 'SET_PDP_PROFILE';
+  payload: PdpInformations;
+};
+
+type setPdpProfileLoadingActionType = {
+  type: 'SET_PDP_PROFILE_LOADING';
+  payload: boolean;
+};
 type ActionType =
   | toDateActionType
   | fromDateActionType
@@ -41,6 +53,8 @@ type ActionType =
   | productReportLoadingActionType
   | listPdpActionType
   | listPdpLoadingActionType
+  | setPdpProfileActionType
+  | setPdpProfileLoadingActionType
   | selectedPdpActionType;
 
 // =================================================================================
@@ -55,6 +69,8 @@ const initState: initialState = {
   listPdp: [],
   selectedPdp: null,
   listPdpLoading: false,
+  pdpProfile: null,
+  pdpProfileLoading: false,
 };
 
 interface ContextProps {
@@ -132,6 +148,19 @@ const reducer = (state: initialState, action: ActionType) => {
       return newState;
     }
 
+    case 'SET_PDP_PROFILE': {
+      const newState = produce(state, draftState => {
+        draftState.pdpProfile = action.payload;
+      });
+      return newState;
+    }
+    case 'SET_PDP_PROFILE_LOADING': {
+      const newState = produce(state, draftState => {
+        draftState.pdpProfileLoading = action.payload;
+      });
+      return newState;
+    }
+
     default: {
       return state;
     }
@@ -165,6 +194,31 @@ export const AppProvider: React.FC = ({ children }) => {
     } catch (error) {
       dispatch({
         type: 'SET_LIST_PDP_LOADING',
+        payload: false,
+      });
+    }
+  }, []);
+
+  const getPdpProfile = useCallback(async (id: string) => {
+    try {
+      dispatch({
+        type: 'SET_PDP_PROFILE_LOADING',
+        payload: true,
+      });
+      const response = await identityService.getCurrentUser(id);
+      dispatch({
+        type: 'SET_PDP_PROFILE_LOADING',
+        payload: false,
+      });
+      if (response.statusCode === 0) {
+        dispatch({
+          type: 'SET_PDP_PROFILE',
+          payload: response.data,
+        });
+      }
+    } catch (error) {
+      dispatch({
+        type: 'SET_PDP_PROFILE_LOADING',
         payload: false,
       });
     }
@@ -244,6 +298,12 @@ export const AppProvider: React.FC = ({ children }) => {
       getListPdp();
     }
   }, [isLogin, isAdmin, getListPdp]);
+
+  useEffect(() => {
+    if (selectedPdp?.id && isAdmin) {
+      getPdpProfile(selectedPdp?.id);
+    }
+  }, [isAdmin, getPdpProfile, selectedPdp?.id]);
 
   return <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>;
 };
