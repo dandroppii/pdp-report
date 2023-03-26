@@ -41,3 +41,15 @@ export function convertToSlug(text: string) {
     .replace(/ /g, '-')
     .replace(/[^\w-]+/g, '')}`;
 }
+
+export const searchString = (data: any[] = [], searchText: string, keySearch: string) => {
+  const filterData = data.filter(i => {
+    const s = nonAccentVietnamese(i[keySearch])
+      ?.replace(/[^a-z0-9]/gi, ' ')
+      ?.toLowerCase()
+      ?.trim();
+
+    return s.includes(searchText);
+  });
+  return filterData;
+};

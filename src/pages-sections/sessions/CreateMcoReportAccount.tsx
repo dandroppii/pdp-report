@@ -62,7 +62,7 @@ const CreateMcoReportAccount = ({ onSuccess, onClose }: { onSuccess: any; onClos
 
   const handleCloseForm = useCallback(() => {
     onClose && onClose();
-  }, []);
+  }, [onClose]);
 
   const {
     values,

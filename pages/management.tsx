@@ -23,24 +23,26 @@ import { H1, H2, Paragraph } from 'components/Typography';
 import SearchInput from 'components/SearchInput';
 import useMuiTable from 'hooks/useMuiTable';
 import { StyledTableCell, StyledTableRow } from 'pages-sections/admin';
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useMemo } from 'react';
 import Card2 from 'pages-sections/dashboard/Card2';
 import { formatDatetime } from 'utils/datetime';
 import { useAppContext } from 'contexts/AppContext';
 import { useState } from 'react';
-import { PDPTrafficItem } from 'types/common';
+import { ListPdpResponse, PDPTrafficItem } from 'types/common';
 import { useCallback } from 'react';
 import { useEffect } from 'react';
 import DRowSkeleton from 'pages-sections/admin/DOrderSkeleton';
 import { pdpService } from 'api';
 import { exportToExcel } from 'react-json-to-excel';
 import { useAuthContext } from 'contexts/AuthContext';
-import { convertToSlug } from 'utils/utils';
+import { convertToSlug, searchString } from 'utils/utils';
 import { MAX_ITEM_PER_SHEET } from 'utils/constants';
 import { FlexBox } from 'components/flex-box';
 import toast, { Toaster } from 'react-hot-toast';
 import BazaarSwitch from 'components/BazaarSwitch';
 import CreateMcoReportAccount from 'pages-sections/sessions/CreateMcoReportAccount';
+import { useRouter } from 'next/router';
+import ChangePassword from 'pages-sections/sessions/ChangePassword';
 
 const tableHeading = [
   { id: 'id', label: 'ID', align: 'left', size: 'small' },
@@ -53,7 +55,7 @@ const tableHeading = [
 ];
 
 // =============================================================================
-PdpTraffic.getLayout = function getLayout(page: ReactElement) {
+Management.getLayout = function getLayout(page: ReactElement) {
   return <VendorDashboardLayout adminFeature={true}>{page}</VendorDashboardLayout>;
 };
 // =============================================================================
@@ -82,11 +84,15 @@ export const ContentWrapper = styled(Box)(({ theme }) => ({
   '& .carousel__next-button': { right: 0 },
 }));
 
-type PdpTrafficProps = {};
+type ManagementProps = {};
 
 // =============================================================================
 
 const statusList = [
+  {
+    status: 0,
+    label: 'All',
+  },
   {
     status: 1,
     label: 'Active',
@@ -97,27 +103,63 @@ const statusList = [
   },
 ];
 
-export default function PdpTraffic({}: PdpTrafficProps) {
+export default function Management({}: ManagementProps) {
   const {
     state: { listPdpFull, listPdpLoading },
   } = useAppContext();
-  const { user, isAdmin } = useAuthContext();
-
-  const [pdpTraffic, setPdpTraffic] = useState<PDPTrafficItem[]>([]);
-  const [totalPage, setTotalPage] = useState<number>(1);
-  const [currentPdpStatus, setCurrentPdpStatus] = useState<any>();
-  const [totalPageDownload, setTotalPageDownload] = useState<number>(100);
-  const [percent, setPercent] = useState<number>(0);
+  const { isAdmin } = useAuthContext();
+  const router = useRouter();
   const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [status, setStatus] = useState<{
+    status: number;
+    label: string;
+  }>({
+    status: 0,
+    label: 'All',
+  });
+  const [pdpSelected, setPdpSelected] = useState<ListPdpResponse>();
+  const [listPdp, setListPdp] = useState<ListPdpResponse[]>(listPdpFull);
+  const [openDialogChangePassword, setOpenDialogChangePassword] = useState<boolean>(false);
+  const [search, setSearch] = useState<string>();
 
   const { order, orderBy, selected, filteredList, handleRequestSort } = useMuiTable({
-    listData: listPdpFull,
+    listData: listPdp,
   });
 
   const handleAddNewPdp = useCallback(() => {
     setOpenDialog(true);
   }, []);
 
+  const handleChangePdpPassword = useCallback((pdp: ListPdpResponse) => {
+    setOpenDialogChangePassword(true);
+    setPdpSelected(pdp);
+  }, []);
+
+  useEffect(() => {
+    !isAdmin && router?.isReady && router.push('/');
+  }, [isAdmin, router]);
+
+  useEffect(() => {
+    setListPdp(listPdpFull);
+  }, [listPdpFull]);
+
+  const handleFilterStatus = useCallback(
+    s => {
+      setStatus(s);
+      const filterPdp = s.status ? listPdp.filter(p => p.status === s.status) : listPdp;
+      setListPdp(filterPdp);
+    },
+    [listPdp]
+  );
+
+  const handleSearch = useCallback(
+    s => {
+      setSearch(s);
+      const filterPdp = s ? searchString(listPdpFull, s, 'fullName') : listPdpFull;
+      setListPdp(filterPdp);
+    },
+    [listPdpFull]
+  );
   return (
     <Box py={2}>
       <H1 my={2} textTransform="uppercase" textAlign={'center'} color="grey.900">
@@ -140,10 +182,10 @@ export default function PdpTraffic({}: PdpTrafficProps) {
                 },
               }}
               options={statusList}
-              value={currentPdpStatus}
+              value={status}
               getOptionLabel={(option: any) => option.label}
               onChange={(_, value) => {
-                setCurrentPdpStatus(value);
+                handleFilterStatus(value);
               }}
               renderInput={params => (
                 <TextField label="Chọn trạng thái" {...params} helperText={null} />
@@ -151,7 +193,14 @@ export default function PdpTraffic({}: PdpTrafficProps) {
             />
           </Box>
           <Box mr={2}>
-            <SearchInput placeholder="Nhập tên nhà cung cấp" />
+            <SearchInput
+              placeholder="Nhập tên nhà cung cấp"
+              value={search}
+              onChange={e => {
+                console.log('🚀 ~ file: management.tsx:273 ~ Management ~ e:', e);
+                handleSearch(e?.target?.value);
+              }}
+            />
           </Box>
           <Button
             variant="contained"
@@ -170,14 +219,14 @@ export default function PdpTraffic({}: PdpTrafficProps) {
                 hideSelectBtn
                 orderBy={orderBy}
                 heading={tableHeading}
-                rowCount={pdpTraffic.length}
+                rowCount={listPdpFull.length}
                 numSelected={selected.length}
                 onRequestSort={handleRequestSort}
               />
 
               <TableBody>
                 {listPdpLoading ? (
-                  <DRowSkeleton numberOfCol={3}></DRowSkeleton>
+                  <DRowSkeleton numberOfCol={7}></DRowSkeleton>
                 ) : (
                   filteredList.map((item, index) => (
                     <StyledTableRow role="checkbox" key={index}>
@@ -190,7 +239,12 @@ export default function PdpTraffic({}: PdpTrafficProps) {
                         <BazaarSwitch color="info" checked={item.status === 1} />
                       </StyledTableCell>
                       <StyledTableCell align="center" sx={{ width: 150 }}>
-                        <Button variant="outlined" color="primary" size="small">
+                        <Button
+                          variant="outlined"
+                          color="primary"
+                          size="small"
+                          onClick={() => handleChangePdpPassword(item)}
+                        >
                           Đổi mật khẩu
                         </Button>
                       </StyledTableCell>
@@ -205,6 +259,13 @@ export default function PdpTraffic({}: PdpTrafficProps) {
 
       <Dialog open={openDialog} maxWidth={false} sx={{ zIndex: 100 }}>
         <CreateMcoReportAccount onSuccess={() => {}} onClose={() => setOpenDialog(false)} />
+      </Dialog>
+      <Dialog open={openDialogChangePassword} maxWidth={false} sx={{ zIndex: 100 }}>
+        <ChangePassword
+          pdp={pdpSelected}
+          onSuccess={() => {}}
+          onClose={() => setOpenDialogChangePassword(false)}
+        />
       </Dialog>
       <Toaster toastOptions={{ duration: 4000 }} />
     </Box>

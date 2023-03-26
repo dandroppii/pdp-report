@@ -17,7 +17,7 @@ import TableHeader from 'components/data-table/TableHeader';
 import TablePagination from 'components/data-table/TablePagination';
 import VendorDashboardLayout from 'components/layouts/vendor-dashboard';
 import Scrollbar from 'components/Scrollbar';
-import { H1, H2, H4, Paragraph } from 'components/Typography';
+import { H1, H2, H3, H4, Paragraph, Span } from 'components/Typography';
 import useMuiTable from 'hooks/useMuiTable';
 import { StyledTableCell, StyledTableRow } from 'pages-sections/admin';
 import React, { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
@@ -219,18 +219,29 @@ export default function ProductTraffic({}: ProductTrafficProps) {
 
   const productTrafficBasic = [
     {
-      id: '9a16528c-d339-434e-b2eb-2382c366bc4e',
-      supplierId: '2db211d8-0baf-46c8-bd4d-d2fed8a7cf66',
+      supplierId: '0d1e95cd-68ee-4a50-987a-ce569819ef2f',
       price: 1100,
       taxPercent: 10,
-      visitTime: 1675456467570,
       visitType: 'PRODUCT',
-      productName: 'THIẾT BỊ LỌC NƯỚC MÀNG LỌC SỢI RỖNG  WATEK',
-      productLink:
-        'https://mco.com.vn/product/thiet-bi-loc-nuoc-mang-loc-soi-rong--watek?id=0a6c729a-40d8-484e-9010-5c7788761381&type=0&sId=2db211d8-0baf-46c8-bd4d-d2fed8a7cf66',
-      userAgent:
-        'Mozilla/5.0 (Linux; Android 12; SM-S906N Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/80.0.3987.119 Mobile Safari/537.36',
-      totalVisit: 1000,
+      totalCount: 4669,
+      productName: 'Sữa công thức dành cho trẻ từ 0-6 tháng tuổi Nedmill Stage 1 ',
+    },
+    {
+      supplierId: '0d1e95cd-68ee-4a50-987a-ce569819ef2f',
+      price: 1100,
+      taxPercent: 10,
+      visitType: 'PRODUCT',
+      totalCount: 4685,
+      productName: 'Sữa công thức dành cho trẻ từ 6-12 tháng tuổi Nedmill Stage 2',
+    },
+    {
+      supplierId: '0d1e95cd-68ee-4a50-987a-ce569819ef2f',
+      price: 1100,
+      taxPercent: 10,
+      visitType: 'PRODUCT',
+      totalCount: 4583,
+      productName:
+        'Sữa công thức với mục đích ăn bổ sung cho trẻ trên 12 tháng tuổi Nedmill Stage 3',
     },
   ];
 
@@ -311,7 +322,7 @@ export default function ProductTraffic({}: ProductTrafficProps) {
               content={() => contentPrintRef.current}
               trigger={() => (
                 <Button variant="contained" color="primary">
-                  Tải báo cáo
+                  In báo cáo
                 </Button>
               )}
             />
@@ -322,7 +333,7 @@ export default function ProductTraffic({}: ProductTrafficProps) {
               onClick={startDownload}
               disabled={loading || !productTraffic.length}
             >
-              In báo cáo
+              Tải báo cáo
             </Button>
           )}
         </FlexBox>
@@ -333,11 +344,13 @@ export default function ProductTraffic({}: ProductTrafficProps) {
                 ref={(element: any) => (contentPrintRef.current = element)}
                 sx={{
                   '@media print': {
+                    padding: '30px',
+                    table: {},
                     '.MuiTableHead-root': {
                       backgroundColor: 'transparent !important',
                     },
                     '.MuiTableContainer-root': {
-                      padding: '10px 30px 30px 30px',
+                      marginTop: '30px',
                     },
                     'th, tr, td': {
                       border: '1px solid !important',
@@ -345,26 +358,45 @@ export default function ProductTraffic({}: ProductTrafficProps) {
                     },
                     a: {
                       color: '#2B3445 !important',
+                      whiteSpace: 'none',
                     },
-                    h4: {
+                    h3: {
                       display: 'block',
                       marginTop: '30px',
+                    },
+                    '.print': {
+                      display: 'block',
                     },
                   },
                 }}
               >
-                <H4
+                <H3
                   my={2}
                   textTransform="uppercase"
                   textAlign={'center'}
                   color="grey.900"
                   sx={{ display: 'none' }}
                 >
-                  Số lượng tiếp cận thông tin sản phẩm từ{' '}
+                  Số lượng tiếp cận thông tin sản phẩm từ <br />
                   {formatDatetime(fromDate.getTime(), 'dd/MM/yyyy')} đến{' '}
                   {formatDatetime(toDate.getTime(), 'dd/MM/yyyy')}
-                </H4>
+                </H3>
 
+                <Span className="print" sx={{ display: 'none' }}>
+                  Số lượt truy cập:{' '}
+                  <strong>{formatNumber(productReport?.totalVisitInDuration)}</strong>
+                </Span>
+                <Span className="print" sx={{ display: 'none' }}>
+                  Đơn giá dịch vụ: <strong>{formatCurrency(productReport?.avgPricePerItem)}</strong>
+                </Span>
+                <Span className="print" sx={{ display: 'none' }}>
+                  Phí dịch vụ:{' '}
+                  <strong>
+                    {formatCurrency(
+                      productReport?.avgPricePerItem * productReport?.totalVisitInDuration
+                    )}
+                  </strong>
+                </Span>
                 <TableContainer>
                   <Table>
                     <TableHeader
@@ -383,10 +415,10 @@ export default function ProductTraffic({}: ProductTrafficProps) {
                       ) : (
                         filteredListBasic.map((item, index) => (
                           <StyledTableRow key={index}>
-                            <StyledTableCell align="center" size="small">
+                            <StyledTableCell align="center" size="small" sx={{ width: '5%' }}>
                               {index + 1}
                             </StyledTableCell>
-                            <StyledTableCell align="left">
+                            <StyledTableCell align="left" sx={{ width: '50%' }}>
                               <ExternalLink
                                 color="blue.main"
                                 href={item.productLink}
@@ -397,11 +429,11 @@ export default function ProductTraffic({}: ProductTrafficProps) {
                                 {item.productName}
                               </ExternalLink>
                             </StyledTableCell>
-                            <StyledTableCell align="center">
-                              {formatNumber(item.totalVisit)}
+                            <StyledTableCell align="center" sx={{ width: '25%' }}>
+                              {formatNumber(item.totalCount)}
                             </StyledTableCell>
-                            <StyledTableCell align="right">
-                              {formatCurrency(item.totalVisit * item.price)}
+                            <StyledTableCell align="right" sx={{ width: '20%' }}>
+                              {formatCurrency(item.totalCount * item.price)}
                             </StyledTableCell>
                           </StyledTableRow>
                         ))
