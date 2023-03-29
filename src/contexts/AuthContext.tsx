@@ -19,6 +19,7 @@ interface AuthContextValues {
   login: (username: string, password: string) => Promise<any>;
   logout: () => void;
   isPdpLoading: boolean;
+  isAdmin: boolean;
 }
 
 const [Provider, useAuthContext] = createContext<AuthContextValues>({
@@ -28,6 +29,7 @@ const [Provider, useAuthContext] = createContext<AuthContextValues>({
 const AuthContextProvider = ({ children }: WithChildren) => {
   const t = useTranslations();
   const [isLogin, setIsLogin] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isPdpLoading, setIsPdpLoading] = useState(true);
   const [user, setUser] = useState<PdpInformations>();
@@ -82,14 +84,20 @@ const AuthContextProvider = ({ children }: WithChildren) => {
       const response = await identityService.getCurrentUserId();
       setIsPdpLoading(false);
       if (response?.data) {
-        const user = await identityService.getCurrentUser(response?.data);
-        if (user?.data) {
-          setUser(user?.data);
+        if (response?.data?.roles?.includes('MCO_ADMIN')) {
+          setIsAdmin(true);
+          setUser(response?.data);
           setIsLoading(false);
           setIsLogin(true);
-          // router.push('/');
         } else {
-          logout();
+          const user = await identityService.getCurrentUser(response?.data?.supplierId);
+          if (user?.data) {
+            setUser(user?.data);
+            setIsLoading(false);
+            setIsLogin(true);
+          } else {
+            logout();
+          }
         }
       } else {
         logout();
@@ -116,7 +124,6 @@ const AuthContextProvider = ({ children }: WithChildren) => {
           services.setAuthToken(token);
           window?.localStorage.setItem(STORAGE_TOKEN_KEY, token);
           window?.localStorage.setItem(STORAGE_REFRESH_TOKEN_KEY, data.refreshToken);
-          setIsLogin(true);
           showAlertSuccess(t('login_success'));
           checkUser();
           return true;
@@ -154,6 +161,7 @@ const AuthContextProvider = ({ children }: WithChildren) => {
         login,
         logout,
         isPdpLoading,
+        isAdmin,
       }}
     >
       {children}

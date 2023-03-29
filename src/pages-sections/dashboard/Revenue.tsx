@@ -10,8 +10,22 @@ import { useAuthContext } from 'contexts/AuthContext';
 
 const Revenue = () => {
   const {
-    state: { pdpReport, fromDate, toDate, productReport, pdpReportLoading, productReportLoading },
+    state: {
+      pdpReport,
+      fromDate,
+      toDate,
+      productReport,
+      pdpReportLoading,
+      productReportLoading,
+      pdpProfileLoading,
+      pdpProfile,
+    },
   } = useAppContext();
+
+  const isLoading = useMemo(
+    () => pdpReportLoading || productReportLoading || pdpProfileLoading,
+    [pdpReportLoading, productReportLoading, pdpProfileLoading]
+  );
 
   const report = useMemo(() => {
     return {
@@ -21,7 +35,10 @@ const Revenue = () => {
     };
   }, [pdpReport, productReport]);
 
-  const { user } = useAuthContext();
+  const { user, isAdmin } = useAuthContext();
+
+  const profile = useMemo(() => (isAdmin ? pdpProfile : user), [user, isAdmin, pdpProfile]);
+
   return (
     <Card
       sx={{
@@ -34,7 +51,7 @@ const Revenue = () => {
       }}
     >
       <H2 color="info.main" mb={0.5}>
-        Xin chào {user?.name}
+        Xin chào {profile?.name}
       </H2>
       <Paragraph mb={2} color="grey.600">
         Đây là doanh thu từ {formatDatetime(new Date(fromDate).getTime(), 'dd/MM/yyyy')} đến{' '}
@@ -44,7 +61,7 @@ const Revenue = () => {
       <H6 color="grey.600">Tổng Phí dịch vụ (chưa VAT)</H6>
 
       <H3 mb={2} color="info.main">
-        {pdpReportLoading || productReportLoading ? (
+        {isLoading ? (
           <Skeleton variant="text" sx={{ width: '40%' }} />
         ) : (
           <CountUp
@@ -57,7 +74,7 @@ const Revenue = () => {
       </H3>
       <H6 color="grey.600">VAT</H6>
       <H3 mb={2} color="info.main">
-        {pdpReportLoading || productReportLoading ? (
+        {isLoading ? (
           <Skeleton variant="text" sx={{ width: '40%' }} />
         ) : (
           <CountUp
@@ -70,7 +87,7 @@ const Revenue = () => {
       </H3>
       <H6 color="grey.600">Tổng tiền thanh toán</H6>
       <H3 color="info.main">
-        {pdpReportLoading || productReportLoading ? (
+        {isLoading ? (
           <Skeleton variant="text" sx={{ width: '40%' }} />
         ) : (
           <CountUp

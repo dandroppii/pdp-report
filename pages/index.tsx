@@ -25,8 +25,13 @@ type DashboardProps = {
 
 export default function VendorDashboard() {
   const {
-    state: { pdpReport, productReport, pdpReportLoading, productReportLoading },
+    state: { pdpReport, productReport, pdpReportLoading, productReportLoading, pdpProfileLoading },
   } = useAppContext();
+
+  const isLoading = useMemo(
+    () => pdpReportLoading || productReportLoading || pdpProfileLoading,
+    [pdpReportLoading, productReportLoading, pdpProfileLoading]
+  );
 
   const cardList = useMemo(() => {
     return [
@@ -52,9 +57,13 @@ export default function VendorDashboard() {
   return (
     <Box py={2}>
       <Paragraph fontStyle="italic" fontSize={14} mb={2} textAlign="center" color="grey.600">
-        {pdpReportLoading || productReportLoading ? (
+        {isLoading ? (
           <>
-            <CircularProgress color="primary" size={20} sx={{ marginRight: '10px', marginBottom: '-5px' }} />
+            <CircularProgress
+              color="primary"
+              size={20}
+              sx={{ marginRight: '10px', marginBottom: '-5px' }}
+            />
             Đang tải dữ liệu, vui lòng đợi trong giây lát
           </>
         ) : (

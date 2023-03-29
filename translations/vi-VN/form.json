@@ -1,0 +1,9 @@
+{
+  "new_password": "Mật khẩu mới",
+  "new_password_placeholder": "Nhập mật khẩu mới",
+  "old_password": "Mật khẩu cũ",
+  "old_password_placeholder": "Nhập mật khẩu cũ",
+  "password": "Mật khẩu",
+  "password_placeholder": "Nhập mật khẩu",
+  "re_password": "Nhập lại mật khẩu"
+}

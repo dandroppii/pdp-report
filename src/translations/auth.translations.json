@@ -76,5 +76,61 @@
       "en": "Login Successfully!",
       "vi": "Đăng nhập thành công!"
     }
+  },
+  "old_password": {
+    "key": "form:old_password",
+    "messages": {
+      "en": "Old password",
+      "vi": "Mật khẩu cũ"
+    }
+  },
+  "new_password": {
+    "key": "form:new_password",
+    "messages": {
+      "en": "New password",
+      "vi": "Mật khẩu mới"
+    }
+  },
+  "old_password_placeholder": {
+    "key": "form:old_password_placeholder",
+    "messages": {
+      "en": "Enter your old password",
+      "vi": "Nhập mật khẩu cũ"
+    }
+  },
+  "new_password_placeholder": {
+    "key": "form:new_password_placeholder",
+    "messages": {
+      "en": "Enter your new password",
+      "vi": "Nhập mật khẩu mới"
+    }
+  },
+  "password": {
+    "key": "form:password",
+    "messages": {
+      "en": "Password",
+      "vi": "Mật khẩu"
+    }
+  },
+  "password_placeholder": {
+    "key": "form:password_placeholder",
+    "messages": {
+      "en": "Enter your new password",
+      "vi": "Nhập mật khẩu"
+    }
+  },
+  "re_password": {
+    "key": "form:re_password",
+    "messages": {
+      "en": "Re-enter your new password",
+      "vi": "Nhập lại mật khẩu"
+    }
+  },
+  "change_password": {
+    "key": "profile:change_password",
+    "messages": {
+      "en": "Change Password",
+      "vi": "Đổi mật khẩu"
+    }
   }
 }

@@ -1,10 +1,11 @@
-import { Avatar, Box, Theme, useMediaQuery } from "@mui/material";
-import { FlexBetween } from "components/flex-box";
-import Scrollbar from "components/Scrollbar";
-import Image from "next/image";
-import { useRouter } from "next/router";
-import { FC, useState } from "react";
-import LayoutDrawer from "../LayoutDrawer";
+import { Avatar, Box, Theme, useMediaQuery } from '@mui/material';
+import { FlexBetween } from 'components/flex-box';
+import Scrollbar from 'components/Scrollbar';
+import { useAuthContext } from 'contexts/AuthContext';
+import Image from 'next/image';
+import { useRouter } from 'next/router';
+import { FC, useMemo, useState } from 'react';
+import LayoutDrawer from '../LayoutDrawer';
 import {
   BadgeValue,
   BulletIcon,
@@ -16,9 +17,9 @@ import {
   NavWrapper,
   SidebarWrapper,
   StyledText,
-} from "./LayoutStyledComponents";
-import { navigations } from "./NavigationList";
-import SidebarAccordion from "./SidebarAccordion";
+} from './LayoutStyledComponents';
+import { navigations, navigationsAdmin } from './NavigationList';
+import SidebarAccordion from './SidebarAccordion';
 
 const TOP_HEADER_AREA = 70;
 
@@ -31,23 +32,22 @@ type DashboardSidebarProps = {
 };
 // -----------------------------------------------------------------------------
 
-const DashboardSidebar: FC<DashboardSidebarProps> = (props) => {
-  const {
-    sidebarCompact,
-    showMobileSideBar,
-    setShowMobileSideBar,
-    setSidebarCompact,
-  } = props;
+const DashboardSidebar: FC<DashboardSidebarProps> = props => {
+  const { sidebarCompact, showMobileSideBar, setShowMobileSideBar, setSidebarCompact } = props;
 
   const router = useRouter();
   const [onHover, setOnHover] = useState(false);
-  const downLg = useMediaQuery((theme: Theme) => theme.breakpoints.down("lg"));
+  const downLg = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
+  const { isAdmin } = useAuthContext();
+
+  const navData = useMemo(() => {
+    return isAdmin ? navigationsAdmin : navigations;
+  }, [isAdmin]);
 
   // side hover when side bar is compacted
   const COMPACT = sidebarCompact && !onHover ? 1 : undefined;
   // handle active current page
-  const activeRoute = (path: string) =>
-    router.pathname === path ? 1 : undefined;
+  const activeRoute = (path: string) => (router.pathname === path ? 1 : undefined);
 
   // handle navigate to another route and close sidebar drawer in mobile device
   const handleNavigation = (path: string) => {
@@ -57,7 +57,7 @@ const DashboardSidebar: FC<DashboardSidebarProps> = (props) => {
 
   const renderLevels = (data: any) => {
     return data.map((item: any, index: any) => {
-      if (item.type === "label")
+      if (item.type === 'label')
         return (
           <ListLabel key={index} compact={COMPACT}>
             {item.label}
@@ -70,14 +70,9 @@ const DashboardSidebar: FC<DashboardSidebarProps> = (props) => {
             {renderLevels(item.children)}
           </SidebarAccordion>
         );
-      } else if (item.type === "extLink") {
+      } else if (item.type === 'extLink') {
         return (
-          <ExternalLink
-            key={index}
-            href={item.path}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
+          <ExternalLink key={index} href={item.path} rel="noopener noreferrer" target="_blank">
             <NavItemButton key={item.name} name="child" active={0}>
               {item.icon ? (
                 <ListIconWrapper>
@@ -91,9 +86,7 @@ const DashboardSidebar: FC<DashboardSidebarProps> = (props) => {
 
               {/* <Box mx="auto" /> */}
 
-              {item.badge && (
-                <BadgeValue compact={COMPACT}>{item.badge.value}</BadgeValue>
-              )}
+              {item.badge && <BadgeValue compact={COMPACT}>{item.badge.value}</BadgeValue>}
             </NavItemButton>
           </ExternalLink>
         );
@@ -118,9 +111,7 @@ const DashboardSidebar: FC<DashboardSidebarProps> = (props) => {
 
               {/* <Box mx="auto" /> */}
 
-              {item.badge && (
-                <BadgeValue compact={COMPACT}>{item.badge.value}</BadgeValue>
-              )}
+              {item.badge && <BadgeValue compact={COMPACT}>{item.badge.value}</BadgeValue>}
             </NavItemButton>
           </Box>
         );
@@ -133,13 +124,11 @@ const DashboardSidebar: FC<DashboardSidebarProps> = (props) => {
       autoHide
       clickOnTrack={false}
       sx={{
-        overflowX: "hidden",
+        overflowX: 'hidden',
         maxHeight: `calc(100vh - ${TOP_HEADER_AREA}px)`,
       }}
     >
-      <NavWrapper compact={sidebarCompact}>
-        {renderLevels(navigations)}
-      </NavWrapper>
+      <NavWrapper compact={sidebarCompact}>{renderLevels(navData)}</NavWrapper>
     </Scrollbar>
   );
 
@@ -170,19 +159,15 @@ const DashboardSidebar: FC<DashboardSidebarProps> = (props) => {
       <FlexBetween
         p={2}
         maxHeight={TOP_HEADER_AREA}
-        justifyContent={COMPACT ? "center" : "space-between"}
+        justifyContent={COMPACT ? 'center' : 'space-between'}
       >
         <Avatar
-          src={
-            COMPACT
-              ? "/assets/images/bazaar-white-sm.svg"
-              : "/assets/images/logo-mco.svg"
-          }
+          src={COMPACT ? '/assets/images/bazaar-white-sm.svg' : '/assets/images/logo-mco.svg'}
           sx={{
             borderRadius: 0,
-            width: "auto",
+            width: 'auto',
             marginLeft: COMPACT ? undefined : 1,
-            height: 50
+            height: 50,
           }}
         />
 

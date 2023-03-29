@@ -1,4 +1,4 @@
-import { Box, styled, TextField, Theme, useMediaQuery } from '@mui/material';
+import { Autocomplete, Box, styled, TextField, Theme, useMediaQuery } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Container from '@mui/material/Container';
 import Toolbar from '@mui/material/Toolbar';
@@ -9,6 +9,7 @@ import AccountPopover from './popovers/AccountPopover';
 import { DatePicker } from '@mui/x-date-pickers-pro';
 import { Paragraph } from 'components/Typography';
 import { useAppContext } from 'contexts/AppContext';
+import { ListPdp } from 'types/common';
 
 // custom styled components
 const DashboardNavbarRoot = styled(AppBar)(({ theme }) => ({
@@ -49,10 +50,17 @@ type DashboardNavbarProps = {
 
 const DashboardNavbar: FC<DashboardNavbarProps> = ({ handleDrawerToggle }) => {
   const {
-    state: { fromDate, toDate, pdpReportLoading, productReportLoading },
+    state: { fromDate, toDate, pdpReportLoading, productReportLoading, listPdp, selectedPdp },
     dispatch,
   } = useAppContext();
   const downLg = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
+
+  const handeChangePdp = useCallback(
+    (pdp: ListPdp) => {
+      dispatch({ type: 'SET_SELECTED_PDP', payload: pdp });
+    },
+    [dispatch]
+  );
 
   const handeChangeFromDate = useCallback(
     (date: Date) => {
@@ -78,34 +86,49 @@ const DashboardNavbar: FC<DashboardNavbarProps> = ({ handleDrawerToggle }) => {
             </ToggleWrapper>
           )}
 
-          <Box flexGrow={1} />
-
-          <FlexBox alignItems="center" gap={2}>
-            <Paragraph> Từ </Paragraph>
-            <DatePicker
-              // minDate={new Date('2021-03-01')}
-              disabled={pdpReportLoading || productReportLoading}
-              maxDate={toDate}
-              value={fromDate}
-              onChange={handeChangeFromDate}
-              dayOfWeekFormatter={day => {
-                return day.toUpperCase();
+          <FlexBox alignItems="center" flex={1} gap={2} justifyContent="flex-end">
+            <Autocomplete
+              fullWidth
+              sx={{ maxWidth: 300 }}
+              options={listPdp}
+              value={selectedPdp}
+              getOptionLabel={(option: ListPdp) => option.name}
+              onChange={(_, value: ListPdp) => {
+                handeChangePdp(value);
               }}
-              renderInput={params => <TextField {...params} helperText={null} />}
-            ></DatePicker>
-            <Paragraph> đến </Paragraph>
+              renderInput={params => (
+                <TextField label="Chọn nhà cung cấp" {...params} helperText={null} />
+              )}
+            />
 
-            <DatePicker
-              disabled={pdpReportLoading || productReportLoading}
-              minDate={fromDate}
-              maxDate={new Date()}
-              value={toDate}
-              onChange={handeChangeToDate}
-              dayOfWeekFormatter={day => {
-                return day.toUpperCase();
-              }}
-              renderInput={params => <TextField {...params} helperText={null} />}
-            ></DatePicker>
+            <Box sx={{ minWidth: 200 }}>
+              <DatePicker
+                // minDate={new Date('2021-03-01')}
+                label="Từ ngày"
+                disabled={pdpReportLoading || productReportLoading}
+                maxDate={toDate}
+                value={fromDate}
+                onChange={handeChangeFromDate}
+                dayOfWeekFormatter={day => {
+                  return day.toUpperCase();
+                }}
+                renderInput={params => <TextField {...params} helperText={null} />}
+              ></DatePicker>
+            </Box>
+            <Box sx={{ minWidth: 200 }}>
+              <DatePicker
+                label="đến ngày"
+                disabled={pdpReportLoading || productReportLoading}
+                minDate={fromDate}
+                maxDate={new Date()}
+                value={toDate}
+                onChange={handeChangeToDate}
+                dayOfWeekFormatter={day => {
+                  return day.toUpperCase();
+                }}
+                renderInput={params => <TextField {...params} helperText={null} />}
+              ></DatePicker>
+            </Box>
             <AccountPopover />
           </FlexBox>
         </StyledToolBar>
@@ -113,5 +136,6 @@ const DashboardNavbar: FC<DashboardNavbarProps> = ({ handleDrawerToggle }) => {
     </DashboardNavbarRoot>
   );
 };
+    
 
 export default DashboardNavbar;

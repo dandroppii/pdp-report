@@ -114,7 +114,7 @@ const Login = () => {
           color="primary"
           variant="contained"
           sx={{ mb: '1.65rem', height: 44 }}
-          disabled={!(dirty && isValid)}
+          disabled={!(dirty && isValid) || loading}
         >
           Đăng nhập
         </BazaarButton>

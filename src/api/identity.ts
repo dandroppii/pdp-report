@@ -20,7 +20,7 @@ class IdentityService extends Client {
   }
 
   public getCurrentUserId() {
-    return fetcher<BaseResponse<string>>(`${process.env.BASE_URL}${ENDPOINT.GET_ID}`, {
+    return fetcher<BaseResponse<any>>(`${process.env.BASE_URL}${ENDPOINT.GET_ID}`, {
       headers: this.privateHeaders,
     });
   }

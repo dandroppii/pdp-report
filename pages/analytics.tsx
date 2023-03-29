@@ -9,6 +9,7 @@ import { useEffect } from 'react';
 import { format, lastDayOfMonth } from 'date-fns';
 import Analytics from 'pages-sections/dashboard/Analytics';
 import { pdpService } from 'api';
+import { useAppContext } from 'contexts/AppContext';
 
 AnalyticsPage.getLayout = function getLayout(page: ReactElement) {
   return <VendorDashboardLayout>{page}</VendorDashboardLayout>;
@@ -34,6 +35,9 @@ export default function AnalyticsPage({}: AnalyticsPageProps) {
   const listTimeAnalytics = getListTime();
   const [pdpReport, setPdpReport] = useState<PdpReport[]>([]);
   const [productReport, setProductReport] = useState<PdpReport[]>([]);
+  const {
+    state: { selectedPdp },
+  } = useAppContext();
   const currentYear = new Date().getFullYear();
 
   const pdpReportSeries = useMemo(() => {
@@ -67,31 +71,39 @@ export default function AnalyticsPage({}: AnalyticsPageProps) {
     ];
   }, [productReport, pdpReport]);
 
-  const getProductReport = useCallback(async (fromDate: string, toDate: string) => {
-    try {
-      const response = await pdpService.getPdpReport({
-        fromDate,
-        toDate,
-        type: 'PRODUCT',
-      });
-      return response.data || {};
-    } catch (error) {
-      return {};
-    }
-  }, []);
+  const getProductReport = useCallback(
+    async (fromDate: string, toDate: string) => {
+      try {
+        const response = await pdpService.getPdpReport({
+          fromDate,
+          toDate,
+          type: 'PRODUCT',
+          supplierId: selectedPdp?.id,
+        });
+        return response.data || {};
+      } catch (error) {
+        return {};
+      }
+    },
+    [selectedPdp?.id]
+  );
 
-  const getPdpReport = useCallback(async (fromDate: string, toDate: string) => {
-    try {
-      const response = await pdpService.getPdpReport({
-        fromDate,
-        toDate,
-        type: 'PDP',
-      });
-      return response.data || {};
-    } catch (error) {
-      return {};
-    }
-  }, []);
+  const getPdpReport = useCallback(
+    async (fromDate: string, toDate: string) => {
+      try {
+        const response = await pdpService.getPdpReport({
+          fromDate,
+          toDate,
+          type: 'PDP',
+          supplierId: selectedPdp?.id,
+        });
+        return response.data || {};
+      } catch (error) {
+        return {};
+      }
+    },
+    [selectedPdp?.id]
+  );
 
   useEffect(() => {
     const obsProduct = listTimeAnalytics.map(({ fromDate, toDate }) =>

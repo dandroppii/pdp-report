@@ -79,9 +79,9 @@ type PdpTrafficProps = {};
 
 export default function PdpTraffic({}: PdpTrafficProps) {
   const {
-    state: { fromDate, toDate, pdpReport },
+    state: { fromDate, toDate, pdpReport, selectedPdp },
   } = useAppContext();
-  const { user } = useAuthContext();
+  const { user, isAdmin } = useAuthContext();
 
   const [pdpTraffic, setPdpTraffic] = useState<PDPTrafficItem[]>([]);
   const [totalPage, setTotalPage] = useState<number>(1);
@@ -105,6 +105,7 @@ export default function PdpTraffic({}: PdpTrafficProps) {
           toDate: formatDatetime(toDate.getTime(), 'yyyy-MM-dd'),
           type: 'PDP',
           page: pageNumber,
+          supplierId: selectedPdp?.id,
         });
         setLoading(false);
         if (response.statusCode === 0) {
@@ -117,7 +118,7 @@ export default function PdpTraffic({}: PdpTrafficProps) {
         setLoading(false);
       }
     },
-    [toDate, fromDate]
+    [toDate, fromDate, selectedPdp?.id]
   );
 
   const triggerDownloadReport = useCallback(
@@ -211,9 +212,9 @@ export default function PdpTraffic({}: PdpTrafficProps) {
   }, [getPdpTrafficDownload, totalPageDownload, triggerDownloadReport]);
 
   useEffect(() => {
-    getPdpTraffic(1);
+    (!isAdmin || (isAdmin && selectedPdp?.id)) && getPdpTraffic(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fromDate, toDate]);
+  }, [fromDate, toDate, selectedPdp?.id, isAdmin]);
 
   const { order, orderBy, selected, filteredList, handleRequestSort } = useMuiTable({
     listData: pdpTraffic,
@@ -221,7 +222,7 @@ export default function PdpTraffic({}: PdpTrafficProps) {
 
   return (
     <Box py={2}>
-      <H1 my={2} textTransform="uppercase" textAlign={'center'}>
+      <H1 my={2} textTransform="uppercase" textAlign={'center'} color="grey.900">
         Số lượng tiếp cận thông tin công ty
       </H1>
 
@@ -269,7 +270,12 @@ export default function PdpTraffic({}: PdpTrafficProps) {
 
       <Card>
         <FlexBox justifyContent={'flex-end'} m={1}>
-          <Button variant="contained" color="primary" onClick={startDownload} disabled={loading}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={startDownload}
+            disabled={loading || !pdpTraffic.length}
+          >
             Tải báo cáo
           </Button>
         </FlexBox>

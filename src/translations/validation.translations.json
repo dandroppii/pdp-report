@@ -168,6 +168,13 @@
       "vi": "Vui lòng chọn loại hỗ trợ"
     }
   },
+  "pdp_required": {
+    "key": "validation:pdp_required",
+    "messages": {
+      "en": "Support type is required",
+      "vi": "Vui lòng chọn nhà cung cấp"
+    }
+  },
   "support_message_required": {
     "key": "validation:support_message_required",
     "messages": {

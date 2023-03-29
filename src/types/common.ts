@@ -127,6 +127,7 @@ export interface PdpInformations {
   backgroundUrl: string;
   avatarUrl: string;
   avatar: string;
+  roles?: string[];
 }
 
 export interface PdpReport {
@@ -149,6 +150,16 @@ export interface TrafficItem {
   userAgent: string;
 }
 
+export interface ProductTrafficItemSummary {
+  supplierId: string;
+  price: number;
+  taxPercent: number;
+  visitType: string;
+  totalCount: number;
+  productName: string;
+  productLink: string;
+}
+
 export interface PDPTrafficItem {
   id: string;
   supplierId: string;
@@ -164,4 +175,18 @@ export interface PDPTrafficItemForDownload {
   STT: number;
   'Thời gian': string;
   'Thiết bị': string;
+}
+
+export interface ListPdp {
+  name: string;
+  id: string;
+}
+
+export interface ListPdpResponse {
+  name: string;
+  id: string;
+  fullName: string;
+  phone: string;
+  email: string;
+  status: number;
 }
