@@ -170,6 +170,47 @@ export default function ProductTraffic({}: ProductTrafficProps) {
     [fromDate, toDate, user?.fullName, resetDownload, productReport]
   );
 
+  const triggerDownloadBasicReport = useCallback(() => {
+    try {
+      const fileName = `traffic_san_pham_${convertToSlug(
+        user?.fullName
+      )}_report_tu_${formatDatetime(fromDate.getTime(), 'yyyyMMdd')}_den_${formatDatetime(
+        toDate.getTime(),
+        'yyyyMMdd'
+      )}`;
+      const newSheet = {
+        sheetName: `Số lượt tiếp cận`,
+        details: productTrafficSummary.map((item, index) => ({
+          STT: index + 1,
+          'Sản phẩm': item.productName,
+          'Số lượt truy cập': item.totalCount,
+          'Chi phí': item.totalCount * item.price,
+        })),
+      };
+
+      const exportData = [
+        {
+          sheetName: 'Tổng quan',
+          details: [
+            {
+              'Số lượt truy cập': productReport?.totalVisitInDuration,
+              'Đơn giá dịch vụ': productReport?.avgPricePerItem,
+              'Phí dịch vụ': productReport?.totalVisitInDuration * productReport?.avgPricePerItem,
+            },
+          ],
+        },
+        newSheet,
+      ];
+      exportToExcel(exportData, fileName, true);
+      resetDownload();
+      toast.success('Tải báo cáo thành công!');
+    } catch (error) {
+      console.log('🚀 ~ file: product-traffic.tsx:131 ~ ProductTraffic ~ error:', error);
+      toast.error(error.message);
+      resetDownload();
+    }
+  }, [fromDate, toDate, user?.fullName, resetDownload, productReport, productTrafficSummary]);
+
   const getProductTrafficDownload = useCallback(
     async (pageNumber: number) => {
       try {
@@ -231,7 +272,6 @@ export default function ProductTraffic({}: ProductTrafficProps) {
   }, [getProductTrafficDownload, totalPageDownload, triggerDownloadReport]);
 
   useEffect(() => {
-    console.log('🚀 ~ file: product-traffic.tsx:232 ~ useEffect ~ c:', selectedPdp);
     if (!isAdmin || (isAdmin && selectedPdp)) {
       getProductTraffic(1);
       getProductTrafficSummary();
@@ -315,15 +355,30 @@ export default function ProductTraffic({}: ProductTrafficProps) {
             />
           </Box>
           {isBasicMode ? (
-            <ReactToPrint
-              documentTitle="Số lượng tiếp cận thông tin sản phẩm"
-              content={() => contentPrintRef.current}
-              trigger={() => (
-                <Button variant="contained" color="primary">
-                  In báo cáo
-                </Button>
-              )}
-            />
+            <>
+              <ReactToPrint
+                documentTitle="Số lượng tiếp cận thông tin sản phẩm"
+                content={() => contentPrintRef.current}
+                trigger={() => (
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    disabled={loading || !productTrafficSummary.length}
+                  >
+                    In báo cáo(pdf)
+                  </Button>
+                )}
+              />
+              <Button
+                sx={{ ml: 2 }}
+                variant="contained"
+                color="primary"
+                onClick={triggerDownloadBasicReport}
+                disabled={loading || !productTrafficSummary.length}
+              >
+                Tải báo cáo(xlsx)
+              </Button>
+            </>
           ) : (
             <Button
               variant="contained"
@@ -331,7 +386,7 @@ export default function ProductTraffic({}: ProductTrafficProps) {
               onClick={startDownload}
               disabled={loading || !productTraffic.length}
             >
-              Tải báo cáo
+              Tải báo cáo(xlsx)
             </Button>
           )}
         </FlexBox>
@@ -356,7 +411,7 @@ export default function ProductTraffic({}: ProductTrafficProps) {
                     },
                     a: {
                       color: '#2B3445 !important',
-                      whiteSpace: 'none',
+                      whiteSpace: 'normal',
                     },
                     h3: {
                       display: 'block',
@@ -382,7 +437,7 @@ export default function ProductTraffic({}: ProductTrafficProps) {
 
                 <Span className="print" sx={{ display: 'none' }}>
                   Số lượt truy cập:{' '}
-                  <strong>{formatNumber(productReport?.totalVisitInDuration)}</strong>
+                  <strong>{formatNumber(productReport?.totalVisitInDuration)}</strong> lượt
                 </Span>
                 <Span className="print" sx={{ display: 'none' }}>
                   Đơn giá dịch vụ: <strong>{formatCurrency(productReport?.avgPricePerItem)}</strong>
