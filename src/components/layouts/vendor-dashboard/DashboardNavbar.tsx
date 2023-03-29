@@ -10,6 +10,7 @@ import { DatePicker } from '@mui/x-date-pickers-pro';
 import { Paragraph } from 'components/Typography';
 import { useAppContext } from 'contexts/AppContext';
 import { ListPdp } from 'types/common';
+import { useAuthContext } from 'contexts/AuthContext';
 
 // custom styled components
 const DashboardNavbarRoot = styled(AppBar)(({ theme }) => ({
@@ -53,6 +54,8 @@ const DashboardNavbar: FC<DashboardNavbarProps> = ({ handleDrawerToggle }) => {
     state: { fromDate, toDate, pdpReportLoading, productReportLoading, listPdp, selectedPdp },
     dispatch,
   } = useAppContext();
+
+  const { isAdmin } = useAuthContext();
   const downLg = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
 
   const handeChangePdp = useCallback(
@@ -87,19 +90,23 @@ const DashboardNavbar: FC<DashboardNavbarProps> = ({ handleDrawerToggle }) => {
           )}
 
           <FlexBox alignItems="center" flex={1} gap={2} justifyContent="flex-end">
-            <Autocomplete
-              fullWidth
-              sx={{ maxWidth: 300 }}
-              options={listPdp}
-              value={selectedPdp}
-              getOptionLabel={(option: ListPdp) => option.name}
-              onChange={(_, value: ListPdp) => {
-                handeChangePdp(value);
-              }}
-              renderInput={params => (
-                <TextField label="Chọn nhà cung cấp" {...params} helperText={null} />
-              )}
-            />
+            {isAdmin ? (
+              <Autocomplete
+                fullWidth
+                sx={{ maxWidth: 300 }}
+                options={listPdp}
+                value={selectedPdp}
+                getOptionLabel={(option: ListPdp) => option.name}
+                onChange={(_, value: ListPdp) => {
+                  handeChangePdp(value);
+                }}
+                renderInput={params => (
+                  <TextField label="Chọn nhà cung cấp" {...params} helperText={null} />
+                )}
+              />
+            ) : (
+              <></>
+            )}
 
             <Box sx={{ minWidth: 200 }}>
               <DatePicker
@@ -136,6 +143,5 @@ const DashboardNavbar: FC<DashboardNavbarProps> = ({ handleDrawerToggle }) => {
     </DashboardNavbarRoot>
   );
 };
-    
 
 export default DashboardNavbar;
