@@ -25,7 +25,7 @@ import Card2 from 'pages-sections/dashboard/Card2';
 import { formatDatetime } from 'utils/datetime';
 import { GET_PRODUCT_TRAFFICS_RESPONSE } from 'constance/mockPdpData';
 import { useAppContext } from 'contexts/AppContext';
-import { TrafficItem } from 'types/common';
+import { ProductTrafficItemSummary, TrafficItem } from 'types/common';
 import DRowSkeleton from 'pages-sections/admin/DOrderSkeleton';
 import { ExternalLink } from 'components/layouts/vendor-dashboard/LayoutStyledComponents';
 import { pdpService } from 'api';
@@ -71,6 +71,9 @@ export default function ProductTraffic({}: ProductTrafficProps) {
   } = useAppContext();
   const { user, isAdmin } = useAuthContext();
   const [productTraffic, setProductTraffic] = useState<TrafficItem[]>([]);
+  const [productTrafficSummary, setProductTrafficSummary] = useState<ProductTrafficItemSummary[]>(
+    []
+  );
   const [totalPage, setTotalPage] = useState<number>(1);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
@@ -94,6 +97,7 @@ export default function ProductTraffic({}: ProductTrafficProps) {
           toDate: formatDatetime(toDate.getTime(), 'yyyy-MM-dd'),
           type: 'PRODUCT',
           page: pageNumber,
+          supplierId: selectedPdp?.id,
         });
         setLoading(false);
         if (response.statusCode === 0) {
@@ -106,8 +110,25 @@ export default function ProductTraffic({}: ProductTrafficProps) {
         setLoading(false);
       }
     },
-    [toDate, fromDate]
+    [toDate, fromDate, selectedPdp]
   );
+
+  const getProductTrafficSummary = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await pdpService.getProductTrafficsSummary({
+        fromDate: formatDatetime(fromDate.getTime(), 'yyyy-MM-dd'),
+        toDate: formatDatetime(toDate.getTime(), 'yyyy-MM-dd'),
+        supplierId: selectedPdp?.id,
+      });
+      setLoading(false);
+      if (response.statusCode === 0) {
+        setProductTrafficSummary(response.data);
+      }
+    } catch (error) {
+      setLoading(false);
+    }
+  }, [toDate, fromDate, selectedPdp]);
 
   const triggerDownloadReport = useCallback(
     (data, index, isOneFile) => {
@@ -158,6 +179,7 @@ export default function ProductTraffic({}: ProductTrafficProps) {
           type: 'PRODUCT',
           page: pageNumber,
           size: MAX_ITEM_PER_SHEET,
+          supplierId: selectedPdp?.id,
         });
         if (response.statusCode === 0) {
           const page = response.pageable.pageNumber;
@@ -183,7 +205,7 @@ export default function ProductTraffic({}: ProductTrafficProps) {
         resetDownload();
       }
     },
-    [toDate, fromDate, resetDownload]
+    [toDate, fromDate, resetDownload, selectedPdp?.id]
   );
 
   const startDownload = useCallback(async () => {
@@ -209,41 +231,17 @@ export default function ProductTraffic({}: ProductTrafficProps) {
   }, [getProductTrafficDownload, totalPageDownload, triggerDownloadReport]);
 
   useEffect(() => {
-    (!isAdmin || (isAdmin && selectedPdp)) && getProductTraffic(1);
+    console.log('🚀 ~ file: product-traffic.tsx:232 ~ useEffect ~ c:', selectedPdp);
+    if (!isAdmin || (isAdmin && selectedPdp)) {
+      getProductTraffic(1);
+      getProductTrafficSummary();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fromDate, toDate, selectedPdp, isAdmin]);
 
   const { order, orderBy, selected, filteredList, handleRequestSort } = useMuiTable({
     listData: productTraffic,
   });
-
-  const productTrafficBasic = [
-    {
-      supplierId: '0d1e95cd-68ee-4a50-987a-ce569819ef2f',
-      price: 1100,
-      taxPercent: 10,
-      visitType: 'PRODUCT',
-      totalCount: 4669,
-      productName: 'Sữa công thức dành cho trẻ từ 0-6 tháng tuổi Nedmill Stage 1 ',
-    },
-    {
-      supplierId: '0d1e95cd-68ee-4a50-987a-ce569819ef2f',
-      price: 1100,
-      taxPercent: 10,
-      visitType: 'PRODUCT',
-      totalCount: 4685,
-      productName: 'Sữa công thức dành cho trẻ từ 6-12 tháng tuổi Nedmill Stage 2',
-    },
-    {
-      supplierId: '0d1e95cd-68ee-4a50-987a-ce569819ef2f',
-      price: 1100,
-      taxPercent: 10,
-      visitType: 'PRODUCT',
-      totalCount: 4583,
-      productName:
-        'Sữa công thức với mục đích ăn bổ sung cho trẻ trên 12 tháng tuổi Nedmill Stage 3',
-    },
-  ];
 
   const {
     order: orderBasic,
@@ -252,8 +250,8 @@ export default function ProductTraffic({}: ProductTrafficProps) {
     filteredList: filteredListBasic,
     handleRequestSort: handleRequestSortBasic,
   } = useMuiTable({
-    listData: productTrafficBasic,
-    pageSize: productTrafficBasic?.length,
+    listData: productTrafficSummary,
+    pageSize: productTrafficSummary?.length,
   });
 
   return (
@@ -404,7 +402,7 @@ export default function ProductTraffic({}: ProductTrafficProps) {
                       hideSelectBtn
                       orderBy={orderByBasic}
                       heading={tableHeadingBasic}
-                      rowCount={productTrafficBasic.length}
+                      rowCount={productTrafficSummary.length}
                       numSelected={selectedBasic.length}
                       onRequestSort={handleRequestSortBasic}
                     />

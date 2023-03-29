@@ -8,6 +8,7 @@ import {
   ListPdpResponse,
   LoginResponseData,
   PdpReport,
+  ProductTrafficItemSummary,
   TrafficItem,
   UserResponseData,
 } from 'types/common';
@@ -43,6 +44,24 @@ class PdpService extends Client {
         ...params,
         sortField: 'visitTime',
         size: params.size || 20,
+      })}`,
+      {
+        headers: this.privateHeaders,
+      }
+    );
+  }
+
+  public getProductTrafficsSummary(params: {
+    fromDate: string;
+    toDate: string;
+    supplierId?: string;
+  }) {
+    return fetcher<BaseResponse<ProductTrafficItemSummary[]>>(
+      `${process.env.BASE_URL}${ENDPOINT.GET_TRAFFICS_SUMMARY}?${qs.stringify({
+        ...params,
+        sortField: 'visitTime',
+        type: 'PRODUCT',
+        size: 999,
       })}`,
       {
         headers: this.privateHeaders,

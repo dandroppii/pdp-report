@@ -113,10 +113,7 @@ export default function Management({}: ManagementProps) {
   const [status, setStatus] = useState<{
     status: number;
     label: string;
-  }>({
-    status: 0,
-    label: 'All',
-  });
+  }>();
   const [pdpSelected, setPdpSelected] = useState<ListPdpResponse>();
   const [listPdp, setListPdp] = useState<ListPdpResponse[]>(listPdpFull);
   const [openDialogChangePassword, setOpenDialogChangePassword] = useState<boolean>(false);
@@ -143,23 +140,21 @@ export default function Management({}: ManagementProps) {
     setListPdp(listPdpFull);
   }, [listPdpFull]);
 
-  const handleFilterStatus = useCallback(
-    s => {
-      setStatus(s);
-      const filterPdp = s.status ? listPdp.filter(p => p.status === s.status) : listPdp;
-      setListPdp(filterPdp);
-    },
-    [listPdp]
-  );
+  const handleFilterStatus = useCallback(s => {
+    setStatus(s);
+  }, []);
 
-  const handleSearch = useCallback(
-    s => {
-      setSearch(s);
-      const filterPdp = s ? searchString(listPdpFull, s, 'fullName') : listPdpFull;
-      setListPdp(filterPdp);
-    },
-    [listPdpFull]
-  );
+  const handleSearch = useCallback(s => {
+    setSearch(s);
+  }, []);
+
+  const handleFilterSearch = useCallback(() => {
+    const searchPdp = search ? searchString(listPdpFull, search, 'fullName') : listPdpFull;
+    const filterPdp = status?.status
+      ? searchPdp.filter(p => p.status === status.status)
+      : searchPdp;
+    setListPdp(filterPdp);
+  }, [listPdpFull, search, status]);
   return (
     <Box py={2}>
       <H1 my={2} textTransform="uppercase" textAlign={'center'} color="grey.900">
@@ -168,6 +163,15 @@ export default function Management({}: ManagementProps) {
 
       <Card>
         <FlexBox justifyContent={'flex-end'} m={1}>
+          <Box mr={2}>
+            <SearchInput
+              placeholder="Nhập tên nhà cung cấp"
+              value={search}
+              onChange={e => {
+                handleSearch(e?.target?.value);
+              }}
+            />
+          </Box>
           <Box mr={2}>
             <Autocomplete
               size="medium"
@@ -192,16 +196,7 @@ export default function Management({}: ManagementProps) {
               )}
             />
           </Box>
-          <Box mr={2}>
-            <SearchInput
-              placeholder="Nhập tên nhà cung cấp"
-              value={search}
-              onChange={e => {
-                console.log('🚀 ~ file: management.tsx:273 ~ Management ~ e:', e);
-                handleSearch(e?.target?.value);
-              }}
-            />
-          </Box>
+
           <Button
             variant="contained"
             color="primary"

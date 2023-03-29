@@ -136,5 +136,6 @@ const DashboardNavbar: FC<DashboardNavbarProps> = ({ handleDrawerToggle }) => {
     </DashboardNavbarRoot>
   );
 };
+    
 
 export default DashboardNavbar;

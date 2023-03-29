@@ -127,7 +127,7 @@ export interface PdpInformations {
   backgroundUrl: string;
   avatarUrl: string;
   avatar: string;
-  isAdmin: boolean;
+  roles?: string[];
 }
 
 export interface PdpReport {
@@ -148,6 +148,16 @@ export interface TrafficItem {
   productName: null;
   productLink: null;
   userAgent: string;
+}
+
+export interface ProductTrafficItemSummary {
+  supplierId: string;
+  price: number;
+  taxPercent: number;
+  visitType: string;
+  totalCount: number;
+  productName: string;
+  productLink: string;
 }
 
 export interface PDPTrafficItem {
@@ -178,5 +188,5 @@ export interface ListPdpResponse {
   fullName: string;
   phone: string;
   email: string;
-  status: string
+  status: number;
 }

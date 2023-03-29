@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 // ================================================================
 type Order = 'asc' | 'desc';
@@ -52,6 +52,10 @@ const useMuiTable = (props: HookProps) => {
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
+
+  useEffect(() => {
+    pageSize && setRowsPerPage(pageSize);
+  }, [pageSize]);
 
   const handleSelectAllClick = (checked: boolean, defaultSelect: string) => {
     if (checked) {

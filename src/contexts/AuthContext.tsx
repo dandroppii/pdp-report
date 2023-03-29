@@ -84,15 +84,20 @@ const AuthContextProvider = ({ children }: WithChildren) => {
       const response = await identityService.getCurrentUserId();
       setIsPdpLoading(false);
       if (response?.data) {
-        const user = await identityService.getCurrentUser(response?.data);
-        if (user?.data) {
-          setUser(user?.data);
-          // setIsAdmin(!!user?.data.isAdmin);
-          setIsAdmin(true)
+        if (response?.data?.roles?.includes('MCO_ADMIN')) {
+          setIsAdmin(true);
+          setUser(response?.data);
           setIsLoading(false);
           setIsLogin(true);
         } else {
-          logout();
+          const user = await identityService.getCurrentUser(response?.data?.supplierId);
+          if (user?.data) {
+            setUser(user?.data);
+            setIsLoading(false);
+            setIsLogin(true);
+          } else {
+            logout();
+          }
         }
       } else {
         logout();

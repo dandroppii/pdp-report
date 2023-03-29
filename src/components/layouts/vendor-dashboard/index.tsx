@@ -5,7 +5,7 @@ import { useAppContext } from 'contexts/AppContext';
 import { useAuthContext } from 'contexts/AuthContext';
 import NavBarLoadingSkeleton from 'pages-sections/admin/NavBarLoadingSkeleton';
 import DPageSkeleton from 'pages-sections/admin/PageLoadingSkeleton';
-import RequirePdp from 'pages-sections/dashboard/\bRequirePdp';
+import RequirePdp from 'pages-sections/dashboard/RequirePdp';
 import { Fragment, useState } from 'react';
 import DashboardNavbar from './DashboardNavbar';
 import DashboardSidebar from './DashboardSidebar';
@@ -20,6 +20,7 @@ const BodyWrapper = styled(Box)<{ compact: number }>(({ theme, compact }) => ({
 
 const InnerWrapper = styled(Box)(({ theme }) => ({
   transition: 'all 0.3s',
+  paddingBottom: '200px',
   [theme.breakpoints.up('lg')]: { maxWidth: 1200, margin: 'auto' },
   [theme.breakpoints.down(1550)]: { paddingLeft: '2rem', paddingRight: '2rem' },
 }));
