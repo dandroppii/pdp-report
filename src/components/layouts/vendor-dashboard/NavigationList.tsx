@@ -44,9 +44,9 @@ export const navigationsAdmin = [
     icon: duotone.ProjectChart,
     path: '/analytics',
   },
-  {
-    name: 'Quản lý tài khoản',
-    icon: duotone.AccountSetting,
-    path: '/management',
-  },
+  // {
+  //   name: 'Quản lý tài khoản',
+  //   icon: duotone.AccountSetting,
+  //   path: '/management',
+  // },
 ];
