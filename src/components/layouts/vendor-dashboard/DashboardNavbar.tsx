@@ -51,7 +51,15 @@ type DashboardNavbarProps = {
 
 const DashboardNavbar: FC<DashboardNavbarProps> = ({ handleDrawerToggle }) => {
   const {
-    state: { fromDate, toDate, pdpReportLoading, productReportLoading, listPdp, selectedPdp },
+    state: {
+      fromDate,
+      toDate,
+      pdpReportLoading,
+      productReportLoading,
+      listPdp,
+      selectedPdp,
+      listPdpLoading,
+    },
     dispatch,
   } = useAppContext();
 
@@ -92,6 +100,7 @@ const DashboardNavbar: FC<DashboardNavbarProps> = ({ handleDrawerToggle }) => {
           <FlexBox alignItems="center" flex={1} gap={2} justifyContent="flex-end">
             {isAdmin ? (
               <Autocomplete
+                disabled={pdpReportLoading || productReportLoading || listPdpLoading}
                 fullWidth
                 sx={{ maxWidth: 300 }}
                 options={listPdp}
