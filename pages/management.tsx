@@ -139,15 +139,7 @@ export default function Management({}: ManagementProps) {
   useEffect(() => {
     setListPdp(listPdpFull);
   }, [listPdpFull]);
-
-  const handleFilterStatus = useCallback(s => {
-    setStatus(s);
-  }, []);
-
-  const handleSearch = useCallback(s => {
-    setSearch(s);
-  }, []);
-
+  
   const handleFilterSearch = useCallback(() => {
     const searchPdp = search ? searchString(listPdpFull, search, 'fullName') : listPdpFull;
     const filterPdp = status?.status
@@ -155,6 +147,23 @@ export default function Management({}: ManagementProps) {
       : searchPdp;
     setListPdp(filterPdp);
   }, [listPdpFull, search, status]);
+
+  const handleFilterStatus = useCallback(
+    s => {
+      setStatus(s);
+      handleFilterSearch();
+    },
+    [handleFilterSearch]
+  );
+
+  const handleSearch = useCallback(
+    s => {
+      setSearch(s);
+      handleFilterSearch();
+    },
+    [handleFilterSearch]
+  );
+
   return (
     <Box py={2}>
       <H1 my={2} textTransform="uppercase" textAlign={'center'} color="grey.900">
