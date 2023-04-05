@@ -1,5 +1,6 @@
 import { Autocomplete, Button, Card, CardProps, TextField } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { pdpService } from 'api';
 import BazaarButton from 'components/BazaarButton';
 import BazaarTextField from 'components/BazaarTextField';
 import { FlexBox } from 'components/flex-box';
@@ -9,7 +10,9 @@ import { useAuthContext } from 'contexts/AuthContext';
 import { useFormik } from 'formik';
 import { useTranslations } from 'next-intl';
 import React, { useCallback, useState } from 'react';
+import { toast } from 'react-hot-toast';
 import { ListPdp } from 'types/common';
+import { STATUS_CODE_SUCCESS } from 'utils/constants';
 import * as yup from 'yup';
 import EyeToggleButton from './EyeToggleButton';
 
@@ -32,12 +35,20 @@ export const Wrapper = styled<React.FC<WrapperProps & CardProps>>(
   '.agreement': { marginTop: 12, marginBottom: 24 },
 }));
 
-const CreateMcoReportAccount = ({ onSuccess, onClose }: { onSuccess: any; onClose: any }) => {
+const CreateMcoReportAccount = ({
+  onSuccess,
+  onClose,
+  listPdp,
+}: {
+  onSuccess: any;
+  onClose: any;
+  listPdp: {
+    name: string;
+    id: string;
+  }[];
+}) => {
   const t = useTranslations();
-  const {
-    state: { listPdp, selectedPdp },
-    dispatch,
-  } = useAppContext();
+  const { getListPdp } = useAppContext();
   const [passwordVisibility, setPasswordVisibility] = useState(false);
   const [rePasswordVisibility, setRePasswordVisibility] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -52,11 +63,31 @@ const CreateMcoReportAccount = ({ onSuccess, onClose }: { onSuccess: any; onClos
   const handleFormSubmit = async (values: any) => {
     try {
       setLoading(true);
-      const res = {};
+      const res = await pdpService.createAccount({
+        userName: values.username,
+        fullName: values.fullName,
+        password: values.password,
+      });
+
       setLoading(false);
-      onSuccess && onSuccess(res);
+      if (res.statusCode === STATUS_CODE_SUCCESS && res?.data) {
+        const resMapping = await pdpService.mapAccountWithPdp({
+          userName: values.username,
+          supplierId: values.pdp?.id,
+        });
+        if (resMapping.statusCode === STATUS_CODE_SUCCESS && resMapping?.data) {
+          onSuccess && onSuccess(res);
+          getListPdp();
+          toast.success('Tạo tài khoản thành công');
+        } else {
+          toast.error(resMapping.message);
+        }
+      } else {
+        toast.error(res.message);
+      }
     } catch (error) {
       setLoading(false);
+      toast.error(error?.message || 'Tạo tài khoản thất bại');
     }
   };
 
@@ -109,8 +140,8 @@ const CreateMcoReportAccount = ({ onSuccess, onClose }: { onSuccess: any; onClos
         <Autocomplete
           fullWidth
           options={listPdp}
-          value={selectedPdp}
-          getOptionLabel={(option: ListPdp) => option.name}
+          value={values.pdp}
+          getOptionLabel={(option: any) => option.name}
           onChange={(_, value: ListPdp) => {
             setFieldValue('pdp', value);
           }}
@@ -129,6 +160,7 @@ const CreateMcoReportAccount = ({ onSuccess, onClose }: { onSuccess: any; onClos
           mb={1.5}
           mt={1.5}
           fullWidth
+          autoComplete="new-password"
           name="username"
           size="small"
           variant="outlined"
@@ -147,7 +179,7 @@ const CreateMcoReportAccount = ({ onSuccess, onClose }: { onSuccess: any; onClos
           size="small"
           name="password"
           label="Mật khẩu"
-          autoComplete="on"
+          autoComplete="new-password"
           variant="outlined"
           onBlur={handleBlur}
           onChange={handleChange}
@@ -169,7 +201,7 @@ const CreateMcoReportAccount = ({ onSuccess, onClose }: { onSuccess: any; onClos
           size="small"
           name="rePassword"
           label="Nhập lại mật khẩu"
-          autoComplete="on"
+          autoComplete="new-password"
           variant="outlined"
           onBlur={handleBlur}
           onChange={handleChange}
@@ -191,7 +223,7 @@ const CreateMcoReportAccount = ({ onSuccess, onClose }: { onSuccess: any; onClos
             color="primary"
             variant="contained"
             sx={{ mb: '1.65rem', height: 44 }}
-            disabled={!(dirty && isValid)}
+            disabled={!(dirty && isValid && !loading)}
           >
             Tạo mới
           </BazaarButton>
@@ -200,6 +232,7 @@ const CreateMcoReportAccount = ({ onSuccess, onClose }: { onSuccess: any; onClos
             variant="outlined"
             onClick={handleCloseForm}
             sx={{ mb: '1.65rem', height: 44 }}
+            disabled={loading}
           >
             Hủy
           </Button>
@@ -208,15 +241,5 @@ const CreateMcoReportAccount = ({ onSuccess, onClose }: { onSuccess: any; onClos
     </Wrapper>
   );
 };
-
-const initialValues = {
-  email: '',
-  password: '',
-};
-
-const formSchema = yup.object().shape({
-  password: yup.string().required('Password is required'),
-  email: yup.string().email('invalid email').required('Email is required'),
-});
 
 export default CreateMcoReportAccount;

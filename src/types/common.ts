@@ -189,4 +189,7 @@ export interface ListPdpResponse {
   phone: string;
   email: string;
   status: number;
+  userDetail?: {
+    username: string;
+  };
 }

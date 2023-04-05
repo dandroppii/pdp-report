@@ -80,11 +80,13 @@ const initState: initialState = {
 interface ContextProps {
   state: initialState;
   dispatch: (args: ActionType) => void;
+  getListPdp: () => any;
 }
 
 const AppContext = createContext<ContextProps>({
   state: initState,
   dispatch: () => {},
+  getListPdp: () => {},
 });
 
 const reducer = (state: initialState, action: ActionType) => {
@@ -299,7 +301,10 @@ export const AppProvider: React.FC = ({ children }) => {
     }
   }, []);
 
-  const contextValue = useMemo(() => ({ state, dispatch }), [state, dispatch]);
+  const contextValue = useMemo(
+    () => ({ state, dispatch, getListPdp }),
+    [state, dispatch, getListPdp]
+  );
 
   useEffect(() => {
     if (isLogin && (!isAdmin || (isAdmin && selectedPdp?.id))) {

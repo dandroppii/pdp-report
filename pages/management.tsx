@@ -36,13 +36,14 @@ import { pdpService } from 'api';
 import { exportToExcel } from 'react-json-to-excel';
 import { useAuthContext } from 'contexts/AuthContext';
 import { convertToSlug, searchString } from 'utils/utils';
-import { MAX_ITEM_PER_SHEET } from 'utils/constants';
+import { MAX_ITEM_PER_SHEET, STATUS_CODE_SUCCESS } from 'utils/constants';
 import { FlexBox } from 'components/flex-box';
 import toast, { Toaster } from 'react-hot-toast';
 import BazaarSwitch from 'components/BazaarSwitch';
 import CreateMcoReportAccount from 'pages-sections/sessions/CreateMcoReportAccount';
 import { useRouter } from 'next/router';
 import ChangePassword from 'pages-sections/sessions/ChangePassword';
+import DLoadingOverlay from 'components/DLoadingOverlay';
 
 const tableHeading = [
   { id: 'id', label: 'ID', align: 'left', size: 'small' },
@@ -105,17 +106,29 @@ const statusList = [
 
 export default function Management({}: ManagementProps) {
   const {
+    dispatch,
     state: { listPdpFull, listPdpLoading },
   } = useAppContext();
   const { isAdmin } = useAuthContext();
   const router = useRouter();
   const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [pageLoading, setPageLoading] = useState<boolean>(false);
   const [status, setStatus] = useState<{
     status: number;
     label: string;
   }>();
   const [pdpSelected, setPdpSelected] = useState<ListPdpResponse>();
   const [listPdp, setListPdp] = useState<ListPdpResponse[]>(listPdpFull);
+  const listPdpCreatedAccountIds = useMemo(() => {
+    return listPdpFull?.map(i => i.id);
+  }, [listPdpFull]);
+
+  const [listPdpNotYetCreateAccount, setListPdpNotYetCreateAccount] = useState<
+    {
+      name: string;
+      id: string;
+    }[]
+  >([]);
   const [openDialogChangePassword, setOpenDialogChangePassword] = useState<boolean>(false);
   const [search, setSearch] = useState<string>();
 
@@ -123,23 +136,61 @@ export default function Management({}: ManagementProps) {
     listData: listPdp,
   });
 
+  const getListPdpNotYetCreateAccount = useCallback(async () => {
+    setPageLoading(true);
+    try {
+      const res = await pdpService.getListPdpNotYetCreateAccount(listPdpCreatedAccountIds);
+
+      setPageLoading(false);
+      if (res.statusCode === STATUS_CODE_SUCCESS) {
+        const listPdp = res.data?.map(i => ({
+          name: i.fullName,
+          id: i.id,
+        }));
+        setListPdpNotYetCreateAccount(listPdp);
+      }
+    } catch (error) {
+      setPageLoading(false);
+    }
+  }, [listPdpCreatedAccountIds]);
+
   const handleAddNewPdp = useCallback(() => {
     setOpenDialog(true);
   }, []);
+
+  const handleChangePdpStatus = useCallback(
+    async (item, status) => {
+      setPageLoading(true);
+      try {
+        const res = await pdpService.changePdpStatus({
+          id: item.id,
+          status: status,
+        });
+
+        setPageLoading(false);
+        if (res.statusCode === STATUS_CODE_SUCCESS) {
+          const newListPdpFull = listPdpFull.map(pdp => ({
+            ...pdp,
+            status: pdp.id === item.id ? status : pdp.status,
+          }));
+          dispatch({ type: 'SET_LIST_PDP_FULL', payload: newListPdpFull });
+          toast.success('Thay đổi trạng thái thành công');
+        } else {
+          toast.error('Thay đổi trạng thái thất bại. Vui lòng thử lại sau');
+        }
+      } catch (error) {
+        setPageLoading(false);
+        toast.error('Thay đổi trạng thái thất bại. Vui lòng thử lại sau');
+      }
+    },
+    [listPdpFull, dispatch]
+  );
 
   const handleChangePdpPassword = useCallback((pdp: ListPdpResponse) => {
     setOpenDialogChangePassword(true);
     setPdpSelected(pdp);
   }, []);
 
-  useEffect(() => {
-    !isAdmin && router?.isReady && router.push('/');
-  }, [isAdmin, router]);
-
-  useEffect(() => {
-    setListPdp(listPdpFull);
-  }, [listPdpFull]);
-  
   const handleFilterSearch = useCallback(() => {
     const searchPdp = search ? searchString(listPdpFull, search, 'fullName') : listPdpFull;
     const filterPdp = status?.status
@@ -164,8 +215,22 @@ export default function Management({}: ManagementProps) {
     [handleFilterSearch]
   );
 
+  useEffect(() => {
+    !isAdmin && router?.isReady && router.push('/');
+  }, [isAdmin, router]);
+
+  useEffect(() => {
+    setListPdp(listPdpFull);
+    handleFilterSearch();
+  }, [listPdpFull, handleFilterSearch]);
+
+  useEffect(() => {
+    getListPdpNotYetCreateAccount();
+  }, [getListPdpNotYetCreateAccount]);
+
   return (
-    <Box py={2}>
+    <Box py={2} sx={{ position: 'relative' }}>
+      <DLoadingOverlay loading={pageLoading} />
       <H1 my={2} textTransform="uppercase" textAlign={'center'} color="grey.900">
         Quản lý nhà cung cấp
       </H1>
@@ -210,7 +275,7 @@ export default function Management({}: ManagementProps) {
             variant="contained"
             color="primary"
             onClick={handleAddNewPdp}
-            disabled={listPdpLoading}
+            disabled={listPdpLoading || !listPdpNotYetCreateAccount?.length}
           >
             Tạo tài khoản
           </Button>
@@ -236,11 +301,18 @@ export default function Management({}: ManagementProps) {
                     <StyledTableRow role="checkbox" key={index}>
                       <StyledTableCell align="left">{index + 1}</StyledTableCell>
                       <StyledTableCell align="center">{item.fullName}</StyledTableCell>
-                      <StyledTableCell align="center">{item.name}</StyledTableCell>
+                      <StyledTableCell align="center">{item.userDetail?.username}</StyledTableCell>
                       <StyledTableCell align="center">{item.phone}</StyledTableCell>
                       <StyledTableCell align="center">{item.email}</StyledTableCell>
                       <StyledTableCell align="center">
-                        <BazaarSwitch color="info" checked={item.status === 1} />
+                        <BazaarSwitch
+                          color="info"
+                          checked={item.status === 1}
+                          onChange={e => {
+                            const newStatus = item.status === 1 ? 2 : 1;
+                            handleChangePdpStatus(item, newStatus);
+                          }}
+                        />
                       </StyledTableCell>
                       <StyledTableCell align="center" sx={{ width: 150 }}>
                         <Button
@@ -262,13 +334,25 @@ export default function Management({}: ManagementProps) {
       </Card>
 
       <Dialog open={openDialog} maxWidth={false} sx={{ zIndex: 100 }}>
-        <CreateMcoReportAccount onSuccess={() => {}} onClose={() => setOpenDialog(false)} />
+        <CreateMcoReportAccount
+          listPdp={listPdpNotYetCreateAccount}
+          onSuccess={() => {
+            setOpenDialog(false);
+          }}
+          onClose={() => {
+            setOpenDialog(false);
+          }}
+        />
       </Dialog>
       <Dialog open={openDialogChangePassword} maxWidth={false} sx={{ zIndex: 100 }}>
         <ChangePassword
           pdp={pdpSelected}
-          onSuccess={() => {}}
-          onClose={() => setOpenDialogChangePassword(false)}
+          onSuccess={() => {
+            setOpenDialogChangePassword(false);
+          }}
+          onClose={() => {
+            setOpenDialogChangePassword(false);
+          }}
         />
       </Dialog>
       <Toaster toastOptions={{ duration: 4000 }} />
