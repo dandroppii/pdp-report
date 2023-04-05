@@ -77,6 +77,67 @@ class PdpService extends Client {
       }
     );
   }
+
+  public getListPdpNotYetCreateAccount(payload: string[]) {
+    return fetcher<BaseResponse<ListPdpResponse[]>>(
+      `${process.env.BASE_URL}${ENDPOINT.GET_LIST_PDP_NOT_YET_CREATE_ACCOUNT}?PageNumber=0&PageSize=999`,
+      {
+        headers: this.privateHeaders,
+        method: 'POST',
+        body: JSON.stringify({
+          NotInListIds: payload,
+        }),
+      }
+    );
+  }
+
+  public createAccount(payload: { userName: string; fullName: string; password: string }) {
+    return fetcher<BaseResponse<boolean>>(`${process.env.BASE_URL}${ENDPOINT.CREATE_ACCOUNT}`, {
+      headers: this.privateHeaders,
+      method: 'POST',
+      body: JSON.stringify({
+        role: 'SUPPLIER',
+        fullName: payload.fullName,
+        ...payload,
+      }),
+    });
+  }
+
+  public mapAccountWithPdp(payload: { userName: string; supplierId: string }) {
+    return fetcher<BaseResponse<boolean>>(
+      `${process.env.BASE_URL}${ENDPOINT.MAP_ACCOUNT_WITH_PDP}`,
+      {
+        headers: this.privateHeaders,
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }
+    );
+  }
+
+  public changePdpStatus(payload: { id: string; status: number }) {
+    return fetcher<BaseResponse<ListPdpResponse[]>>(
+      `${process.env.BASE_URL}${ENDPOINT.CHANGE_PDP_STATUS}`,
+      {
+        headers: this.privateHeaders,
+        method: 'PUT',
+        body: JSON.stringify(payload),
+      }
+    );
+  }
+
+  public changePdpPassword(payload: { id: string; userName: string; password: string }) {
+    return fetcher<BaseResponse<any>>(
+      `${process.env.BASE_URL}${ENDPOINT.CHANGE_PASSWORD(payload.id)}`,
+      {
+        headers: this.privateHeaders,
+        method: 'PUT',
+        body: JSON.stringify({
+          userName: payload.userName,
+          password: payload.password,
+        }),
+      }
+    );
+  }
 }
 
 const pdpService = new PdpService();
