@@ -85,7 +85,8 @@ class PdpService extends Client {
         headers: this.privateHeaders,
         method: 'POST',
         body: JSON.stringify({
-          NotInListIds: payload,
+          notInListIds: payload,
+          status: 1,
         }),
       }
     );

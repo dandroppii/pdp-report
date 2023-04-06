@@ -143,10 +143,12 @@ export default function Management({}: ManagementProps) {
 
       setPageLoading(false);
       if (res.statusCode === STATUS_CODE_SUCCESS) {
-        const listPdp = res.data?.map(i => ({
-          name: i.fullName,
-          id: i.id,
-        }));
+        const listPdp = res.data
+          ?.map(i => ({
+            name: i.fullName,
+            id: i.id,
+          }))
+          .filter(i => i.name);
         setListPdpNotYetCreateAccount(listPdp);
       }
     } catch (error) {

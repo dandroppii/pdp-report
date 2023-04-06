@@ -191,5 +191,6 @@ export interface ListPdpResponse {
   status: number;
   userDetail?: {
     username: string;
+    id: string;
   };
 }

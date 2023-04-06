@@ -22,7 +22,6 @@ const ChangePassword = ({
   onClose: any;
   pdp: ListPdpResponse;
 }) => {
-  console.log('🚀 ~ file: ChangePassword.tsx:25 ~ pdp:', pdp);
   const t = useTranslations();
   const [loading, setLoading] = useState<boolean>(false);
   const [newPasswordVisibility, setNewPasswordVisibility] = useState(false);
@@ -39,7 +38,7 @@ const ChangePassword = ({
       try {
         setLoading(true);
         const res = await pdpService.changePdpPassword({
-          id: pdp?.id,
+          id: pdp?.userDetail?.id,
           password: values.password,
           userName: pdp?.userDetail?.username,
         });
