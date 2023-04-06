@@ -41,6 +41,7 @@ const AuthContextProvider = ({ children }: WithChildren) => {
     window?.localStorage?.removeItem(STORAGE_TOKEN_KEY);
     window?.localStorage?.removeItem(STORAGE_REFRESH_TOKEN_KEY);
     setIsLogin(false);
+    setIsAdmin(false);
     setUser(undefined);
     router.push('/login');
   }, [router]);
