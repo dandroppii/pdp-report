@@ -68,7 +68,7 @@ const initState: initialState = {
   pdpReport: undefined,
   productReport: undefined,
   pdpReportLoading: false,
-  productReportLoading: true,
+  productReportLoading: false,
   listPdp: [],
   selectedPdp: null,
   listPdpLoading: false,
