@@ -38,7 +38,7 @@ const ToggleWrapper = styled(FlexRowCenter)(({ theme }) => ({
   height: 40,
   flexShrink: 0,
   cursor: 'pointer',
-  borderRadius: '8px',
+  borderRadius: '9px',
   backgroundColor: theme.palette.grey[100],
 }));
 
