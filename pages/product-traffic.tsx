@@ -52,7 +52,7 @@ const tableHeadingBasic = [
   { id: 'no', label: 'No', align: 'center', size: 'small' },
   { id: 'productName', label: 'Sản phẩm', align: 'left' },
   { id: 'totalVisit', label: 'Số lượt truy cập', align: 'center' },
-  { id: 'cost', label: 'Chi phí', align: 'right' },
+  { id: 'cost', label: 'Phí dịch vụ', align: 'right' },
 ];
 
 // =============================================================================
@@ -184,7 +184,7 @@ export default function ProductTraffic({}: ProductTrafficProps) {
           STT: index + 1,
           'Sản phẩm': item.productName,
           'Số lượt truy cập': item.totalCount,
-          'Chi phí': item.totalCount * item.price,
+          'Phí dịch vụ': item.totalCount * item.price,
         })),
       };
 
