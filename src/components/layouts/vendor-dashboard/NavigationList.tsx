@@ -49,4 +49,12 @@ export const navigationsAdmin = [
     icon: duotone.AccountSetting,
     path: '/management',
   },
+<<<<<<< HEAD
+=======
+  {
+    name: 'CMS',
+    icon: duotone.DataTable,
+    path: '/report',
+  },
+>>>>>>> 04c6b6a (init)
 ];

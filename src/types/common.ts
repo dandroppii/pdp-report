@@ -171,6 +171,22 @@ export interface PDPTrafficItem {
   userAgent: string;
 }
 
+export interface ReportItem {
+  id: string;
+  lastDownloadTime: string;
+  lastCalculateTime: string;
+  fileName: string;
+  month: string;
+}
+
+export interface ReportResponse {
+  id: string;
+  lastDownloadTime: number;
+  lastCalculateTime: number;
+  fileName: string;
+  createdDate: number;
+}
+
 export interface PDPTrafficItemForDownload {
   STT: number;
   'Thời gian': string;

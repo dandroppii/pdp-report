@@ -38,8 +38,7 @@ const Card1: FC<Card1Props> = props => {
               <Skeleton variant="text" sx={{ width: 100 }} />
             ) : (
               <>
-                <CountUp end={traffic} duration={0.05} separator="." />
-                lượt
+                <CountUp end={traffic} duration={0.05} separator="." /> lượt
               </>
             )}
           </H3>

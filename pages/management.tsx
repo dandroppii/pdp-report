@@ -4,7 +4,6 @@ import {
   Dialog,
   Table,
   TableContainer,
-  styled,
   Button,
   Autocomplete,
   TextField,
@@ -51,30 +50,6 @@ Management.getLayout = function getLayout(page: ReactElement) {
   return <VendorDashboardLayout adminFeature={true}>{page}</VendorDashboardLayout>;
 };
 // =============================================================================
-
-export const ContentWrapper = styled(Box)(({ theme }) => ({
-  textAlign: 'center',
-
-  '& .carousel:hover': {
-    cursor: 'pointer',
-    '& .carousel__back-button': { opacity: 1, left: 10 },
-    '& .carousel__next-button': { opacity: 1, right: 10 },
-  },
-  '& .carousel__next-button, & .carousel__back-button': {
-    opacity: 0,
-    boxShadow: 'none',
-    transition: 'all 0.3s',
-    background: 'transparent',
-    color: theme.palette.primary.main,
-    ':disabled': { color: theme.palette.grey[500] },
-    ':hover': {
-      color: theme.palette.primary.main,
-      backgroundColor: 'transparent',
-    },
-  },
-  '& .carousel__back-button': { left: 0 },
-  '& .carousel__next-button': { right: 0 },
-}));
 
 type ManagementProps = {};
 

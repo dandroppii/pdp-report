@@ -4,6 +4,7 @@ type DatetimeFormat =
   | 'dd/MM/yyyy'
   | 'dd/MM/yyyy'
   | 'dd/MM/yyyy HH:mm'
+  | 'dd/MM/yyyy HH:mm:ss'
   | 'HH:mm dd/MM/yyyy'
   | 'HH:mm:ss dd/M/yyyy'
   | 'HH:mm:ss dd/MM/yyyy'
@@ -11,6 +12,7 @@ type DatetimeFormat =
   | 'dd-MM-yyyy'
   | 'HH:mm dd-MM-yyyy'
   | 'dd/MM/yyyy'
+  | 'MM/yyyy'
   | 'yyyyMMdd';
 
 export function formatDatetime(date: number, f: DatetimeFormat = 'dd/MM/yyyy HH:mm') {

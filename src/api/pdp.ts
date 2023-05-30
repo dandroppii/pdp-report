@@ -4,13 +4,11 @@ import fetcher from 'libs/fetcher';
 import qs from 'query-string';
 import {
   BaseResponse,
-  ListPdp,
   ListPdpResponse,
-  LoginResponseData,
   PdpReport,
   ProductTrafficItemSummary,
+  ReportResponse,
   TrafficItem,
-  UserResponseData,
 } from 'types/common';
 
 class PdpService extends Client {
@@ -78,6 +76,7 @@ class PdpService extends Client {
     );
   }
 
+<<<<<<< HEAD
   public getListPdpNotYetCreateAccount(payload: string[]) {
     return fetcher<BaseResponse<ListPdpResponse[]>>(
       `${process.env.BASE_URL}${ENDPOINT.GET_LIST_PDP_NOT_YET_CREATE_ACCOUNT}`,
@@ -138,6 +137,17 @@ class PdpService extends Client {
           userName: payload.userName,
           password: payload.password,
         }),
+=======
+  public getCms(params: { year: string; page: number; size?: number }) {
+    return fetcher<BaseResponse<ReportResponse[]>>(
+      `${process.env.BASE_URL}${ENDPOINT.GET_CMS}?${qs.stringify({
+        ...params,
+        sortField: 'month',
+        size: params.size || 12,
+      })}`,
+      {
+        headers: this.privateHeaders,
+>>>>>>> 04c6b6a (init)
       }
     );
   }
