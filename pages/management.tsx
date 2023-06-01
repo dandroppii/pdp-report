@@ -1,12 +1,7 @@
 import {
   Box,
   Card,
-  CircularProgress,
   Dialog,
-  DialogContent,
-  Grid,
-  LinearProgress,
-  Stack,
   Table,
   TableContainer,
   styled,
@@ -16,27 +11,23 @@ import {
 } from '@mui/material';
 import TableBody from '@mui/material/TableBody';
 import TableHeader from 'components/data-table/TableHeader';
-import TablePagination from 'components/data-table/TablePagination';
 import VendorDashboardLayout from 'components/layouts/vendor-dashboard';
 import Scrollbar from 'components/Scrollbar';
-import { H1, H2, Paragraph } from 'components/Typography';
+import { H1 } from 'components/Typography';
 import SearchInput from 'components/SearchInput';
 import useMuiTable from 'hooks/useMuiTable';
 import { StyledTableCell, StyledTableRow } from 'pages-sections/admin';
 import React, { ReactElement, useMemo } from 'react';
-import Card2 from 'pages-sections/dashboard/Card2';
-import { formatDatetime } from 'utils/datetime';
 import { useAppContext } from 'contexts/AppContext';
 import { useState } from 'react';
-import { ListPdpResponse, PDPTrafficItem } from 'types/common';
+import { ListPdpResponse } from 'types/common';
 import { useCallback } from 'react';
 import { useEffect } from 'react';
 import DRowSkeleton from 'pages-sections/admin/DOrderSkeleton';
 import { pdpService } from 'api';
-import { exportToExcel } from 'react-json-to-excel';
 import { useAuthContext } from 'contexts/AuthContext';
-import { convertToSlug, searchString } from 'utils/utils';
-import { MAX_ITEM_PER_SHEET, STATUS_CODE_SUCCESS } from 'utils/constants';
+import { searchString } from 'utils/utils';
+import { STATUS_CODE_SUCCESS } from 'utils/constants';
 import { FlexBox } from 'components/flex-box';
 import toast, { Toaster } from 'react-hot-toast';
 import BazaarSwitch from 'components/BazaarSwitch';
@@ -199,6 +190,7 @@ export default function Management({}: ManagementProps) {
       ? searchPdp.filter(p => p.status === status.status)
       : searchPdp;
     setListPdp(filterPdp);
+    console.log('🚀 ~ file: management.tsx:204 ~ handleFilterSearch ~ filterPdp:', filterPdp);
   }, [listPdpFull, search, status]);
 
   const handleFilterStatus = useCallback(

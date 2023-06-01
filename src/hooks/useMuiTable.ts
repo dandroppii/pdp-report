@@ -39,7 +39,7 @@ type HookProps = {
 // ================================================================
 
 const useMuiTable = (props: HookProps) => {
-  const { listData = [], defaultSort = 'name', defaultOrder = 'asc', pageSize = 20 } = props;
+  const { listData = [], defaultSort = 'name', defaultOrder = 'asc', pageSize = 999 } = props;
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(pageSize);
