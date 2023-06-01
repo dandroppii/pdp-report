@@ -49,7 +49,7 @@ export const searchString = (data: any[] = [], searchText: string, keySearch: st
       ?.toLowerCase()
       ?.trim();
 
-    return s.includes(searchText);
+    return s.includes(searchText?.toLowerCase());
   });
   return filterData;
 };
