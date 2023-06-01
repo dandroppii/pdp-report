@@ -190,7 +190,6 @@ export default function Management({}: ManagementProps) {
       ? searchPdp.filter(p => p.status === status.status)
       : searchPdp;
     setListPdp(filterPdp);
-    console.log('🚀 ~ file: management.tsx:204 ~ handleFilterSearch ~ filterPdp:', filterPdp);
   }, [listPdpFull, search, status]);
 
   const handleFilterStatus = useCallback(

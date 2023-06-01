@@ -80,13 +80,15 @@ class PdpService extends Client {
 
   public getListPdpNotYetCreateAccount(payload: string[]) {
     return fetcher<BaseResponse<ListPdpResponse[]>>(
-      `${process.env.BASE_URL}${ENDPOINT.GET_LIST_PDP_NOT_YET_CREATE_ACCOUNT}?PageNumber=0&pageSize=999`,
+      `${process.env.BASE_URL}${ENDPOINT.GET_LIST_PDP_NOT_YET_CREATE_ACCOUNT}`,
       {
         headers: this.privateHeaders,
         method: 'POST',
         body: JSON.stringify({
           notInListIds: payload,
           status: 1,
+          PageNumber: 0,
+          PageSize: 999,
         }),
       }
     );
