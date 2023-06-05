@@ -90,18 +90,22 @@ const AuthContextProvider = ({ children }: WithChildren) => {
           setUser(response?.data);
           setIsLoading(false);
           setIsLogin(true);
+          return true;
         } else {
           const user = await identityService.getCurrentUser(response?.data?.supplierId);
           if (user?.data) {
             setUser(user?.data);
             setIsLoading(false);
             setIsLogin(true);
+            return true;
           } else {
             logout();
+            return false;
           }
         }
       } else {
         logout();
+        return false;
       }
     } catch (error: any) {
       setIsPdpLoading(false);
@@ -110,6 +114,7 @@ const AuthContextProvider = ({ children }: WithChildren) => {
       if (statusCode === STATUS_CODE_NO_AUTH) {
         return logout();
       }
+      return false;
     }
   }, [logout, checkInvalidToken]);
 

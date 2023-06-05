@@ -135,44 +135,47 @@ export default function Report({}: ReportProps) {
             }
           }
         }
-        const totalCommission = sumBy(dataDownload, 'income');
-        const totalTax = sumBy(dataDownload, 'tax');
-        const totalIncomeAfterTax = sumBy(dataDownload, 'incomeAfterTax');
-        const totalPdpTraffic = sumBy(dataDownload, 'pdpTraffic');
-        const totalProductTraffic = sumBy(dataDownload, 'productTraffic');
-        const now = new Date();
-
-        const fileName = item.fileName;
-        const formatData = formatCmsDetailItem(dataDownload);
-        const data = {
-          day: now.getDate(),
-          month: now.getMonth() + 1,
-          year: now.getFullYear(),
-          reportMonth: item.month,
-          reportYear: currentYear,
-          data: formatData,
-          totalCommission,
-          totalTax,
-          totalProductTraffic,
-          totalIncomeAfterTax,
-          totalPdpTraffic,
-        };
-        fetch('./CMS.xlsx', {
-          method: 'GET',
-        })
-          .then(response => response.arrayBuffer())
-          .then(buffer => new Renderer().renderFromArrayBuffer(buffer, data))
-          .then(report => report.xlsx.writeBuffer())
-          .then(buffer => {
-            resetDownload();
-            saveAs(new Blob([buffer]), `${fileName}.xlsx`);
-            getCmsList();
-            toast.success('Tải báo cáo thành công!');
+        if (dataDownload?.length) {
+          const totalCommission = sumBy(dataDownload, 'commission');
+          const totalTax = sumBy(dataDownload, 'tax');
+          const totalIncomeAfterTax = sumBy(dataDownload, 'incomeAfterTax');
+          const totalPdpTraffic = sumBy(dataDownload, 'pdpTraffic');
+          const totalProductTraffic = sumBy(dataDownload, 'productTraffic');
+          const now = new Date();
+          const fileName = item.fileName;
+          const formatData = formatCmsDetailItem(dataDownload);
+          const data = {
+            day: now.getDate(),
+            month: now.getMonth() + 1,
+            year: now.getFullYear(),
+            reportMonth: item.month,
+            reportYear: currentYear,
+            data: formatData,
+            totalCommission,
+            totalTax,
+            totalProductTraffic,
+            totalIncomeAfterTax,
+            totalPdpTraffic,
+          };
+          fetch('./CMS.xlsx', {
+            method: 'GET',
           })
-          .catch(err => {
-            resetDownload();
-            toast.error(err?.message);
-          });
+            .then(response => response.arrayBuffer())
+            .then(buffer => new Renderer().renderFromArrayBuffer(buffer, data))
+            .then(report => report.xlsx.writeBuffer())
+            .then(buffer => {
+              resetDownload();
+              saveAs(new Blob([buffer]), `${fileName}.xlsx`);
+              getCmsList();
+              toast.success('Tải báo cáo thành công!');
+            })
+            .catch(err => {
+              resetDownload();
+              toast.error(err?.message);
+            });
+        } else {
+          toast.error('Không có dữ liệu trong báo cáo. Vui lòng thử lại sau vài phút!');
+        }
       } catch (error) {
         resetDownload();
         toast.error(error?.message);

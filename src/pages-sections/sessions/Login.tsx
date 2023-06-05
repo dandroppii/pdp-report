@@ -41,7 +41,8 @@ const Login = () => {
   const handleFormSubmit = async (values: any) => {
     try {
       setLoading(true);
-      await login(values.username, values.password);
+      const res = await login(values.username, values.password);
+      !res && setLoading(false);
     } catch (error) {
       setLoading(false);
     }
