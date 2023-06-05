@@ -1,46 +1,41 @@
 import {
   Box,
   Card,
-  CircularProgress,
   Dialog,
   DialogContent,
-  Grid,
   LinearProgress,
-  Stack,
   Table,
   TableContainer,
   styled,
   Button,
   TextField,
+  CircularProgress,
 } from '@mui/material';
 import TableBody from '@mui/material/TableBody';
 import TableHeader from 'components/data-table/TableHeader';
-import TablePagination from 'components/data-table/TablePagination';
 import VendorDashboardLayout from 'components/layouts/vendor-dashboard';
 import Scrollbar from 'components/Scrollbar';
 import { H1, H2, Paragraph } from 'components/Typography';
 import useMuiTable from 'hooks/useMuiTable';
 import { StyledTableCell, StyledTableRow } from 'pages-sections/admin';
-import React, { ReactElement } from 'react';
-import Card2 from 'pages-sections/dashboard/Card2';
-import { formatDatetime } from 'utils/datetime';
+import React, { ReactElement, useMemo } from 'react';
 import { useAppContext } from 'contexts/AppContext';
 import { useState } from 'react';
 import { ReportItem } from 'types/common';
 import { useCallback } from 'react';
 import { useEffect } from 'react';
 import DRowSkeleton from 'pages-sections/admin/DOrderSkeleton';
-import { pdpService } from 'api';
-import { exportToExcel } from 'react-json-to-excel';
 import { useAuthContext } from 'contexts/AuthContext';
-import { convertToSlug } from 'utils/utils';
-import { MAX_ITEM_PER_SHEET } from 'utils/constants';
 import { FlexBox } from 'components/flex-box';
-import toast, { Toaster } from 'react-hot-toast';
+import { toast, Toaster } from 'react-hot-toast';
 import { DatePicker } from '@mui/x-date-pickers-pro';
-import { mockReportCmsList } from './mock';
 import { useRouter } from 'next/router';
-import { formatCmsItem } from 'utils/reports';
+import { formatCmsDetailItem, formatCmsItem } from 'utils/reports';
+import { Renderer } from 'xlsx-renderer';
+import { saveAs } from 'file-saver';
+import { cloneDeep, sumBy } from 'lodash';
+import { pdpService } from 'api';
+import { STATUS_CODE_SUCCESS } from 'utils/constants';
 
 const tableHeading = [
   { id: 'id', label: 'STT', align: 'left', size: 'small' },
@@ -89,137 +84,134 @@ export default function Report({}: ReportProps) {
   const {
     state: { fromDate, toDate, pdpReport },
   } = useAppContext();
-  const { user, isAdmin } = useAuthContext();
+  const { isAdmin } = useAuthContext();
   const [cmsList, setCmsList] = useState<ReportItem[]>([]);
-  const [totalPage, setTotalPage] = useState<number>(1);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [totalPageDownload, setTotalPageDownload] = useState<number>(100);
+  const [currentTime, setCurrentTime] = useState<Date>(new Date());
   const [percent, setPercent] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [loadingRecalculate, setLoadingRecalculate] = useState<{ [key: string]: boolean }>({});
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const router = useRouter();
-  const pageSize = 12;
+
+  const currentYear = useMemo(() => {
+    return currentTime?.getFullYear();
+  }, [currentTime]);
 
   const resetDownload = useCallback(() => {
     setPercent(0);
     setOpenDialog(false);
   }, []);
 
-  const getCmsList = useCallback(async (pageNumber: number) => {
+  const getCmsList = useCallback(async () => {
     setLoading(true);
     try {
-      // const response = await pdpService.getCms({
-      //   year: '2023',
-      //   page: pageNumber,
-      // });
-      const delay = () => {
-        return new Promise(resolve => setTimeout(() => resolve(mockReportCmsList), 2000));
-      };
-
-      const response: any = await delay();
+      const response = await pdpService.getCms(currentYear);
       setLoading(false);
       if (response.statusCode === 0) {
         const formatCmsData = formatCmsItem(response.data);
         setCmsList(formatCmsData);
-        setTotalPage(response.pageable.totalPages);
-        setCurrentPage(pageNumber);
       }
     } catch (error) {
       setLoading(false);
     }
-  }, []);
+  }, [currentYear]);
 
-  const triggerDownloadReport = useCallback(
-    (data, index, isOneFile) => {
+  const startDownload = useCallback(
+    async (item: ReportItem) => {
       try {
-        const fileName = isOneFile
-          ? `traffic_cong_ty_${convertToSlug(user?.fullName)}_report_tu_${formatDatetime(
-              fromDate.getTime(),
-              'yyyyMMdd'
-            )}_den_${formatDatetime(toDate.getTime(), 'yyyyMMdd')}`
-          : `traffic_cong_ty_${convertToSlug(user?.fullName)}_report_tu_${formatDatetime(
-              fromDate.getTime(),
-              'yyyyMMdd'
-            )}_den_${formatDatetime(toDate.getTime(), 'yyyyMMdd')}_part_${index + 1}`;
-        const exportData = index
-          ? data
-          : [
-              {
-                sheetName: 'Tổng quan',
-                details: [
-                  {
-                    'Số lượt truy cập': pdpReport?.totalVisitInDuration,
-                    'Đơn giá dịch vụ': pdpReport?.avgPricePerItem,
-                    'Phí dịch vụ': pdpReport?.totalVisitInDuration * pdpReport?.avgPricePerItem,
-                  },
-                ],
-              },
-              ...data,
-            ];
-        exportToExcel(exportData, fileName, true);
-        resetDownload();
-        toast.success('Tải báo cáo thành công!');
+        setOpenDialog(true);
+        setPercent(0);
+        const dataDownload = [];
+        const res = await pdpService.getCmsDetail(item.id, 1);
+        if (res.statusCode === STATUS_CODE_SUCCESS) {
+          res?.data?.length && dataDownload.push(...res?.data);
+          setPercent(Math.round((1 / res.pageable.totalPages) * 100));
+          for (let i = 2; i <= res.pageable.totalPages; i++) {
+            const resp = await pdpService.getCmsDetail(item.id, i);
+            if (res.statusCode === STATUS_CODE_SUCCESS) {
+              resp?.data?.length && dataDownload.push(...resp.data);
+              const percenta = Math.round((i / res.pageable.totalPages) * 100);
+              setPercent(percenta);
+            }
+          }
+        }
+        const totalCommission = sumBy(dataDownload, 'income');
+        const totalTax = sumBy(dataDownload, 'tax');
+        const totalIncomeAfterTax = sumBy(dataDownload, 'incomeAfterTax');
+        const totalPdpTraffic = sumBy(dataDownload, 'pdpTraffic');
+        const totalProductTraffic = sumBy(dataDownload, 'productTraffic');
+        const now = new Date();
+
+        const fileName = item.fileName;
+        const formatData = formatCmsDetailItem(dataDownload);
+        const data = {
+          day: now.getDate(),
+          month: now.getMonth() + 1,
+          year: now.getFullYear(),
+          reportMonth: item.month,
+          reportYear: currentYear,
+          data: formatData,
+          totalCommission,
+          totalTax,
+          totalProductTraffic,
+          totalIncomeAfterTax,
+          totalPdpTraffic,
+        };
+        fetch('./CMS.xlsx', {
+          method: 'GET',
+        })
+          .then(response => response.arrayBuffer())
+          .then(buffer => new Renderer().renderFromArrayBuffer(buffer, data))
+          .then(report => report.xlsx.writeBuffer())
+          .then(buffer => {
+            resetDownload();
+            saveAs(new Blob([buffer]), `${fileName}.xlsx`);
+            getCmsList();
+            toast.success('Tải báo cáo thành công!');
+          })
+          .catch(err => {
+            resetDownload();
+            toast.error(err?.message);
+          });
       } catch (error) {
-        toast.error(error.message);
         resetDownload();
+        toast.error(error?.message);
       }
     },
-    [fromDate, toDate, user?.fullName, resetDownload, pdpReport]
+    [currentYear, getCmsList, resetDownload]
   );
 
-  const getCmsDetailForDownload = useCallback(
-    async (pageNumber: number) => {
+  const handleRecalculateCms = useCallback(
+    async (item: ReportItem, index: number) => {
       try {
-        const response = await pdpService.getCms({
-          year: '2023',
-          page: pageNumber,
-          size: MAX_ITEM_PER_SHEET,
+        toast.loading('Đang tính toán lại số liệu!', {
+          duration: 30000,
+          id: item.id,
+          ariaProps: { role: 'alert', 'aria-live': 'off' },
         });
-        if (response.statusCode === 0) {
-          const page = response.pageable.pageNumber;
-          setPercent(page + 1);
-          const startIndex = (page - 1) * MAX_ITEM_PER_SHEET;
-          const newSheet = {
-            sheetName: `${startIndex + 1} - ${startIndex + response.data.length}`,
-            details: response.data.map((_item, index) => ({
-              STT: startIndex + index + 1,
-            })),
-          };
-          return newSheet;
-        } else {
-          return [];
+        setLoadingRecalculate({ ...loadingRecalculate, [item.id]: true });
+        const res = await pdpService.recalculateCms(item.id);
+        setLoadingRecalculate({ ...loadingRecalculate, [item.id]: false });
+        if (res.statusCode === STATUS_CODE_SUCCESS) {
+          let newCmsList = cloneDeep(cmsList);
+          const newCmsItem = formatCmsItem([res.data])[0];
+          newCmsList[index] = newCmsItem;
+          setCmsList(newCmsList);
+          toast.success('Tính toán lại số liệu thành công!');
+          toast.dismiss(item.id);
         }
       } catch (error) {
-        toast.error('Lỗi khi tải dữ liệu. Vui lòng thử lại sau vài phút!');
-        resetDownload();
+        setLoadingRecalculate({ ...loadingRecalculate, [item.id]: false });
+        toast.error(error.message);
+        toast.dismiss(item.id);
       }
     },
-    [resetDownload]
+    [cmsList, loadingRecalculate]
   );
 
-  const startDownload = useCallback(async () => {
-    // setOpenDialog(true);
-    // setPercent(0);
-    // const dataDownload = [];
-    // for (let i = 0; i < totalPageDownload; i++) {
-    //   const index = Math.round(i / 40);
-    // const res = await getCmsListDownload(i + 1);
-    //   if (dataDownload[index]) {
-    //     dataDownload[index].push(res);
-    //   } else {
-    //     dataDownload[index] = [res];
-    //   }
-    // }
-    // dataDownload.forEach((data, index) => {
-    //   triggerDownloadReport(data, index, dataDownload.length === 1);
-    // });
-  }, [totalPageDownload, triggerDownloadReport]);
-
   useEffect(() => {
-    getCmsList(1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    currentYear && getCmsList();
+  }, [currentYear]);
 
   useEffect(() => {
     !isAdmin && router?.isReady && router.push('/');
@@ -240,10 +232,12 @@ export default function Report({}: ReportProps) {
           <DatePicker
             views={['year']}
             label="Chọn năm"
-            value={fromDate}
-            minDate={new Date('01/01/2010')}
+            value={currentTime}
+            minDate={new Date('01/01/2023')}
             maxDate={new Date()}
-            onChange={() => {}}
+            onChange={v => {
+              setCurrentTime(v);
+            }}
             disableFuture={true}
             renderInput={params => (
               <TextField
@@ -276,13 +270,13 @@ export default function Report({}: ReportProps) {
                 ) : (
                   filteredList.map((item, index) => (
                     <StyledTableRow role="checkbox" key={index}>
-                      <StyledTableCell align="left">
-                        {(currentPage - 1) * pageSize + index + 1}
+                      <StyledTableCell align="left">{index + 1}</StyledTableCell>
+                      <StyledTableCell align="center">
+                        {item.month}/{currentYear}
                       </StyledTableCell>
-                      <StyledTableCell align="center">{item.month}</StyledTableCell>
                       <StyledTableCell align="center">{item.fileName}</StyledTableCell>
-                      <StyledTableCell align="center">{item.lastDownloadTime}</StyledTableCell>
-                      <StyledTableCell align="center">{item.lastCalculateTime}</StyledTableCell>
+                      <StyledTableCell align="center">{item.lastTimeDownload}</StyledTableCell>
+                      <StyledTableCell align="center">{item.lastTimeRecalculate}</StyledTableCell>
                       <StyledTableCell align="center">
                         <Button
                           variant="contained"
@@ -290,7 +284,7 @@ export default function Report({}: ReportProps) {
                           size="small"
                           disabled={loadingRecalculate[item.id]}
                           sx={{ mr: 1 }}
-                          onClick={() => startDownload(item.id)}
+                          onClick={() => startDownload(item)}
                         >
                           Tải báo cáo
                         </Button>
@@ -300,8 +294,18 @@ export default function Report({}: ReportProps) {
                           size="small"
                           disabled={loadingRecalculate[item.id]}
                           sx={{ borderRadius: '8px' }}
+                          onClick={() => handleRecalculateCms(item, index)}
                         >
-                          Tính toán lại
+                          {loadingRecalculate[item.id] ? (
+                            <CircularProgress color="primary" size={12} sx={{ mr: 1 }} />
+                          ) : (
+                            <></>
+                          )}
+                          {loadingRecalculate[item.id] ? (
+                            <>Đang tính toán lại</>
+                          ) : (
+                            <>Tính toán lại</>
+                          )}
                         </Button>
                       </StyledTableCell>
                     </StyledTableRow>
@@ -311,17 +315,6 @@ export default function Report({}: ReportProps) {
             </Table>
           </TableContainer>
         </Scrollbar>
-
-        <Stack alignItems="center" my={4}>
-          <TablePagination
-            disabled={loading}
-            onChange={(_e, page) => {
-              getCmsList(page);
-            }}
-            count={totalPage}
-            page={currentPage}
-          />
-        </Stack>
       </Card>
 
       <Dialog open={openDialog} maxWidth={false} sx={{ zIndex: 1501 }}>
@@ -334,11 +327,7 @@ export default function Report({}: ReportProps) {
             </Paragraph>
           </ContentWrapper>
           <Box mt={3}>
-            <LinearProgress
-              variant="buffer"
-              value={(100 * percent) / totalPageDownload}
-              valueBuffer={(100 * percent) / totalPageDownload}
-            />
+            <LinearProgress variant="buffer" value={percent} valueBuffer={percent} />
           </Box>
         </DialogContent>
       </Dialog>

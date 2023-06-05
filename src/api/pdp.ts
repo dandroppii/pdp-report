@@ -7,9 +7,11 @@ import {
   ListPdpResponse,
   PdpReport,
   ProductTrafficItemSummary,
+  ReportDetailResponse,
   ReportResponse,
   TrafficItem,
 } from 'types/common';
+import { MAX_ITEM_PER_SHEET } from 'utils/constants';
 
 class PdpService extends Client {
   public getPdpReport(params: {
@@ -76,7 +78,6 @@ class PdpService extends Client {
     );
   }
 
-<<<<<<< HEAD
   public getListPdpNotYetCreateAccount(payload: string[]) {
     return fetcher<BaseResponse<ListPdpResponse[]>>(
       `${process.env.BASE_URL}${ENDPOINT.GET_LIST_PDP_NOT_YET_CREATE_ACCOUNT}`,
@@ -137,17 +138,29 @@ class PdpService extends Client {
           userName: payload.userName,
           password: payload.password,
         }),
-=======
-  public getCms(params: { year: string; page: number; size?: number }) {
+      }
+    );
+  }
+
+  public getCms(year: string | number) {
     return fetcher<BaseResponse<ReportResponse[]>>(
       `${process.env.BASE_URL}${ENDPOINT.GET_CMS}?${qs.stringify({
-        ...params,
-        sortField: 'month',
-        size: params.size || 12,
+        year,
       })}`,
       {
         headers: this.privateHeaders,
->>>>>>> 04c6b6a (init)
+      }
+    );
+  }
+
+  public getCmsDetail(id: string, page: number) {
+    return fetcher<BaseResponse<ReportDetailResponse[]>>(
+      `${process.env.BASE_URL}${ENDPOINT.GET_CMS_DETAILS(id)}?${qs.stringify({
+        page,
+        size: MAX_ITEM_PER_SHEET,
+      })}`,
+      {
+        headers: this.privateHeaders,
       }
     );
   }

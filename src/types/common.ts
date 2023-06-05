@@ -173,18 +173,35 @@ export interface PDPTrafficItem {
 
 export interface ReportItem {
   id: string;
-  lastDownloadTime: string;
-  lastCalculateTime: string;
+  lastTimeDownload: string;
+  lastTimeRecalculate: string;
   fileName: string;
   month: string;
 }
 
 export interface ReportResponse {
   id: string;
-  lastDownloadTime: number;
-  lastCalculateTime: number;
+  lastTimeDownload: number;
+  lastTimeRecalculate: number;
   fileName: string;
   createdDate: number;
+  month: string;
+}
+
+export interface ReportDetailResponse {
+  id: string;
+  userName: string;
+  fullName: string;
+  bankAccountHolder: string;
+  bankAccountNumber: string;
+  bankName: string;
+  productTraffic: number;
+  pdpTraffic: number;
+  productTrafficPrice: number;
+  pdpTrafficPrice: number;
+  income: number;
+  tax: number;
+  incomeAfterTax: number;
 }
 
 export interface PDPTrafficItemForDownload {

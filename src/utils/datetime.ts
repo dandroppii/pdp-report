@@ -5,6 +5,7 @@ type DatetimeFormat =
   | 'dd/MM/yyyy'
   | 'dd/MM/yyyy HH:mm'
   | 'dd/MM/yyyy HH:mm:ss'
+  | 'dd/MM/yyyy hh:mm:ss a'
   | 'HH:mm dd/MM/yyyy'
   | 'HH:mm:ss dd/M/yyyy'
   | 'HH:mm:ss dd/MM/yyyy'
@@ -16,6 +17,9 @@ type DatetimeFormat =
   | 'yyyyMMdd';
 
 export function formatDatetime(date: number, f: DatetimeFormat = 'dd/MM/yyyy HH:mm') {
+  if (!date) {
+    return '';
+  }
   try {
     return format(new Date(date), f);
   } catch (error) {

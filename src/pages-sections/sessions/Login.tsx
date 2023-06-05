@@ -42,7 +42,6 @@ const Login = () => {
     try {
       setLoading(true);
       await login(values.username, values.password);
-      setLoading(false);
     } catch (error) {
       setLoading(false);
     }
