@@ -164,6 +164,16 @@ class PdpService extends Client {
       }
     );
   }
+
+  public recalculateCms(id: string) {
+    return fetcher<BaseResponse<ReportResponse>>(
+      `${process.env.BASE_URL}${ENDPOINT.CMS_RECALCULATE(id)}`,
+      {
+        headers: this.privateHeaders,
+        method: 'POST',
+      }
+    );
+  }
 }
 
 const pdpService = new PdpService();
