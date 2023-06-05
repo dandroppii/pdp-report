@@ -99,7 +99,7 @@ class PdpService extends Client {
       headers: this.privateHeaders,
       method: 'POST',
       body: JSON.stringify({
-        roleId: 'Supplier',
+        roleId: 'Suplier',
         fullName: payload.fullName,
         ...payload,
       }),

@@ -65,7 +65,7 @@ const CreateMcoReportAccount = ({
       setLoading(true);
       const res = await pdpService.createAccount({
         userName: values.username,
-        fullName: values.fullName,
+        fullName: values.pdp.name,
         password: values.password,
       });
 
