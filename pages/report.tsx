@@ -136,6 +136,7 @@ export default function Report({}: ReportProps) {
           }
         }
         if (dataDownload?.length) {
+          const totalIncome = sumBy(dataDownload, 'income');
           const totalCommission = sumBy(dataDownload, 'commission');
           const totalTax = sumBy(dataDownload, 'tax');
           const totalIncomeAfterTax = sumBy(dataDownload, 'incomeAfterTax');
@@ -156,6 +157,8 @@ export default function Report({}: ReportProps) {
             totalProductTraffic,
             totalIncomeAfterTax,
             totalPdpTraffic,
+            totalIncome,
+            reportTime: `${item.month}/${currentYear}`,
           };
           fetch('./CMS.xlsx', {
             method: 'GET',
