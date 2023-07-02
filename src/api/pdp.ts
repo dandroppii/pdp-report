@@ -142,6 +142,17 @@ class PdpService extends Client {
     );
   }
 
+  public pdpChangePdpPassword(payload: { oldPassword: string; newPassword: string }) {
+    return fetcher<BaseResponse<any>>(`${process.env.BASE_URL}${ENDPOINT.PDP_CHANGE_PASSWORD}`, {
+      headers: this.privateHeaders,
+      method: 'PUT',
+      body: JSON.stringify({
+        oldPassword: payload.oldPassword,
+        newPassword: payload.newPassword,
+      }),
+    });
+  }
+
   public getCms(year: string | number) {
     return fetcher<BaseResponse<ReportResponse[]>>(
       `${process.env.BASE_URL}${ENDPOINT.GET_CMS}?${qs.stringify({

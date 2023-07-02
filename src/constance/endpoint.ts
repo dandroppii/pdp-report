@@ -14,4 +14,5 @@ export const ENDPOINT = {
   GET_CMS: '/order-service/v1/back-office/cms',
   GET_CMS_DETAILS: (id: string) => `/order-service/v1/back-office/cms/${id}`,
   CMS_RECALCULATE: (id: string) => `/order-service/v1/back-office/cms/${id}/recalculate`,
+  PDP_CHANGE_PASSWORD: '/identity-service/v1/mco/identity/password',
 };

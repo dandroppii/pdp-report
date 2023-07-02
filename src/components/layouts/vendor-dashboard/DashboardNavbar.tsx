@@ -7,10 +7,10 @@ import Toggle from 'components/icons/Toggle';
 import { FC, useCallback } from 'react';
 import AccountPopover from './popovers/AccountPopover';
 import { DatePicker } from '@mui/x-date-pickers-pro';
-import { Paragraph } from 'components/Typography';
 import { useAppContext } from 'contexts/AppContext';
 import { ListPdp } from 'types/common';
 import { useAuthContext } from 'contexts/AuthContext';
+import { Toaster } from 'react-hot-toast';
 
 // custom styled components
 const DashboardNavbarRoot = styled(AppBar)(({ theme }) => ({
@@ -148,6 +148,7 @@ const DashboardNavbar: FC<DashboardNavbarProps> = ({ handleDrawerToggle }) => {
             <AccountPopover />
           </FlexBox>
         </StyledToolBar>
+        <Toaster toastOptions={{ duration: 4000 }} />
       </Container>
     </DashboardNavbarRoot>
   );
