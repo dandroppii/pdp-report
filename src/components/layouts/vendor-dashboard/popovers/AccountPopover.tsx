@@ -1,8 +1,10 @@
-import { Avatar, Box, IconButton, Menu, MenuItem, styled } from '@mui/material';
+import { Avatar, Box, Dialog, IconButton, Menu, MenuItem, styled } from '@mui/material';
 import { H6, Small } from 'components/Typography';
 import { useAppContext } from 'contexts/AppContext';
 import { useAuthContext } from 'contexts/AuthContext';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
+import { toast } from 'react-hot-toast';
+import PdpChangePassword from './ChangePasswordPopover';
 
 // styled components
 const Divider = styled(Box)(({ theme }) => ({
@@ -17,6 +19,11 @@ const AccountPopover = () => {
   const { logout, user } = useAuthContext();
   const handleClose = () => setAnchorEl(null);
   const handleClick = event => setAnchorEl(event.currentTarget);
+  const [openDialogChangePassword, setOpenDialogChangePassword] = useState<boolean>(false);
+
+  const handleOpenDialog = useCallback(() => {
+    setOpenDialogChangePassword(true);
+  }, []);
 
   return (
     <Box>
@@ -73,10 +80,22 @@ const AccountPopover = () => {
           <H6>{user?.name}</H6>
           <Small color="grey.500">{user?.email}</Small>
         </Box>
-
+        <Divider />
+        <MenuItem onClick={handleOpenDialog}>Đổi mật khẩu</MenuItem>
         <Divider />
         <MenuItem onClick={logout}>Đăng xuất</MenuItem>
       </Menu>
+      <Dialog open={openDialogChangePassword} maxWidth={false} sx={{ zIndex: 100 }}>
+        <PdpChangePassword
+          onSuccess={() => {
+            setOpenDialogChangePassword(false);
+            toast.success('Đổi mật khẩu thành công');
+          }}
+          onClose={() => {
+            setOpenDialogChangePassword(false);
+          }}
+        />
+      </Dialog>
     </Box>
   );
 };
