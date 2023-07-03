@@ -7,6 +7,7 @@ import CountUp from 'react-countup';
 import { useAppContext } from 'contexts/AppContext';
 import { formatDatetime } from 'utils/datetime';
 import { useAuthContext } from 'contexts/AuthContext';
+import { DEFAULT_TAX } from 'utils/constants';
 
 const Revenue = () => {
   const {
@@ -78,7 +79,7 @@ const Revenue = () => {
           <Skeleton variant="text" sx={{ width: '40%' }} />
         ) : (
           <CountUp
-            end={report?.revenue * 0.1 || 0}
+            end={report?.revenue * DEFAULT_TAX || 0}
             duration={0.1}
             suffix={` ${getCurrencySuffix()}`}
             separator="."
@@ -91,7 +92,7 @@ const Revenue = () => {
           <Skeleton variant="text" sx={{ width: '40%' }} />
         ) : (
           <CountUp
-            end={report?.revenue * 1.1 || 0}
+            end={report?.revenue * (1 + DEFAULT_TAX) || 0}
             duration={0.1}
             suffix={` ${getCurrencySuffix()}`}
             separator="."
