@@ -136,6 +136,12 @@ export interface PdpReport {
   revenueInDuration: number;
   currentPrice: number;
   avgPricePerItem: number;
+  mcoSummaryItems: {
+    quantity: number;
+    taxRate: number;
+    priceAverage: number;
+    visitType: string;
+  }[];
 }
 
 export interface TrafficItem {

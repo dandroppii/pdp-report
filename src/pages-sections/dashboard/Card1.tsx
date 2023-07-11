@@ -12,13 +12,13 @@ type Card1Props = {
   color: string;
   title: string;
   traffic: number;
-  price: number;
+  amount: number;
   status?: 'up' | 'down';
 };
 // ========================================================
 
 const Card1: FC<Card1Props> = props => {
-  const { title, traffic, price } = props;
+  const { title, traffic, amount } = props;
   const {
     state: { pdpReportLoading, productReportLoading },
   } = useAppContext();
@@ -51,7 +51,7 @@ const Card1: FC<Card1Props> = props => {
             <Skeleton variant="text" sx={{ width: 100 }} />
           ) : (
             <CountUp
-              end={price * traffic}
+              end={amount}
               duration={0.05}
               suffix={` ${getCurrencySuffix()}`}
               separator="."

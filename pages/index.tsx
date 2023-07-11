@@ -3,6 +3,7 @@ import VendorDashboardLayout from 'components/layouts/vendor-dashboard';
 import { Paragraph } from 'components/Typography';
 import { useAppContext } from 'contexts/AppContext';
 import { useAuthContext } from 'contexts/AuthContext';
+import { sumBy } from 'lodash';
 import DPageSkeleton from 'pages-sections/admin/PageLoadingSkeleton';
 import Card1 from 'pages-sections/dashboard/Card1';
 import CompanyCard from 'pages-sections/dashboard/CompanyCard';
@@ -34,12 +35,16 @@ export default function VendorDashboard() {
   );
 
   const cardList = useMemo(() => {
+    const pdpSummaryItems = pdpReport.mcoSummaryItems || [];
+    const productSummaryItems = productReport.mcoSummaryItems || [];
+    const pdpAmount = sumBy(pdpSummaryItems, i => i.quantity * i.priceAverage);
+    const productAmount = sumBy(productSummaryItems, i => i.quantity * i.priceAverage);
     return [
       {
         id: 1,
         title: 'Số lượng tiếp cận thông tin công ty',
         traffic: pdpReport?.totalVisitInDuration,
-        price: pdpReport?.avgPricePerItem,
+        amount: pdpAmount,
         color: 'info.main',
         status: '',
       },
@@ -47,7 +52,7 @@ export default function VendorDashboard() {
         id: 2,
         title: 'Số lượng tiếp cận thông tin sản phẩm',
         traffic: productReport?.totalVisitInDuration,
-        price: productReport?.avgPricePerItem,
+        amount: productAmount,
         color: 'info.main',
         status: '',
       },
@@ -81,7 +86,7 @@ export default function VendorDashboard() {
               <Card1
                 title={item.title}
                 color={item.color}
-                price={item.price}
+                amount={item.amount}
                 traffic={item.traffic}
                 status={item.status === 'down' ? 'down' : 'up'}
               />

@@ -2,12 +2,12 @@ import { Box, Card, Skeleton } from '@mui/material';
 import { H3, H2, Paragraph, H6 } from 'components/Typography';
 import NextImage from 'next/image';
 import React, { useMemo } from 'react';
-import { currencies, formatCurrency, getCurrencySuffix } from 'utils/currency';
+import { getCurrencySuffix } from 'utils/currency';
 import CountUp from 'react-countup';
 import { useAppContext } from 'contexts/AppContext';
 import { formatDatetime } from 'utils/datetime';
 import { useAuthContext } from 'contexts/AuthContext';
-import { DEFAULT_TAX } from 'utils/constants';
+import { sumBy } from 'lodash';
 
 const Revenue = () => {
   const {
@@ -29,10 +29,18 @@ const Revenue = () => {
   );
 
   const report = useMemo(() => {
+    const pdpSummaryItems = pdpReport.mcoSummaryItems || [];
+    const productSummaryItems = productReport.mcoSummaryItems || [];
+    const revenue =
+      sumBy(pdpSummaryItems, i => i.quantity * i.priceAverage) +
+      sumBy(productSummaryItems, i => i.quantity * i.priceAverage);
+    const vat =
+      sumBy(pdpSummaryItems, i => i.quantity * i.priceAverage) +
+      sumBy(productSummaryItems, i => i.quantity * i.priceAverage);
     return {
-      revenue:
-        pdpReport?.avgPricePerItem * pdpReport?.totalVisitInDuration +
-        productReport?.avgPricePerItem * productReport?.totalVisitInDuration,
+      revenue,
+      vat,
+      revenueAfterTax: revenue + vat,
     };
   }, [pdpReport, productReport]);
 
@@ -79,7 +87,7 @@ const Revenue = () => {
           <Skeleton variant="text" sx={{ width: '40%' }} />
         ) : (
           <CountUp
-            end={report?.revenue * DEFAULT_TAX || 0}
+            end={report?.vat || 0}
             duration={0.1}
             suffix={` ${getCurrencySuffix()}`}
             separator="."
@@ -92,7 +100,7 @@ const Revenue = () => {
           <Skeleton variant="text" sx={{ width: '40%' }} />
         ) : (
           <CountUp
-            end={report?.revenue * (1 + DEFAULT_TAX) || 0}
+            end={report?.revenueAfterTax || 0}
             duration={0.1}
             suffix={` ${getCurrencySuffix()}`}
             separator="."
