@@ -35,8 +35,8 @@ export default function VendorDashboard() {
   );
 
   const cardList = useMemo(() => {
-    const pdpSummaryItems = pdpReport.mcoSummaryItems || [];
-    const productSummaryItems = productReport.mcoSummaryItems || [];
+    const pdpSummaryItems = pdpReport?.mcoSummaryItems || [];
+    const productSummaryItems = productReport?.mcoSummaryItems || [];
     const pdpAmount = sumBy(pdpSummaryItems, i => i.quantity * i.priceAverage);
     const productAmount = sumBy(productSummaryItems, i => i.quantity * i.priceAverage);
     return [

@@ -29,8 +29,8 @@ const Revenue = () => {
   );
 
   const report = useMemo(() => {
-    const pdpSummaryItems = pdpReport.mcoSummaryItems || [];
-    const productSummaryItems = productReport.mcoSummaryItems || [];
+    const pdpSummaryItems = pdpReport?.mcoSummaryItems || [];
+    const productSummaryItems = productReport?.mcoSummaryItems || [];
     const revenue =
       sumBy(pdpSummaryItems, i => i.quantity * i.priceAverage) +
       sumBy(productSummaryItems, i => i.quantity * i.priceAverage);
