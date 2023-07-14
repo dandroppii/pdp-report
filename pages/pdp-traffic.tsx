@@ -20,7 +20,7 @@ import Scrollbar from 'components/Scrollbar';
 import { H1, H2, Paragraph } from 'components/Typography';
 import useMuiTable from 'hooks/useMuiTable';
 import { StyledTableCell, StyledTableRow } from 'pages-sections/admin';
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useMemo } from 'react';
 import Card2 from 'pages-sections/dashboard/Card2';
 import { formatDatetime } from 'utils/datetime';
 import { useAppContext } from 'contexts/AppContext';
@@ -36,6 +36,7 @@ import { convertToSlug } from 'utils/utils';
 import { MAX_ITEM_PER_SHEET } from 'utils/constants';
 import { FlexBox } from 'components/flex-box';
 import toast, { Toaster } from 'react-hot-toast';
+import { sumBy } from 'lodash';
 
 const tableHeading = [
   { id: 'no', label: 'No', align: 'left' },
@@ -91,6 +92,16 @@ export default function PdpTraffic({}: PdpTrafficProps) {
   const [loading, setLoading] = useState<boolean>(true);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 
+  const totalVisitInDuration = useMemo(() => {
+    const pdpSummaryItems = pdpReport?.mcoSummaryItems || [];
+    return sumBy(pdpSummaryItems, i => i.quantity);
+  }, [pdpReport?.mcoSummaryItems]);
+
+  const totalRevenue = useMemo(() => {
+    const pdpSummaryItems = pdpReport?.mcoSummaryItems || [];
+    return sumBy(pdpSummaryItems, i => i.quantity * i.priceAverage);
+  }, [pdpReport?.mcoSummaryItems]);
+
   const resetDownload = useCallback(() => {
     setPercent(0);
     setOpenDialog(false);
@@ -140,9 +151,9 @@ export default function PdpTraffic({}: PdpTrafficProps) {
                 sheetName: 'Tổng quan',
                 details: [
                   {
-                    'Số lượt truy cập': pdpReport?.totalVisitInDuration,
+                    'Số lượt truy cập': totalVisitInDuration,
                     'Đơn giá dịch vụ': pdpReport?.avgPricePerItem,
-                    'Phí dịch vụ': pdpReport?.totalVisitInDuration * pdpReport?.avgPricePerItem,
+                    'Phí dịch vụ': totalRevenue,
                   },
                 ],
               },
@@ -156,7 +167,15 @@ export default function PdpTraffic({}: PdpTrafficProps) {
         resetDownload();
       }
     },
-    [fromDate, toDate, user?.fullName, resetDownload, pdpReport]
+    [
+      user?.fullName,
+      fromDate,
+      toDate,
+      totalVisitInDuration,
+      pdpReport?.avgPricePerItem,
+      totalRevenue,
+      resetDownload,
+    ]
   );
 
   const getPdpTrafficDownload = useCallback(
@@ -243,11 +262,7 @@ export default function PdpTraffic({}: PdpTrafficProps) {
 
       <Grid container spacing={3} mb={4}>
         <Grid item xl={4} lg={4} md={4} xs={12}>
-          <Card2
-            title="Số lượt truy cập"
-            amount={pdpReport?.totalVisitInDuration}
-            loading={loading}
-          ></Card2>
+          <Card2 title="Số lượt truy cập" amount={totalVisitInDuration} loading={loading}></Card2>
         </Grid>
         <Grid item xl={4} lg={4} md={4} xs={12}>
           <Card2
@@ -260,7 +275,7 @@ export default function PdpTraffic({}: PdpTrafficProps) {
         <Grid item xl={4} lg={4} md={4} xs={12}>
           <Card2
             title="Phí dịch vụ"
-            amount={pdpReport?.totalVisitInDuration * pdpReport?.avgPricePerItem}
+            amount={totalRevenue}
             currency
             loading={loading}
             description="* Chưa bao gồm VAT"
