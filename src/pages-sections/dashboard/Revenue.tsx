@@ -34,12 +34,10 @@ const Revenue = () => {
     const revenue =
       sumBy(pdpSummaryItems, i => i.quantity * i.priceAverage) +
       sumBy(productSummaryItems, i => i.quantity * i.priceAverage);
-    const vat =
-      Math.round(
-        (sumBy(pdpSummaryItems, i => (i.quantity * i.priceAverage * i.taxRate) / 100) +
-          sumBy(productSummaryItems, i => (i.quantity * i.priceAverage * i.taxRate) / 100)) /
-          10
-      ) * 10;
+    const vat = Math.round(
+      sumBy(pdpSummaryItems, i => (i.quantity * i.priceAverage * i.taxRate) / 100) +
+        sumBy(productSummaryItems, i => (i.quantity * i.priceAverage * i.taxRate) / 100)
+    );
     return {
       revenue,
       vat,
