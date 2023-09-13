@@ -1,0 +1,166 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+  branches:
+    include: [production]
+
+pr: none
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  - group: discord-secret
+  - name: GITHASH
+    value: "$(Build.SourceVersion)"
+
+steps:
+  - task: ado-discord-webhook@1
+    inputs:
+      channelId: "$(discord-channel)"
+      webhookKey: "$(discord-key)"
+      name: "Azure Devops"
+      messageType: "embeds"
+      embeds: |
+        [{ "title": "[Mco Report production] $(System.TeamProject) build running",
+            "description": "Job [$(Build.BuildNumber)]($(System.TeamFoundationCollectionUri)$(System.TeamProject)/_build/results?buildId=$(Build.BuildId))",
+            "color": 3447003,
+            "fields":[
+              {
+                "name": "Pipeline", 
+                "value": "$(Build.DefinitionName)",
+                "inline": true
+              },
+              {
+                "name": "Git commit hash", 
+                "value": "$(Build.SourceVersion)",
+                "inline": true
+              },
+              {
+                "name": "Git commit message", 
+                "value": "$(Build.SourceVersionMessage)",
+                "inline": true
+              }
+            ]
+        }]
+
+  - task: replacetokens@3
+    displayName: "Replace params in .env"
+    inputs:
+      targetFiles: .env
+      escapeType: none
+      tokenPrefix: __
+      tokenSuffix: __
+
+  - task: replacetokens@3
+    displayName: "Replace tokens in aks-prod.yml"
+    inputs:
+      targetFiles: aks-prod.yml
+      escapeType: none
+      tokenPrefix: __
+      tokenSuffix: __
+
+  - task: DockerCompose@0
+    displayName: "Build services"
+    inputs:
+      containerregistrytype: "Azure Container Registry"
+      azureSubscription: "17a00ed2-cbcd-4ae6-b4d8-b85d39bb127a"
+      azureContainerRegistry: "bcasolutions.azurecr.io"
+      dockerComposeFile: "docker-compose.yml"
+      action: "Build services"
+      additionalImageTags: "$(GITHASH)"
+
+  - task: DockerCompose@0
+    displayName: "Push services"
+    inputs:
+      containerregistrytype: "Azure Container Registry"
+      azureSubscription: "17a00ed2-cbcd-4ae6-b4d8-b85d39bb127a"
+      azureContainerRegistry: "bcasolutions.azurecr.io"
+      dockerComposeFile: "docker-compose.yml"
+      action: "Push services"
+      additionalImageTags: "$(GITHASH)"
+
+  - task: DockerCompose@0
+    displayName: "Lock services"
+    inputs:
+      containerregistrytype: "Azure Container Registry"
+      azureSubscription: "17a00ed2-cbcd-4ae6-b4d8-b85d39bb127a"
+      azureContainerRegistry: "bcasolutions.azurecr.io"
+      dockerComposeFile: "docker-compose.yml"
+      action: "Lock services"
+      outputDockerComposeFile: "$(Build.StagingDirectory)/docker-compose.yml"
+
+  - task: CopyFiles@2
+    displayName: "Copy Files"
+    inputs:
+      Contents: |
+        **/aks-prod.yml
+      TargetFolder: "$(Build.ArtifactStagingDirectory)"
+
+  - task: PublishBuildArtifacts@1
+    displayName: "Publish Artifact"
+    inputs:
+      ArtifactName: deploy
+
+  - task: ado-discord-webhook@1
+    condition: canceled()
+    inputs:
+      channelId: "$(discord-channel)"
+      webhookKey: "$(discord-key)"
+      name: "Azure Devops"
+      messageType: "embeds"
+      embeds: |
+        [{ "title": "[Mco Report production] $(System.TeamProject) build $(Agent.JobStatus)",
+            "description": "Job [$(Build.BuildNumber)]($(System.TeamFoundationCollectionUri)$(System.TeamProject)/_build/results?buildId=$(Build.BuildId))",
+            "color": 10038562,
+            "fields":[
+              {
+                "name": "Pipeline", 
+                "value": "$(Build.DefinitionName)",
+                "inline": true
+              }
+            ]
+        }]
+
+  - task: ado-discord-webhook@1
+    condition: failed()
+    inputs:
+      channelId: "$(discord-channel)"
+      webhookKey: "$(discord-key)"
+      name: "Azure Devops"
+      messageType: "embeds"
+      embeds: |
+        [{ "title": "[Mco Report production] $(System.TeamProject) build $(Agent.JobStatus)",
+            "description": "Job [$(Build.BuildNumber)]($(System.TeamFoundationCollectionUri)$(System.TeamProject)/_build/results?buildId=$(Build.BuildId))",
+            "color": 15158332,
+            "fields":[
+              {
+                "name": "Pipeline", 
+                "value": "$(Build.DefinitionName)",
+                "inline": true
+              }
+            ]
+        }]
+
+  - task: ado-discord-webhook@1
+    condition: succeeded()
+    inputs:
+      channelId: "$(discord-channel)"
+      webhookKey: "$(discord-key)"
+      name: "Azure Devops"
+      messageType: "embeds"
+      embeds: |
+        [{ "title": "[Mco Report production] $(System.TeamProject) build $(Agent.JobStatus)",
+            "description": "Job [$(Build.BuildNumber)]($(System.TeamFoundationCollectionUri)$(System.TeamProject)/_build/results?buildId=$(Build.BuildId))",
+            "color": 5763719,
+            "fields":[
+              {
+                "name": "Pipeline", 
+                "value": "$(Build.DefinitionName)",
+                "inline": true
+              }
+            ]
+        }]
