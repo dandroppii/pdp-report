@@ -43,7 +43,7 @@ export default function VendorDashboard() {
       {
         id: 1,
         title: 'Số lượng tiếp cận thông tin công ty',
-        traffic: pdpReport?.totalVisitInDuration,
+        traffic: sumBy(pdpSummaryItems, i => i.quantity),
         amount: pdpAmount,
         color: 'info.main',
         status: '',
@@ -51,7 +51,7 @@ export default function VendorDashboard() {
       {
         id: 2,
         title: 'Số lượng tiếp cận thông tin sản phẩm',
-        traffic: productReport?.totalVisitInDuration,
+        traffic: sumBy(productSummaryItems, i => i.quantity),
         amount: productAmount,
         color: 'info.main',
         status: '',

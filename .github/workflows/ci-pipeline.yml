@@ -1,0 +1,128 @@
+name: pdp-report
+
+on:
+  push:
+    branches: ['dev', 'stg', 'production']
+
+env:
+  ORGANIZATION: droppii
+  ACTIONS_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{
+    github.run_id }}
+
+jobs:
+  CI:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    env:
+      REGISTRY: bcasolutions.azurecr.io
+      SERVICE_NAME: mco-report
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Generate metadata
+        id: metadata
+        run: |
+          time=`date +"%Y%m%d%H%M"`
+          echo "image-tag-sha=${GITHUB_SHA::12}" >> $GITHUB_OUTPUT
+          echo "image-name=${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/${{ env.SERVICE_NAME }}" >> $GITHUB_OUTPUT
+          echo "run-id=${GITHUB_RUN_ID}" >> $GITHUB_OUTPUT
+          echo "author=${GITHUB_ACTOR}" >> $GITHUB_OUTPUT
+          echo "trigger-type=${GITHUB_REF_TYPE}" >> $GITHUB_OUTPUT
+          echo "service-env=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+          echo "trigger-agent=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+          echo "image-tag-deploy=${GITHUB_SHA::12}-deploy-${GITHUB_REF_NAME}-${time}" >> $GITHUB_OUTPUT
+
+      - name: Notify in-progress to Discord
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: ${{ secrets.DISCORD_WEBHOOK }}
+          method: 'POST'
+          customHeaders: '{"Content-Type": "application/json"}'
+          data: '{"embeds": [{"title":"[FE-${{steps.metadata.outputs.service-env}}]
+            ${{env.SERVICE_NAME}} build starting...", "url":
+            "${{env.ACTIONS_RUN_URL}}", "color":340723, "fields":
+            [{"name":"Author","value": "${{ steps.metadata.outputs.author }}",
+            "inline": true},{"name":"Trigger Type","value": "${{
+            steps.metadata.outputs.trigger-type }}","inline":
+            true},{"name":"Trigger Agent","value": "${{
+            steps.metadata.outputs.trigger-agent }}","inline":
+            true},{"name":"Image Tag","value": "${{
+            steps.metadata.outputs.image-tag-deploy }}"}]}] }'
+
+      - name: Login to ${{ env.REGISTRY }}
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ env.REGISTRY }}
+          username: ${{ secrets.AZURE_CLIENT_ID }}
+          password: ${{ secrets.AZURE_CLIENT_SECRET }}
+
+      - name: Setup Docker buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Generate env
+        run: |
+          echo "" >> .env
+          env_vars="${{vars.NEXT_ENV_VN_DEV}}"
+
+          if [[ ${GITHUB_REF_NAME} == 'dev' ]]; then
+              env_vars="${{vars.NEXT_ENV_VN_DEV}}"
+          elif [[ ${GITHUB_REF_NAME} == 'stg' ]]; then
+              env_vars="${{vars.NEXT_ENV_VN_STG}}"
+          elif [[ ${GITHUB_REF_NAME} == 'production' ]]; then
+              env_vars="${{vars.NEXT_ENV_VN_PROD}}"
+          fi
+
+          echo "${env_vars}" | jq -r 'keys[]' | while read key; do
+            value=$(echo "${env_vars}" | jq -r ".$key")
+            echo "$key=$value" >> .env
+          done
+
+      - name: Build and push Docker image to ACR
+        uses: docker/build-push-action@v3.2.0
+        with:
+          context: .
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          push: true
+          tags: |
+            ${{ steps.metadata.outputs.image-name }}:${{ steps.metadata.outputs.image-tag-sha }}
+            ${{ steps.metadata.outputs.image-name }}:${{ steps.metadata.outputs.image-tag-deploy }}
+            ${{ steps.metadata.outputs.image-name }}:latest
+
+      - name: Notify success to Discord
+        if: ${{ success() }}
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: ${{ secrets.DISCORD_WEBHOOK }}
+          method: 'POST'
+          customHeaders: '{"Content-Type": "application/json"}'
+          data: '{"embeds": [{"title":"[MCO-FE-${{steps.metadata.outputs.service-env}}]
+            ${{env.SERVICE_NAME}} build success", "url":
+            "${{env.ACTIONS_RUN_URL}}", "color":4451595, "fields":
+            [{"name":"Author","value": "${{ steps.metadata.outputs.author }}",
+            "inline": true},{"name":"Trigger Type","value": "${{
+            steps.metadata.outputs.trigger-type }}","inline":
+            true},{"name":"Trigger Agent","value": "${{
+            steps.metadata.outputs.trigger-agent }}","inline":
+            true},{"name":"Image Tag","value": "${{
+            steps.metadata.outputs.image-tag-deploy }}"}]}] }'
+
+      - name: Notify failure to Discord
+        if: ${{ failure() }}
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: ${{ secrets.DISCORD_WEBHOOK }}
+          method: 'POST'
+          customHeaders: '{"Content-Type": "application/json"}'
+          data: '{"content": "Hi <@&1009045841111162910>", "embeds":
+            [{"title":"[FE-${{steps.metadata.outputs.service-env}}]
+            ${{env.SERVICE_NAME}} build failed", "url":
+            "${{env.ACTIONS_RUN_URL}}", "color": 15270160, "fields": [{"name":
+            "Author","value": "${{ steps.metadata.outputs.author }}", "inline":
+            true},{"name":"Trigger Type","value": "${{
+            steps.metadata.outputs.trigger-type }}","inline":
+            true},{"name":"Trigger Agent","value": "${{
+            steps.metadata.outputs.trigger-agent }}","inline": true}]}],
+            "allowed_mentions": { "parse": ["roles"] } }'

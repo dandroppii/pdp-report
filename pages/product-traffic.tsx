@@ -20,7 +20,7 @@ import Scrollbar from 'components/Scrollbar';
 import { H1, H2, H3, H4, Paragraph, Span } from 'components/Typography';
 import useMuiTable from 'hooks/useMuiTable';
 import { StyledTableCell, StyledTableRow } from 'pages-sections/admin';
-import React, { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
+import React, { ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Card2 from 'pages-sections/dashboard/Card2';
 import { formatDatetime } from 'utils/datetime';
 import { GET_PRODUCT_TRAFFICS_RESPONSE } from 'constance/mockPdpData';
@@ -40,6 +40,7 @@ import { FlexBox } from 'components/flex-box';
 import BazaarSwitch from 'components/BazaarSwitch';
 import { formatCurrency } from 'utils/currency';
 import ReactToPrint from 'react-to-print';
+import { sumBy } from 'lodash';
 
 const tableHeading = [
   { id: 'no', label: 'No', align: 'center', size: 'small' },
@@ -82,6 +83,16 @@ export default function ProductTraffic({}: ProductTrafficProps) {
   const [percent, setPercent] = useState<number>(0);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const contentPrintRef = useRef();
+
+  const totalVisitInDuration = useMemo(() => {
+    const pdpSummaryItems = productReport?.mcoSummaryItems || [];
+    return sumBy(pdpSummaryItems, i => i.quantity);
+  }, [productReport?.mcoSummaryItems]);
+
+  const totalRevenue = useMemo(() => {
+    const pdpSummaryItems = productReport?.mcoSummaryItems || [];
+    return sumBy(pdpSummaryItems, i => i.quantity * i.priceAverage);
+  }, [productReport?.mcoSummaryItems]);
 
   const resetDownload = useCallback(() => {
     setPercent(0);
@@ -149,10 +160,9 @@ export default function ProductTraffic({}: ProductTrafficProps) {
                 sheetName: 'Tổng quan',
                 details: [
                   {
-                    'Số lượt truy cập': productReport?.totalVisitInDuration,
+                    'Số lượt truy cập': totalVisitInDuration,
                     'Đơn giá dịch vụ': productReport?.avgPricePerItem,
-                    'Phí dịch vụ':
-                      productReport?.totalVisitInDuration * productReport?.avgPricePerItem,
+                    'Phí dịch vụ': totalRevenue,
                   },
                 ],
               },
@@ -167,7 +177,15 @@ export default function ProductTraffic({}: ProductTrafficProps) {
         resetDownload();
       }
     },
-    [fromDate, toDate, user?.fullName, resetDownload, productReport]
+    [
+      user?.fullName,
+      fromDate,
+      toDate,
+      totalVisitInDuration,
+      productReport?.avgPricePerItem,
+      totalRevenue,
+      resetDownload,
+    ]
   );
 
   const triggerDownloadBasicReport = useCallback(() => {
@@ -193,9 +211,9 @@ export default function ProductTraffic({}: ProductTrafficProps) {
           sheetName: 'Tổng quan',
           details: [
             {
-              'Số lượt truy cập': productReport?.totalVisitInDuration,
+              'Số lượt truy cập': totalVisitInDuration,
               'Đơn giá dịch vụ': productReport?.avgPricePerItem,
-              'Phí dịch vụ': productReport?.totalVisitInDuration * productReport?.avgPricePerItem,
+              'Phí dịch vụ': totalRevenue,
             },
           ],
         },
@@ -209,7 +227,16 @@ export default function ProductTraffic({}: ProductTrafficProps) {
       toast.error(error.message);
       resetDownload();
     }
-  }, [fromDate, toDate, user?.fullName, resetDownload, productReport, productTrafficSummary]);
+  }, [
+    user?.fullName,
+    fromDate,
+    toDate,
+    productTrafficSummary,
+    totalVisitInDuration,
+    productReport?.avgPricePerItem,
+    totalRevenue,
+    resetDownload,
+  ]);
 
   const getProductTrafficDownload = useCallback(
     async (pageNumber: number) => {
@@ -317,11 +344,7 @@ export default function ProductTraffic({}: ProductTrafficProps) {
 
       <Grid container spacing={3} mb={4}>
         <Grid item xl={4} lg={4} md={4} xs={12}>
-          <Card2
-            title="Số lượt truy cập"
-            amount={productReport?.totalVisitInDuration}
-            loading={loading}
-          ></Card2>
+          <Card2 title="Số lượt truy cập" amount={totalVisitInDuration} loading={loading}></Card2>
         </Grid>
         <Grid item xl={4} lg={4} md={4} xs={12}>
           <Card2
@@ -334,7 +357,7 @@ export default function ProductTraffic({}: ProductTrafficProps) {
         <Grid item xl={4} lg={4} md={4} xs={12}>
           <Card2
             title="Phí dịch vụ"
-            amount={productReport?.totalVisitInDuration * productReport?.avgPricePerItem}
+            amount={totalRevenue}
             currency
             loading={loading}
             description="* Chưa bao gồm VAT"
@@ -436,19 +459,13 @@ export default function ProductTraffic({}: ProductTrafficProps) {
                 </H3>
 
                 <Span className="print" sx={{ display: 'none' }}>
-                  Số lượt truy cập:{' '}
-                  <strong>{formatNumber(productReport?.totalVisitInDuration)}</strong> lượt
+                  Số lượt truy cập: <strong>{formatNumber(totalVisitInDuration)}</strong> lượt
                 </Span>
                 <Span className="print" sx={{ display: 'none' }}>
                   Đơn giá dịch vụ: <strong>{formatCurrency(productReport?.avgPricePerItem)}</strong>
                 </Span>
                 <Span className="print" sx={{ display: 'none' }}>
-                  Phí dịch vụ:{' '}
-                  <strong>
-                    {formatCurrency(
-                      productReport?.avgPricePerItem * productReport?.totalVisitInDuration
-                    )}
-                  </strong>
+                  Phí dịch vụ: <strong>{formatCurrency(totalRevenue)}</strong>
                 </Span>
                 <TableContainer>
                   <Table>
