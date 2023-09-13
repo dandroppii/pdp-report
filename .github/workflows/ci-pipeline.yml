@@ -6,7 +6,6 @@ on:
 
 env:
   ORGANIZATION: droppii
-  SERVICE_NAME: pdp-report
   ACTIONS_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{
     github.run_id }}
 
